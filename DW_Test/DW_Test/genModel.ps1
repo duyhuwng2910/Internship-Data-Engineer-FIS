@@ -1,0 +1,2 @@
+﻿dotnet ef dbcontext scaffold  "data source=192.168.20.200;initial catalog=DW_TEST;persist security info=True;user id=TTS_Data;password=1234567;multipleactiveresultsets=True;" Microsoft.EntityFrameworkCore.SqlServer -c DataContext  -o Models -f --no-build --use-database-names --json
+$content = Get-Content -Path 'Models\DataContext.cs' -Encoding UTF8
