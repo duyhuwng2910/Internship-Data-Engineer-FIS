@@ -28,9 +28,5 @@
     <PackageReference Include="TrueSight" Version="3.8.10" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\MActualService\" />
-  </ItemGroup>
-
 
 </Project>
