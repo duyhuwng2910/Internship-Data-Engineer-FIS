@@ -12,7 +12,7 @@ namespace DW_Date.Services.MTimeService
     {
         Task<bool> DateInit();
     }
-    public class DateService
+    public class DateService : IDateService
     {
         private DataContext DataContext;
         private DWEContext DWEContext;

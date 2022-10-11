@@ -1,14 +1,10 @@
 ﻿using DW_Test.DWEModels;
 using DW_Test.Models;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Nest;
 using System.Linq;
 using System.Threading.Tasks;
 using TrueSight.Common;
-using Z.BulkOperations;
-using Raw_B1_5_ActualExportReport_Rep = DW_Test.DWEModels.Raw_B1_5_ActualExportReport_Rep;
+using Raw_B1_5_ActualExportReport_Rep = DW_Test.Models.Raw_B1_5_ActualExportReport_Rep;
 
 namespace DW_Test.Services.MActualService
 {
@@ -16,23 +12,24 @@ namespace DW_Test.Services.MActualService
     {
         Task<bool> ActualInit();
     }
-    public class ActualService
+    public class ActualService : IActualService
     {
         private DataContext DataContext;
         private DWEContext DWEContext;
 
-        public ActualService(DataContext dataContext, DWEContext dWEContext)
+        public ActualService(DataContext DataContext, DWEContext DWEContext)
         {
-            DataContext = dataContext;
-            DWEContext = dWEContext;
+            this.DataContext = DataContext;
+            this.DWEContext = DWEContext;
         }
 
         public async Task<bool> ActualInit()
         {
             var Raw_B1_5_RemoteDAOs = await DWEContext.Raw_B1_5_ActualExportReport_Rep.ToListAsync();
+            var Raw_B1_5_LocalDAOs = await DataContext.Raw_B1_5_ActualExportReport_Rep.ToListAsync();
+            await DataContext.BulkDeleteAsync(Raw_B1_5_LocalDAOs);
             var Raw_B1_5_NewDAOs = Raw_B1_5_RemoteDAOs.Select(x => new Raw_B1_5_ActualExportReport_Rep()
             {
-                Id = x.Id,
                 Ma_HH = x.Ma_HH,
                 Ten_HH = x.Ten_HH,
                 Donvitinh = x.Donvitinh,
