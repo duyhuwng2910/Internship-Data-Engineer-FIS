@@ -9,7 +9,7 @@ namespace DW_Test.Services
 {
     public interface ITestService : IServiceScoped
     {
-        Task<List<Dim_Year>> Test();
+        Task<List<DWEModels.Dim_Year>> Test();
     }
     public class TestService : ITestService
     {
@@ -20,7 +20,7 @@ namespace DW_Test.Services
             this.DataContext = DataContext;
             this.DWEContext = DWEContext;
         }
-        public async Task<List<Dim_Year>> Test()
+        public async Task<List<DWEModels.Dim_Year>> Test()
         {
             var Dim_YearDAOs = await DWEContext.Dim_Year.ToListAsync();
             return Dim_YearDAOs;
