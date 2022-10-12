@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using TrueSight.Common;
-using Dim_Date = DW_Test.Models.Dim_Date;
+using Dim_DateDAO = DW_Test.Models.Dim_DateDAO;
 
 namespace DW_Date.Services.MTimeService
 {
@@ -25,7 +25,7 @@ namespace DW_Date.Services.MTimeService
         {
             var Dim_DateRemoteDAOs = await DWEContext.Dim_Date.ToListAsync();
             var Dim_DateNewDAOs = Dim_DateRemoteDAOs
-                .Select(x => new Dim_Date()
+                .Select(x => new Dim_DateDAO()
                 {
                     DateKey = x.DateKey,
                     Date = x.Date,

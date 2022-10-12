@@ -2,30 +2,21 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-// Code scaffolded by EF Core assumes nullable reference types (NRTs) are not used or disabled.
-// If you have enabled NRTs for your project, then un-comment the following line:
-// #nullable disable
-
 namespace DW_Test.Models
 {
     public partial class DataContext : DbContext
     {
-        public DataContext()
+        public virtual DbSet<Dim_DateDAO> Dim_Date { get; set; }
+        public virtual DbSet<Dim_DateMappingDAO> Dim_DateMapping { get; set; }
+        public virtual DbSet<Dim_MonthDAO> Dim_Month { get; set; }
+        public virtual DbSet<Dim_QuarterDAO> Dim_Quarter { get; set; }
+        public virtual DbSet<Dim_WeekDAO> Dim_Week { get; set; }
+        public virtual DbSet<Dim_YearDAO> Dim_Year { get; set; }
+        public virtual DbSet<Raw_B1_5_ActualExportReport_RepDAO> Raw_B1_5_ActualExportReport_Rep { get; set; }
+
+        public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }
-
-        public DataContext(DbContextOptions<DataContext> options)
-            : base(options)
-        {
-        }
-
-        public virtual DbSet<Dim_Date> Dim_Date { get; set; }
-        public virtual DbSet<Dim_DateMapping> Dim_DateMapping { get; set; }
-        public virtual DbSet<Dim_Month> Dim_Month { get; set; }
-        public virtual DbSet<Dim_Quarter> Dim_Quarter { get; set; }
-        public virtual DbSet<Dim_Week> Dim_Week { get; set; }
-        public virtual DbSet<Dim_Year> Dim_Year { get; set; }
-        public virtual DbSet<Raw_B1_5_ActualExportReport_Rep> Raw_B1_5_ActualExportReport_Rep { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -38,7 +29,7 @@ namespace DW_Test.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Dim_Date>(entity =>
+            modelBuilder.Entity<Dim_DateDAO>(entity =>
             {
                 entity.HasKey(e => e.DateKey);
 
@@ -49,7 +40,7 @@ namespace DW_Test.Models
                 entity.Property(e => e.Date).HasColumnType("datetime");
             });
 
-            modelBuilder.Entity<Dim_DateMapping>(entity =>
+            modelBuilder.Entity<Dim_DateMappingDAO>(entity =>
             {
                 entity.HasKey(e => e.DateKey);
 
@@ -60,7 +51,7 @@ namespace DW_Test.Models
                 entity.Property(e => e.Date).HasColumnType("datetime");
             });
 
-            modelBuilder.Entity<Dim_Month>(entity =>
+            modelBuilder.Entity<Dim_MonthDAO>(entity =>
             {
                 entity.HasKey(e => e.MonthKey);
 
@@ -75,7 +66,7 @@ namespace DW_Test.Models
                 entity.Property(e => e.StartAt).HasColumnType("datetime");
             });
 
-            modelBuilder.Entity<Dim_Quarter>(entity =>
+            modelBuilder.Entity<Dim_QuarterDAO>(entity =>
             {
                 entity.HasKey(e => e.QuarterKey);
 
@@ -90,7 +81,7 @@ namespace DW_Test.Models
                 entity.Property(e => e.StartAt).HasColumnType("datetime");
             });
 
-            modelBuilder.Entity<Dim_Week>(entity =>
+            modelBuilder.Entity<Dim_WeekDAO>(entity =>
             {
                 entity.HasKey(e => e.WeekKey);
 
@@ -105,7 +96,7 @@ namespace DW_Test.Models
                 entity.Property(e => e.WeekName).HasMaxLength(50);
             });
 
-            modelBuilder.Entity<Dim_Year>(entity =>
+            modelBuilder.Entity<Dim_YearDAO>(entity =>
             {
                 entity.ToTable("Dim_Year", "SAP");
 
@@ -116,7 +107,7 @@ namespace DW_Test.Models
                 entity.Property(e => e.StartAt).HasColumnType("datetime");
             });
 
-            modelBuilder.Entity<Raw_B1_5_ActualExportReport_Rep>(entity =>
+            modelBuilder.Entity<Raw_B1_5_ActualExportReport_RepDAO>(entity =>
             {
                 entity.ToTable("Raw_B1_5_ActualExportReport_Rep", "SAP");
 

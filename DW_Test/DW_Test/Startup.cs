@@ -19,6 +19,7 @@ using LicenseContext = OfficeOpenXml.LicenseContext;
 
 namespace DW_Test
 {
+    public class MyDesignTimeService : DesignTimeService { }
     public class Startup
     {
         public Startup(IHostEnvironment env)

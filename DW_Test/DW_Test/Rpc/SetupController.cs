@@ -30,9 +30,9 @@ namespace DW_Test.Rpc
         [HttpGet, Route("rpc/dw/setup/test")]
         public async Task<ActionResult> Init()
         {
-            //var a = await TestService.Test();
-            await ActualService.ActualInit();
-            return Ok();
+            var a = await TestService.Test();
+            //await ActualService.ActualInit();
+            return Ok(a);
         }
     }
 }
