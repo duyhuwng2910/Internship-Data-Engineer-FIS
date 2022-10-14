@@ -1,39 +1,57 @@
-﻿using DW_Test.DWEModels;
-using DW_Test.Models;
+﻿using DW_Test.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using TrueSight.Common;
-using Dim_DateDAO = DW_Test.Models.Dim_DateDAO;
 
 namespace DW_Date.Services.MTimeService
 {
     public interface IDateService : IServiceScoped
     {
-        Task<bool> DateInit();
+        Task<bool> BulkMerge();
     }
     public class DateService : IDateService
     {
         private DataContext DataContext;
-        private DWEContext DWEContext;
-        public DateService(DataContext DataContext, DWEContext DWEContext)
+        public DateService(DataContext DataContext)
         {
             this.DataContext = DataContext;
-            this.DWEContext = DWEContext;
         }
-        public async Task<bool> DateInit()
+
+        public async Task<bool> BulkMerge()
         {
-            var Dim_DateRemoteDAOs = await DWEContext.Dim_Date.ToListAsync();
-            var Dim_DateNewDAOs = Dim_DateRemoteDAOs
-                .Select(x => new Dim_DateDAO()
+            var Dim_DateDAOs = await DataContext.Dim_Date.ToListAsync();
+            DateTime start = new DateTime(2018, 01, 01);
+            DateTime end = new DateTime(2025, 12, 31);
+
+            for (var date = start.Date; date <= end.Date; date = date.AddDays(1))
+            {
+                string _Date = date.ToString("mm/dd/yyyy");
+                var day = long.Parse(_Date.Substring(3, 2));
+                var month = long.Parse(_Date.Substring(0, 2));
+                var year = long.Parse(_Date.Substring(6, 4));
+
+                var Dim_DateDAO = Dim_DateDAOs.Where(x =>
+                x.Day == day && x.Month == month && x.Year == year).FirstOrDefault();
+
+                if (Dim_DateDAO == null)
                 {
-                    DateKey = x.DateKey,
-                    Date = x.Date,
-                    Day = x.Day,
-                    Month = x.Month,
-                    Year = x.Year,
-                }).ToList();
-            await DataContext.BulkMergeAsync(Dim_DateNewDAOs);
+                    Dim_DateDAO = new Dim_DateDAO
+                    {
+                        DateKey = year * 10000 + month * 100 + day,
+                        Date = date,
+                        Day = day,
+                        Month = month,
+                        Year = year,
+                    };
+
+                    Dim_DateDAOs.Add(Dim_DateDAO);
+                }
+            }
+
+            await DataContext.BulkMergeAsync(Dim_DateDAOs);
+
             return true;
         }
     }
