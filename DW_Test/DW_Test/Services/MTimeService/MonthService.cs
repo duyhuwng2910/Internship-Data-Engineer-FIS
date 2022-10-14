@@ -26,13 +26,13 @@ namespace DW_Test.Services.MTimeService
 
             DateTime start = new DateTime(2018, 01, 01);
             DateTime end = new DateTime(2025, 12, 31);
+            
             TimeSpan Interval = new TimeSpan(0, 23, 59, 59, 000);
 
             for (var date = start.Date; date <= end.Date; date = date.AddMonths(1))
             {
-                string _Date = date.ToString("mm/dd/yyyy");
-                var month = long.Parse(_Date.Substring(0, 2));
-                var year = long.Parse(_Date.Substring(6, 4));
+                var month = date.Month;
+                var year = date.Year;
 
                 var Dim_MonthDAO = Dim_MonthDAOs.Where(x =>
                 x.Month == month && x.Year == year).FirstOrDefault();

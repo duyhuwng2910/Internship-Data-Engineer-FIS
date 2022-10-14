@@ -27,10 +27,9 @@ namespace DW_Date.Services.MTimeService
 
             for (var date = start.Date; date <= end.Date; date = date.AddDays(1))
             {
-                string _Date = date.ToString("mm/dd/yyyy");
-                var day = long.Parse(_Date.Substring(3, 2));
-                var month = long.Parse(_Date.Substring(0, 2));
-                var year = long.Parse(_Date.Substring(6, 4));
+                var day = date.Day;
+                var month = date.Month;
+                var year = date.Year;
 
                 var Dim_DateDAO = Dim_DateDAOs.Where(x =>
                 x.Day == day && x.Month == month && x.Year == year).FirstOrDefault();
