@@ -8,6 +8,15 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
+    },
+    "Local": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "rpc/dw/swagger",
+      "applicationUrl": "http://localhost:5000",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Local"
+      }
     }
   }
 }
