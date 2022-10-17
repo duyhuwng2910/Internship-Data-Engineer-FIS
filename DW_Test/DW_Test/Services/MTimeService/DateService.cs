@@ -22,8 +22,8 @@ namespace DW_Date.Services.MTimeService
         public async Task<bool> BulkMerge()
         {
             var Dim_DateDAOs = await DataContext.Dim_Date.ToListAsync();
-            DateTime start = new DateTime(2018, 01, 01);
-            DateTime end = new DateTime(2025, 12, 31);
+            DateTime start = new DateTime(2018, 01, 01, 00, 00, 00);
+            DateTime end = new DateTime(2025, 12, 31, 23, 59, 59);
 
             for (var date = start.Date; date <= end.Date; date = date.AddDays(1))
             {

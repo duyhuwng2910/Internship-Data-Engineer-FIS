@@ -13,6 +13,5 @@ namespace DW_Test.Models
         public long? Month { get; set; }
         public long? Quarter { get; set; }
         public long? Year { get; set; }
-        public long? WeekKey { get; set; }
     }
 }

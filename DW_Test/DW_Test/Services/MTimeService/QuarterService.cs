@@ -24,55 +24,65 @@ namespace DW_Test.Services.MTimeService
 
         public async Task<bool> BulkMerge()
         {
-            var Dim_QuarterDAOs = await DataContext.Dim_Quarter.ToListAsync();
-            
-            DateTime start = new DateTime(2018, 01, 01, 00, 00, 00);
-            DateTime end = new DateTime(2025, 31, 12, 23, 59, 59);
-            
-            TimeSpan Interval = new TimeSpan(0, 23, 59, 59, 000);
+            try {
+                var Dim_QuarterDAOs = await DataContext.Dim_Quarter.ToListAsync();
 
-            for (var date = start.Date; date <= end.Date; date = date.AddMonths(3))
-            {
-                var month = date.Month;
-                var quarter = 1;
-                if (month == 1)
-                {
-                    quarter = 1;
-                } else if (month == 4)
-                {
-                    quarter = 2;
-                } else if (month == 7)
-                {
-                    quarter = 3;
-                } else if (month == 10)
-                {
-                    quarter = 4;
-                }
+                DateTime start = new DateTime(2018, 01, 01, 00, 00, 00);
+                DateTime end = new DateTime(2025, 12, 31, 23, 59, 59);
 
-                var year = date.Year;
+                TimeSpan Interval = new TimeSpan(0, 23, 59, 59, 000);
 
-                var Dim_QuarterDAO = Dim_QuarterDAOs.Where(x =>
-                x.Quarter == quarter && x.Year == year).FirstOrDefault();
-
-                if (Dim_QuarterDAO == null)
+                for (var date = start.Date; date <= end.Date; date = date.AddMonths(3))
                 {
-                    Dim_QuarterDAO = new Dim_QuarterDAO
+                    var month = date.Month;
+                    var quarter = 1;
+                    if (month == 1)
                     {
-                        QuarterKey = year * 100 + quarter,
-                        Quarter = quarter,
-                        Year = year,
-                        QuarterName = "Quý " + quarter,
-                        StartAt = date,
-                        EndAt = date.AddMonths(3).AddDays(-1).Add(Interval),
-                    };
+                        quarter = 1;
+                    }
+                    else if (month == 4)
+                    {
+                        quarter = 2;
+                    }
+                    else if (month == 7)
+                    {
+                        quarter = 3;
+                    }
+                    else if (month == 10)
+                    {
+                        quarter = 4;
+                    }
 
-                    Dim_QuarterDAOs.Add(Dim_QuarterDAO);
+                    var year = date.Year;
+
+                    var Dim_QuarterDAO = Dim_QuarterDAOs.Where(x =>
+                    x.Quarter == quarter && x.Year == year).FirstOrDefault();
+
+                    if (Dim_QuarterDAO == null)
+                    {
+                        Dim_QuarterDAO = new Dim_QuarterDAO
+                        {
+                            QuarterKey = year * 100 + quarter,
+                            Quarter = quarter,
+                            Year = year,
+                            QuarterName = "Quý " + quarter,
+                            StartAt = date,
+                            EndAt = date.AddMonths(3).AddDays(-1).Add(Interval),
+                        };
+
+                        Dim_QuarterDAOs.Add(Dim_QuarterDAO);
+                    }
                 }
+
+                await DataContext.BulkMergeAsync(Dim_QuarterDAOs);
+
+                return true;
             }
-
-            await DataContext.BulkMergeAsync(Dim_QuarterDAOs);
-
-            return true;
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            
         }
     }
 }

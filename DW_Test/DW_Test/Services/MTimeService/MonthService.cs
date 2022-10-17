@@ -24,8 +24,8 @@ namespace DW_Test.Services.MTimeService
         {
             var Dim_MonthDAOs = await DataContext.Dim_Month.ToListAsync();
 
-            DateTime start = new DateTime(2018, 01, 01);
-            DateTime end = new DateTime(2025, 12, 31);
+            DateTime start = new DateTime(2018, 01, 01, 00, 00, 00);
+            DateTime end = new DateTime(2025, 12, 31, 23, 59, 59);
             
             TimeSpan Interval = new TimeSpan(0, 23, 59, 59, 000);
 

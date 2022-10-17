@@ -18,7 +18,7 @@ namespace DW_Test.Rpc.item_report
             this.ItemService = ItemService;
         }
 
-        [HttpGet, Route(ItemRoute.init)]
+        [HttpGet, Route(ItemRoute.Init)]
         public async Task<ActionResult> Init()
         {
             var a = await ItemService.ItemInit();

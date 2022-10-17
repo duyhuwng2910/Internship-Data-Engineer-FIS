@@ -4,6 +4,6 @@
     {
         private const string Default = Rpc + Module + "/item-report";
 
-        public const string init = Default + "/init";
+        public const string Init = Default + "/init";
     }
 }
