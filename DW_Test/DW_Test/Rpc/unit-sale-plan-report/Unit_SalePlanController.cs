@@ -18,31 +18,31 @@ namespace DW_Test.Rpc
         // hai thuộc tính private của class
         private DataContext DataContext;
 
-        private Unit_SalePlanService Excel_SaleUnit_SalePlan_RevenueService;
+        private Unit_SalePlanService Unit_SalePlanService;
 
         // hàm khởi tạo constructor
-        public Unit_SalePlanController(DataContext DataContext, Unit_SalePlanService Excel_SaleUnit_SalePlan_RevenueService)
+        public Unit_SalePlanController(DataContext DataContext, Unit_SalePlanService Unit_SalePlanService)
         {
             this.DataContext = DataContext;
-            // this.Excel_SaleUnit_SalePlan_RevenueService = Excel_SaleUnit_SalePlan_RevenueService;
+            this.Unit_SalePlanService = Unit_SalePlanService;
         }
 
         [RequestSizeLimit(100_000_000)]
         [HttpPost, Route(Unit_SalePlanRoute.Init)]
-        public async Task SaleUnit_SalePlanRevenueUpExcel(IFormFile file)
+        public async Task Unit_SalePlanUpExcel(IFormFile file)
         {
             if (!ModelState.IsValid)
                 throw new BindException(ModelState);
             try
             {
-                MemoryStream memoryStream = new MemoryStream();
+                //MemoryStream memoryStream = new MemoryStream();
 
-                file.OpenReadStream().CopyTo(memoryStream);
+                //file.OpenReadStream().CopyTo(memoryStream);
 
-                List<Raw_SaleUnit_SalePlan_RevenueDAO> Raw_SaleUnit_SalePlan_RevenueDAOs = await ReadRevenueExcel(memoryStream);
+                //List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = await ReadRevenueExcel(memoryStream);
 
                 //Hàm này gọi đến service để import dữ liệu vào db
-                //await Excel_SaleUnit_SalePlan_RevenueService.Handle(Raw_SaleUnit_SalePlan_RevenueDAOs);
+                await Unit_SalePlanService.Import(file);
             }
             catch (Exception e)
             {
@@ -53,32 +53,30 @@ namespace DW_Test.Rpc
         /*
          * Hàm bool kiểm tra xem bảng doanh thu có đang bị bỏ trống không
          */
-        public bool CheckNullObjectRevenue(Raw_SaleUnit_SalePlan_RevenueDAO Raw_SaleUnit_SalePlan_RevenueDAO)
+        public bool CheckNullObjectRevenue(Raw_Plan_RevenueDAO Raw_Plan_RevenueDAO)
         {
-            return String.IsNullOrWhiteSpace(Raw_SaleUnit_SalePlan_RevenueDAO.Company)
-                && String.IsNullOrWhiteSpace(Raw_SaleUnit_SalePlan_RevenueDAO.SaleMainBusiness)
-                && String.IsNullOrWhiteSpace(Raw_SaleUnit_SalePlan_RevenueDAO.SaleRoom)
-                && String.IsNullOrWhiteSpace(Raw_SaleUnit_SalePlan_RevenueDAO.SaleChannel)
-                && String.IsNullOrWhiteSpace(Raw_SaleUnit_SalePlan_RevenueDAO.SaleBranch)
-                && String.IsNullOrWhiteSpace(Raw_SaleUnit_SalePlan_RevenueDAO.SaleProvince)
-                && String.IsNullOrWhiteSpace(Raw_SaleUnit_SalePlan_RevenueDAO.CustomerCode)
-                && String.IsNullOrWhiteSpace(Raw_SaleUnit_SalePlan_RevenueDAO.Customer)
-                && Raw_SaleUnit_SalePlan_RevenueDAO.Year == null && Raw_SaleUnit_SalePlan_RevenueDAO.Year == 0;
+            return String.IsNullOrWhiteSpace(Raw_Plan_RevenueDAO.TongCongTy)
+                && String.IsNullOrWhiteSpace(Raw_Plan_RevenueDAO.PhongBanHang)
+                && String.IsNullOrWhiteSpace(Raw_Plan_RevenueDAO.Kenh)
+                && String.IsNullOrWhiteSpace(Raw_Plan_RevenueDAO.VungChiNhanh)
+                && String.IsNullOrWhiteSpace(Raw_Plan_RevenueDAO.Tinh)
+                && String.IsNullOrWhiteSpace(Raw_Plan_RevenueDAO.MaKhachHang)
+                && String.IsNullOrWhiteSpace(Raw_Plan_RevenueDAO.KhachHang)
+                && Raw_Plan_RevenueDAO.Year == null && Raw_Plan_RevenueDAO.Year == 0;
         }
 
         /*
          * Hàm bất đồng bộ đọc vào một file Excel, return về kiểu dữ liệu là một List kiểu Raw_SaleUnit_SalePlan_RevenueDAO
          */
-        private async Task<List<Raw_SaleUnit_SalePlan_RevenueDAO>> ReadRevenueExcel(Stream Stream)
+        private async Task<List<Raw_Plan_RevenueDAO>> ReadRevenueExcel(Stream Stream)
         {
             if (Stream != null)
             {
                 using (var package = new ExcelPackage(Stream))
                 {
-                    List<Raw_SaleUnit_SalePlan_RevenueDAO> Raw_SaleUnit_SalePlan_RevenueDAOs = new List<Raw_SaleUnit_SalePlan_RevenueDAO>();
+                    List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = new List<Raw_Plan_RevenueDAO>();
                     var workbook = package.Workbook;
 
-                    //var worksheet = workbook.Worksheets.FirstOrDefault();
                     // Vòng lặp for cho từng worksheet
                     foreach (var worksheet in workbook.Worksheets)
                     {
@@ -127,42 +125,37 @@ namespace DW_Test.Rpc
                         {
                             try
                             {
-                                Raw_SaleUnit_SalePlan_RevenueDAO Raw_SaleUnit_SalePlan_RevenueDAO = new Raw_SaleUnit_SalePlan_RevenueDAO();
-                                //rowXK.Stt = Stt;
-                                //Raw_SaleUnit_SalePlan_RevenueDAO.Company = DateTime.TryParse(worksheet.Cells[row, Day].Value?.ToString(), out DateTime day) ? day : DateTime.Now;
-                                //Raw_SaleUnit_SalePlan_RevenueDAO.Month = decimal.TryParse(worksheet.Cells[row, Month].Value?.ToString(), out decimal month) ? month : 0;
-                                //Raw_SaleUnit_SalePlan_RevenueDAO.OrderCode = worksheet.Cells[row, OrderCo  de].Value?.ToString();
+                                Raw_Plan_RevenueDAO Raw_Plan_RevenueDAO = new Raw_Plan_RevenueDAO();
 
-                                Raw_SaleUnit_SalePlan_RevenueDAO.Company = worksheet.Cells[row, Company].Value?.ToString();
-                                Raw_SaleUnit_SalePlan_RevenueDAO.SaleRoom = worksheet.Cells[row, SaleRoom].Value?.ToString();
-                                Raw_SaleUnit_SalePlan_RevenueDAO.SaleChannel = worksheet.Cells[row, SaleChannel].Value?.ToString();
-                                Raw_SaleUnit_SalePlan_RevenueDAO.SaleBranch = worksheet.Cells[row, SaleBranch].Value?.ToString();
-                                Raw_SaleUnit_SalePlan_RevenueDAO.SaleProvince = worksheet.Cells[row, SaleProvince].Value?.ToString();
-                                Raw_SaleUnit_SalePlan_RevenueDAO.CustomerCode = worksheet.Cells[row, CustomerCode].Value?.ToString();
-                                Raw_SaleUnit_SalePlan_RevenueDAO.Customer = worksheet.Cells[row, Customer].Value?.ToString();
-                                Raw_SaleUnit_SalePlan_RevenueDAO.YearPlan = decimal.TryParse(worksheet.Cells[row, KHNam].Value?.ToString(), out decimal y) ? y : 0;
-                                Raw_SaleUnit_SalePlan_RevenueDAO.Q01Plan = decimal.TryParse(worksheet.Cells[row, KHQ1].Value?.ToString(), out decimal q01) ? q01 : 0;
-                                Raw_SaleUnit_SalePlan_RevenueDAO.Q02Plan = decimal.TryParse(worksheet.Cells[row, KHQ2].Value?.ToString(), out decimal q02) ? q02 : 0;
-                                Raw_SaleUnit_SalePlan_RevenueDAO.Q03Plan = decimal.TryParse(worksheet.Cells[row, KHQ3].Value?.ToString(), out decimal q03) ? q03 : 0;
-                                Raw_SaleUnit_SalePlan_RevenueDAO.Q04Plan = decimal.TryParse(worksheet.Cells[row, KHQ4].Value?.ToString(), out decimal q04) ? q04 : 0;
-                                Raw_SaleUnit_SalePlan_RevenueDAO.M01Plan = decimal.TryParse(worksheet.Cells[row, T01].Value?.ToString(), out decimal t01) ? t01 : 0;
-                                Raw_SaleUnit_SalePlan_RevenueDAO.M02Plan = decimal.TryParse(worksheet.Cells[row, T02].Value?.ToString(), out decimal t02) ? t02 : 0;
-                                Raw_SaleUnit_SalePlan_RevenueDAO.M03Plan = decimal.TryParse(worksheet.Cells[row, T03].Value?.ToString(), out decimal t03) ? t03 : 0;
-                                Raw_SaleUnit_SalePlan_RevenueDAO.M04Plan = decimal.TryParse(worksheet.Cells[row, T04].Value?.ToString(), out decimal t04) ? t04 : 0;
-                                Raw_SaleUnit_SalePlan_RevenueDAO.M05Plan = decimal.TryParse(worksheet.Cells[row, T05].Value?.ToString(), out decimal t05) ? t05 : 0;
-                                Raw_SaleUnit_SalePlan_RevenueDAO.M06Plan = decimal.TryParse(worksheet.Cells[row, T06].Value?.ToString(), out decimal t06) ? t06 : 0;
-                                Raw_SaleUnit_SalePlan_RevenueDAO.M07Plan = decimal.TryParse(worksheet.Cells[row, T07].Value?.ToString(), out decimal t07) ? t07 : 0;
-                                Raw_SaleUnit_SalePlan_RevenueDAO.M08Plan = decimal.TryParse(worksheet.Cells[row, T08].Value?.ToString(), out decimal t08) ? t08 : 0;
-                                Raw_SaleUnit_SalePlan_RevenueDAO.M09Plan = decimal.TryParse(worksheet.Cells[row, T09].Value?.ToString(), out decimal t09) ? t09 : 0;
-                                Raw_SaleUnit_SalePlan_RevenueDAO.M10Plan = decimal.TryParse(worksheet.Cells[row, T10].Value?.ToString(), out decimal t10) ? t10 : 0;
-                                Raw_SaleUnit_SalePlan_RevenueDAO.M11Plan = decimal.TryParse(worksheet.Cells[row, T11].Value?.ToString(), out decimal t11) ? t11 : 0;
-                                Raw_SaleUnit_SalePlan_RevenueDAO.M12Plan = decimal.TryParse(worksheet.Cells[row, T12].Value?.ToString(), out decimal t12) ? t12 : 0;
-                                Raw_SaleUnit_SalePlan_RevenueDAO.Year = Nam;
+                                Raw_Plan_RevenueDAO.TongCongTy = worksheet.Cells[row, Company].Value?.ToString();
+                                Raw_Plan_RevenueDAO.PhongBanHang = worksheet.Cells[row, SaleRoom].Value?.ToString();
+                                Raw_Plan_RevenueDAO.Kenh = worksheet.Cells[row, SaleChannel].Value?.ToString();
+                                Raw_Plan_RevenueDAO.VungChiNhanh = worksheet.Cells[row, SaleBranch].Value?.ToString();
+                                Raw_Plan_RevenueDAO.Tinh = worksheet.Cells[row, SaleProvince].Value?.ToString();
+                                Raw_Plan_RevenueDAO.MaKhachHang = worksheet.Cells[row, CustomerCode].Value?.ToString();
+                                Raw_Plan_RevenueDAO.KhachHang = worksheet.Cells[row, Customer].Value?.ToString();
+                                Raw_Plan_RevenueDAO.KHNam = decimal.TryParse(worksheet.Cells[row, KHNam].Value?.ToString(), out decimal y) ? y : 0;
+                                Raw_Plan_RevenueDAO.KHQuy1 = decimal.TryParse(worksheet.Cells[row, KHQ1].Value?.ToString(), out decimal q01) ? q01 : 0;
+                                Raw_Plan_RevenueDAO.KHQuy2 = decimal.TryParse(worksheet.Cells[row, KHQ2].Value?.ToString(), out decimal q02) ? q02 : 0;
+                                Raw_Plan_RevenueDAO.KHQuy3 = decimal.TryParse(worksheet.Cells[row, KHQ3].Value?.ToString(), out decimal q03) ? q03 : 0;
+                                Raw_Plan_RevenueDAO.KHQuy4 = decimal.TryParse(worksheet.Cells[row, KHQ4].Value?.ToString(), out decimal q04) ? q04 : 0;
+                                Raw_Plan_RevenueDAO.KHThang1 = decimal.TryParse(worksheet.Cells[row, T01].Value?.ToString(), out decimal t01) ? t01 : 0;
+                                Raw_Plan_RevenueDAO.KHThang2 = decimal.TryParse(worksheet.Cells[row, T02].Value?.ToString(), out decimal t02) ? t02 : 0;
+                                Raw_Plan_RevenueDAO.KHThang3 = decimal.TryParse(worksheet.Cells[row, T03].Value?.ToString(), out decimal t03) ? t03 : 0;
+                                Raw_Plan_RevenueDAO.KHThang4 = decimal.TryParse(worksheet.Cells[row, T04].Value?.ToString(), out decimal t04) ? t04 : 0;
+                                Raw_Plan_RevenueDAO.KHThang5 = decimal.TryParse(worksheet.Cells[row, T05].Value?.ToString(), out decimal t05) ? t05 : 0;
+                                Raw_Plan_RevenueDAO.KHThang6 = decimal.TryParse(worksheet.Cells[row, T06].Value?.ToString(), out decimal t06) ? t06 : 0;
+                                Raw_Plan_RevenueDAO.KHThang7 = decimal.TryParse(worksheet.Cells[row, T07].Value?.ToString(), out decimal t07) ? t07 : 0;
+                                Raw_Plan_RevenueDAO.KHThang8 = decimal.TryParse(worksheet.Cells[row, T08].Value?.ToString(), out decimal t08) ? t08 : 0;
+                                Raw_Plan_RevenueDAO.KHThang9 = decimal.TryParse(worksheet.Cells[row, T09].Value?.ToString(), out decimal t09) ? t09 : 0;
+                                Raw_Plan_RevenueDAO.KHThang10 = decimal.TryParse(worksheet.Cells[row, T10].Value?.ToString(), out decimal t10) ? t10 : 0;
+                                Raw_Plan_RevenueDAO.KHThang11 = decimal.TryParse(worksheet.Cells[row, T11].Value?.ToString(), out decimal t11) ? t11 : 0;
+                                Raw_Plan_RevenueDAO.KHThang12 = decimal.TryParse(worksheet.Cells[row, T12].Value?.ToString(), out decimal t12) ? t12 : 0;
+                                Raw_Plan_RevenueDAO.Year = Nam;
 
-                                if (!CheckNullObjectRevenue(Raw_SaleUnit_SalePlan_RevenueDAO))
+                                if (!CheckNullObjectRevenue(Raw_Plan_RevenueDAO))
                                 {
-                                    Raw_SaleUnit_SalePlan_RevenueDAOs.Add(Raw_SaleUnit_SalePlan_RevenueDAO);
-
+                                    Raw_Plan_RevenueDAOs.Add(Raw_Plan_RevenueDAO);
                                 }
                             }
                             catch (Exception ex)
@@ -174,7 +167,7 @@ namespace DW_Test.Rpc
                     }
 
 
-                    return Raw_SaleUnit_SalePlan_RevenueDAOs;
+                    return Raw_Plan_RevenueDAOs;
                 }
             }
             else
