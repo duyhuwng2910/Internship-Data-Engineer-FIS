@@ -35,14 +35,14 @@ namespace DW_Test.Rpc
                 throw new BindException(ModelState);
             try
             {
-                //MemoryStream memoryStream = new MemoryStream();
+                MemoryStream memoryStream = new MemoryStream();
 
-                //file.OpenReadStream().CopyTo(memoryStream);
+                file.OpenReadStream().CopyTo(memoryStream);
 
-                //List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = await ReadRevenueExcel(memoryStream);
+                List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueRemoteDAOs = await ReadRevenueExcel(memoryStream);
 
                 //Hàm này gọi đến service để import dữ liệu vào db
-                await Unit_SalePlanService.Import(file);
+                await Unit_SalePlanService.Import(Raw_Plan_RevenueRemoteDAOs);
             }
             catch (Exception e)
             {

@@ -41,6 +41,7 @@ namespace DW_Test.Services.MActualService
             
             // Hàm này dùng để xoá các data đang có ở trong local
             await DataContext.BulkDeleteAsync(Raw_B1_5_ActualServiceLocalDAOs);
+
             var Raw_B1_5_NewDAOs = Raw_B1_5_ActualServiceRemoteDAOs.Select(x => new Raw_B1_5_ActualExportReport_RepDAO()
             {
                 Ma_HH = x.Ma_HH,
