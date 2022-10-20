@@ -9,6 +9,7 @@ namespace DW_Test.Rpc.actual_report
     public class ActualController : ControllerBase
     {
         private DataContext DataContext;
+
         private IActualService ActualService;
 
         public ActualController(DataContext DataContext, IActualService ActualService)

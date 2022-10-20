@@ -14,14 +14,17 @@ namespace DW_Test.Rpc.time_report
         private IMonthService MonthService;
         private IQuarterService QuarterService;
         private IYearService YearService;
+        private IDateMappingService DateMappingService;
 
-        public TimeController(DataContext DataContext, IDateService DateService, IMonthService MonthService, IQuarterService QuarterService, IYearService YearService)
+        public TimeController(DataContext DataContext, IDateService DateService, IMonthService MonthService, 
+                                IQuarterService QuarterService, IYearService YearService, IDateMappingService DateMappingService)
         {
             this.DataContext = DataContext;
             this.DateService = DateService;
             this.MonthService = MonthService;
             this.QuarterService = QuarterService;
             this.YearService = YearService;
+            this.DateMappingService = DateMappingService;
         }
 
         [HttpGet, Route(TimeRoute.Init)]
@@ -31,6 +34,7 @@ namespace DW_Test.Rpc.time_report
             await MonthService.BulkMerge(); 
             await QuarterService.BulkMerge();
             await YearService.BulkMerge();
+            await DateMappingService.BulkMerge();
             return Ok();
         }
     }
