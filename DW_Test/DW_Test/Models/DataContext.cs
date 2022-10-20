@@ -8,6 +8,15 @@ namespace DW_Test.Models
     {
         public virtual DbSet<Dim_DateDAO> Dim_Date { get; set; }
         public virtual DbSet<Dim_DateMappingDAO> Dim_DateMapping { get; set; }
+        public virtual DbSet<Dim_ItemDAO> Dim_Item { get; set; }
+        public virtual DbSet<Dim_Item_Group_Level_1DAO> Dim_Item_Group_Level_1 { get; set; }
+        public virtual DbSet<Dim_Item_Group_Level_2DAO> Dim_Item_Group_Level_2 { get; set; }
+        public virtual DbSet<Dim_Item_Group_Level_3DAO> Dim_Item_Group_Level_3 { get; set; }
+        public virtual DbSet<Dim_Item_Led_Smart_GroupDAO> Dim_Item_Led_Smart_Group { get; set; }
+        public virtual DbSet<Dim_Item_Main_GroupDAO> Dim_Item_Main_Group { get; set; }
+        public virtual DbSet<Dim_Item_New_Item_GroupDAO> Dim_Item_New_Item_Group { get; set; }
+        public virtual DbSet<Dim_Item_Type_GroupDAO> Dim_Item_Type_Group { get; set; }
+        public virtual DbSet<Dim_Item_VAT_GroupDAO> Dim_Item_VAT_Group { get; set; }
         public virtual DbSet<Dim_MonthDAO> Dim_Month { get; set; }
         public virtual DbSet<Dim_QuarterDAO> Dim_Quarter { get; set; }
         public virtual DbSet<Dim_YearDAO> Dim_Year { get; set; }
@@ -15,6 +24,7 @@ namespace DW_Test.Models
         public virtual DbSet<Raw_Customer_RepDAO> Raw_Customer_Rep { get; set; }
         public virtual DbSet<Raw_Item_RepDAO> Raw_Item_Rep { get; set; }
         public virtual DbSet<Raw_Plan_RevenueDAO> Raw_Plan_Revenue { get; set; }
+        public virtual DbSet<Raw_Product_GroupDAO> Raw_Product_Group { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -25,7 +35,7 @@ namespace DW_Test.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("data source=NGUYENDUYHUNG;initial catalog=DW_TEST;Integrated Security=True");
+                optionsBuilder.UseSqlServer("data source=192.168.20.200;initial catalog=DW_TEST;persist security info=True;user id=TTS_Data;password=1234567;multipleactiveresultsets=True;");
             }
         }
 
@@ -51,6 +61,89 @@ namespace DW_Test.Models
                 entity.Property(e => e.DateKey).ValueGeneratedNever();
 
                 entity.Property(e => e.Date).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<Dim_ItemDAO>(entity =>
+            {
+                entity.HasKey(e => e.ItemId);
+
+                entity.ToTable("Dim_Item", "SAP");
+
+                entity.Property(e => e.ItemCode).HasMaxLength(500);
+
+                entity.Property(e => e.ItemName).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Dim_Item_Group_Level_1DAO>(entity =>
+            {
+                entity.HasKey(e => e.ItemGroupLevel1Id);
+
+                entity.ToTable("Dim_Item_Group_Level_1", "SAP");
+
+                entity.Property(e => e.ItemGroupLevel1Name).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Dim_Item_Group_Level_2DAO>(entity =>
+            {
+                entity.HasKey(e => e.ItemGroupLevel2Id);
+
+                entity.ToTable("Dim_Item_Group_Level_2", "SAP");
+
+                entity.Property(e => e.ItemGroupLevel2Name).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Dim_Item_Group_Level_3DAO>(entity =>
+            {
+                entity.HasKey(e => e.ItemGroupLevel3Id);
+
+                entity.ToTable("Dim_Item_Group_Level_3", "SAP");
+
+                entity.Property(e => e.ItemGroupLevel3Name).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Dim_Item_Led_Smart_GroupDAO>(entity =>
+            {
+                entity.HasKey(e => e.ItemLedSmartGroupId);
+
+                entity.ToTable("Dim_Item_Led_Smart_Group", "SAP");
+
+                entity.Property(e => e.ItemLedSmartGroupName).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Dim_Item_Main_GroupDAO>(entity =>
+            {
+                entity.HasKey(e => e.ItemMainGroupId);
+
+                entity.ToTable("Dim_Item_Main_Group", "SAP");
+
+                entity.Property(e => e.ItemMainGroupName).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Dim_Item_New_Item_GroupDAO>(entity =>
+            {
+                entity.HasKey(e => e.ItemNewItemGroupId);
+
+                entity.ToTable("Dim_Item_New_Item_Group", "SAP");
+
+                entity.Property(e => e.ItemNewItemGroupName).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Dim_Item_Type_GroupDAO>(entity =>
+            {
+                entity.HasKey(e => e.ItemTypeId);
+
+                entity.ToTable("Dim_Item_Type_Group", "SAP");
+
+                entity.Property(e => e.ItemTypeName).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Dim_Item_VAT_GroupDAO>(entity =>
+            {
+                entity.HasKey(e => e.ItemVATGroupId);
+
+                entity.ToTable("Dim_Item_VAT_Group", "SAP");
+
+                entity.Property(e => e.ItemVATGroupName).HasMaxLength(500);
             });
 
             modelBuilder.Entity<Dim_MonthDAO>(entity =>
@@ -210,6 +303,37 @@ namespace DW_Test.Models
                 entity.Property(e => e.TongCongTy).HasMaxLength(500);
 
                 entity.Property(e => e.VungChiNhanh).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Raw_Product_GroupDAO>(entity =>
+            {
+                entity.ToTable("Raw_Product_Group", "SAP");
+
+                entity.Property(e => e.GTGT_Endate).HasColumnType("datetime");
+
+                entity.Property(e => e.GTGT_StartDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ItemCode).HasMaxLength(500);
+
+                entity.Property(e => e.ItemName).HasMaxLength(500);
+
+                entity.Property(e => e.Loai_MHang_KH).HasMaxLength(500);
+
+                entity.Property(e => e.M_EndDate).HasColumnType("datetime");
+
+                entity.Property(e => e.M_StartDate).HasColumnType("datetime");
+
+                entity.Property(e => e.NhomC1).HasMaxLength(500);
+
+                entity.Property(e => e.NhomC2).HasMaxLength(500);
+
+                entity.Property(e => e.NhomC3).HasMaxLength(500);
+
+                entity.Property(e => e.Nhom_LEDSMRT1).HasMaxLength(500);
+
+                entity.Property(e => e.Nhom_SMARTDONLE).HasMaxLength(500);
+
+                entity.Property(e => e.Nhomchinh_KH).HasMaxLength(500);
             });
 
             OnModelCreatingPartial(modelBuilder);
