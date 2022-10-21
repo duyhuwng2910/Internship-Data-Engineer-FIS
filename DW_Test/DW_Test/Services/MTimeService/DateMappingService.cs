@@ -23,7 +23,7 @@ namespace DW_Test.Services.MTimeService
 
         public async Task<bool> BulkMerge()
         {
-            var Dim_DateMappingDAOs = await DataContext.Dim_DateMapping.ToListAsync();
+            var Dim_Date_MappingDAOs = await DataContext.Dim_Date_Mapping.ToListAsync();
             DateTime start = new DateTime(2018, 01, 01, 00, 00, 00);
             DateTime end = new DateTime(2025, 12, 31, 23, 59, 59);
 
@@ -51,12 +51,12 @@ namespace DW_Test.Services.MTimeService
                     quarter = 4;
                 }
 
-                var Dim_DateMappingDAO = Dim_DateMappingDAOs.Where(x =>
+                var Dim_Date_MappingDAO = Dim_Date_MappingDAOs.Where(x =>
                 x.Day == day && x.Month == month && x.Year == year).FirstOrDefault();
 
-                if (Dim_DateMappingDAO == null)
+                if (Dim_Date_MappingDAO == null)
                 {
-                    Dim_DateMappingDAO = new Dim_DateMappingDAO
+                    Dim_Date_MappingDAO = new Dim_Date_MappingDAO
                     {
                         DateKey = year * 10000 + month * 100 + day,
                         MonthKey = year * 100 + month,
@@ -68,11 +68,11 @@ namespace DW_Test.Services.MTimeService
                         Year = year,
                     };
 
-                    Dim_DateMappingDAOs.Add(Dim_DateMappingDAO);
+                    Dim_Date_MappingDAOs.Add(Dim_Date_MappingDAO);
                 }
             }
 
-            await DataContext.BulkMergeAsync(Dim_DateMappingDAOs);
+            await DataContext.BulkMergeAsync(Dim_Date_MappingDAOs);
 
             return true;
         }

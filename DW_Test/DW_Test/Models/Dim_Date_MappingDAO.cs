@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DW_Test.Models
 {
-    public partial class Dim_DateMappingDAO
+    public partial class Dim_Date_MappingDAO
     {
         public long DateKey { get; set; }
         public long? MonthKey { get; set; }

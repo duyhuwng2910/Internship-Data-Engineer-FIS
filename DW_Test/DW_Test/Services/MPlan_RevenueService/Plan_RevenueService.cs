@@ -1,29 +1,20 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.ExtendedProperties;
-using DocumentFormat.OpenXml.Spreadsheet;
-using DW_Test.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Build.Utilities;
+﻿using DW_Test.Models;
 using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using TrueSight.Common;
-using Task = System.Threading.Tasks.Task;
 
-namespace DW_Test.Services.MUnit_SalePlanService
+namespace DW_Test.Services.MPlan_RevenueService
 {
-    public interface IUnit_SalePlanService : IServiceScoped
+    public interface IPlan_RevenueService : IServiceScoped
     {
         Task<bool> Import(List<Raw_Plan_RevenueDAO> Raw_PlanRevenueRemoteDAOs);
     }
-    public class Unit_SalePlanService : IUnit_SalePlanService
+    public class Plan_RevenueService : IPlan_RevenueService
     {
         private DataContext DataContext;
 
-        public Unit_SalePlanService(DataContext DataContext)
+        public Plan_RevenueService(DataContext DataContext)
         {
             this.DataContext = DataContext;
         }

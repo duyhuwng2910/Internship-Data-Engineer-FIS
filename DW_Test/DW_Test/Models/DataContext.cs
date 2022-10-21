@@ -6,20 +6,47 @@ namespace DW_Test.Models
 {
     public partial class DataContext : DbContext
     {
+        public virtual DbSet<Dim_CountryDAO> Dim_Country { get; set; }
+        public virtual DbSet<Dim_CountyDAO> Dim_County { get; set; }
+        public virtual DbSet<Dim_CustomerDAO> Dim_Customer { get; set; }
         public virtual DbSet<Dim_DateDAO> Dim_Date { get; set; }
-        public virtual DbSet<Dim_DateMappingDAO> Dim_DateMapping { get; set; }
+        public virtual DbSet<Dim_Date_MappingDAO> Dim_Date_Mapping { get; set; }
         public virtual DbSet<Dim_ItemDAO> Dim_Item { get; set; }
         public virtual DbSet<Dim_Item_Group_Level_1DAO> Dim_Item_Group_Level_1 { get; set; }
         public virtual DbSet<Dim_Item_Group_Level_2DAO> Dim_Item_Group_Level_2 { get; set; }
         public virtual DbSet<Dim_Item_Group_Level_3DAO> Dim_Item_Group_Level_3 { get; set; }
         public virtual DbSet<Dim_Item_Led_Smart_GroupDAO> Dim_Item_Led_Smart_Group { get; set; }
         public virtual DbSet<Dim_Item_Main_GroupDAO> Dim_Item_Main_Group { get; set; }
+        public virtual DbSet<Dim_Item_MappingDAO> Dim_Item_Mapping { get; set; }
         public virtual DbSet<Dim_Item_New_Item_GroupDAO> Dim_Item_New_Item_Group { get; set; }
         public virtual DbSet<Dim_Item_Type_GroupDAO> Dim_Item_Type_Group { get; set; }
         public virtual DbSet<Dim_Item_VAT_GroupDAO> Dim_Item_VAT_Group { get; set; }
         public virtual DbSet<Dim_MonthDAO> Dim_Month { get; set; }
         public virtual DbSet<Dim_QuarterDAO> Dim_Quarter { get; set; }
+        public virtual DbSet<Dim_Sale_BranchDAO> Dim_Sale_Branch { get; set; }
+        public virtual DbSet<Dim_Sale_ChannelDAO> Dim_Sale_Channel { get; set; }
+        public virtual DbSet<Dim_Sale_RoomDAO> Dim_Sale_Room { get; set; }
+        public virtual DbSet<Dim_Unit_MappingDAO> Dim_Unit_Mapping { get; set; }
         public virtual DbSet<Dim_YearDAO> Dim_Year { get; set; }
+        public virtual DbSet<Fact_Company_Month_PlanDAO> Fact_Company_Month_Plan { get; set; }
+        public virtual DbSet<Fact_Company_Quarter_PlanDAO> Fact_Company_Quarter_Plan { get; set; }
+        public virtual DbSet<Fact_Company_Year_PlanDAO> Fact_Company_Year_Plan { get; set; }
+        public virtual DbSet<Fact_County_Month_PlanDAO> Fact_County_Month_Plan { get; set; }
+        public virtual DbSet<Fact_County_Quarter_PlanDAO> Fact_County_Quarter_Plan { get; set; }
+        public virtual DbSet<Fact_County_Year_PlanDAO> Fact_County_Year_Plan { get; set; }
+        public virtual DbSet<Fact_Customer_Month_PlanDAO> Fact_Customer_Month_Plan { get; set; }
+        public virtual DbSet<Fact_Customer_Quarter_PlanDAO> Fact_Customer_Quarter_Plan { get; set; }
+        public virtual DbSet<Fact_Customer_Year_PlanDAO> Fact_Customer_Year_Plan { get; set; }
+        public virtual DbSet<Fact_Report_RevenueDAO> Fact_Report_Revenue { get; set; }
+        public virtual DbSet<Fact_Sale_Branch_Month_PlanDAO> Fact_Sale_Branch_Month_Plan { get; set; }
+        public virtual DbSet<Fact_Sale_Branch_Quarter_PlanDAO> Fact_Sale_Branch_Quarter_Plan { get; set; }
+        public virtual DbSet<Fact_Sale_Branch_Year_PlanDAO> Fact_Sale_Branch_Year_Plan { get; set; }
+        public virtual DbSet<Fact_Sale_Channel_Month_PlanDAO> Fact_Sale_Channel_Month_Plan { get; set; }
+        public virtual DbSet<Fact_Sale_Channel_Quarter_PlanDAO> Fact_Sale_Channel_Quarter_Plan { get; set; }
+        public virtual DbSet<Fact_Sale_Channel_Year_PlanDAO> Fact_Sale_Channel_Year_Plan { get; set; }
+        public virtual DbSet<Fact_Sale_Room_Month_PlanDAO> Fact_Sale_Room_Month_Plan { get; set; }
+        public virtual DbSet<Fact_Sale_Room_Quarter_PlanDAO> Fact_Sale_Room_Quarter_Plan { get; set; }
+        public virtual DbSet<Fact_Sale_Room_Year_PlanDAO> Fact_Sale_Room_Year_Plan { get; set; }
         public virtual DbSet<Raw_B1_5_ActualExportReport_RepDAO> Raw_B1_5_ActualExportReport_Rep { get; set; }
         public virtual DbSet<Raw_Customer_RepDAO> Raw_Customer_Rep { get; set; }
         public virtual DbSet<Raw_Item_RepDAO> Raw_Item_Rep { get; set; }
@@ -41,6 +68,39 @@ namespace DW_Test.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Dim_CountryDAO>(entity =>
+            {
+                entity.HasKey(e => e.CountryId);
+
+                entity.ToTable("Dim_Country", "SAP");
+
+                entity.Property(e => e.CountryCode).HasMaxLength(500);
+
+                entity.Property(e => e.CountryName).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Dim_CountyDAO>(entity =>
+            {
+                entity.HasKey(e => e.CountyId);
+
+                entity.ToTable("Dim_County", "SAP");
+
+                entity.Property(e => e.CountyCode).HasMaxLength(500);
+
+                entity.Property(e => e.CountyName).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Dim_CustomerDAO>(entity =>
+            {
+                entity.HasKey(e => e.CustomerId);
+
+                entity.ToTable("Dim_Customer", "SAP");
+
+                entity.Property(e => e.CustomerCode).HasMaxLength(500);
+
+                entity.Property(e => e.CustomerName).HasMaxLength(500);
+            });
+
             modelBuilder.Entity<Dim_DateDAO>(entity =>
             {
                 entity.HasKey(e => e.DateKey);
@@ -52,11 +112,12 @@ namespace DW_Test.Models
                 entity.Property(e => e.Date).HasColumnType("datetime");
             });
 
-            modelBuilder.Entity<Dim_DateMappingDAO>(entity =>
+            modelBuilder.Entity<Dim_Date_MappingDAO>(entity =>
             {
-                entity.HasKey(e => e.DateKey);
+                entity.HasKey(e => e.DateKey)
+                    .HasName("PK_Dim_DateMapping");
 
-                entity.ToTable("Dim_DateMapping", "SAP");
+                entity.ToTable("Dim_Date_Mapping", "SAP");
 
                 entity.Property(e => e.DateKey).ValueGeneratedNever();
 
@@ -119,6 +180,13 @@ namespace DW_Test.Models
                 entity.Property(e => e.ItemMainGroupName).HasMaxLength(500);
             });
 
+            modelBuilder.Entity<Dim_Item_MappingDAO>(entity =>
+            {
+                entity.HasKey(e => e.Item_MappingId);
+
+                entity.ToTable("Dim_Item_Mapping", "SAP");
+            });
+
             modelBuilder.Entity<Dim_Item_New_Item_GroupDAO>(entity =>
             {
                 entity.HasKey(e => e.ItemNewItemGroupId);
@@ -176,6 +244,49 @@ namespace DW_Test.Models
                 entity.Property(e => e.StartAt).HasColumnType("datetime");
             });
 
+            modelBuilder.Entity<Dim_Sale_BranchDAO>(entity =>
+            {
+                entity.HasKey(e => e.SaleBranchId)
+                    .HasName("PK_Dim_SaleBranch");
+
+                entity.ToTable("Dim_Sale_Branch", "SAP");
+
+                entity.Property(e => e.SaleBranchCode).HasMaxLength(500);
+
+                entity.Property(e => e.SaleBranchName).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Dim_Sale_ChannelDAO>(entity =>
+            {
+                entity.HasKey(e => e.SaleChannelId)
+                    .HasName("PK_Dim_SaleChannel");
+
+                entity.ToTable("Dim_Sale_Channel", "SAP");
+
+                entity.Property(e => e.SaleChannelCode).HasMaxLength(500);
+
+                entity.Property(e => e.SaleChannelName).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Dim_Sale_RoomDAO>(entity =>
+            {
+                entity.HasKey(e => e.SaleRoomId)
+                    .HasName("PK_Dim_SaleRoom");
+
+                entity.ToTable("Dim_Sale_Room", "SAP");
+
+                entity.Property(e => e.SaleRoomCode).HasMaxLength(500);
+
+                entity.Property(e => e.SaleRoomName).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Dim_Unit_MappingDAO>(entity =>
+            {
+                entity.HasKey(e => e.Unit_MappingId);
+
+                entity.ToTable("Dim_Unit_Mapping", "SAP");
+            });
+
             modelBuilder.Entity<Dim_YearDAO>(entity =>
             {
                 entity.ToTable("Dim_Year", "SAP");
@@ -185,6 +296,139 @@ namespace DW_Test.Models
                 entity.Property(e => e.EndAt).HasColumnType("datetime");
 
                 entity.Property(e => e.StartAt).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<Fact_Company_Month_PlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_Company_Month_Plan", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_Company_Quarter_PlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_Company_Quarter_Plan", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_Company_Year_PlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_Company_Year_Plan", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_County_Month_PlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_County_Month_Plan", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_County_Quarter_PlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_County_Quarter_Plan", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_County_Year_PlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_County_Year_Plan", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_Customer_Month_PlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_Customer_Month_Plan", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_Customer_Quarter_PlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_Customer_Quarter_Plan", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_Customer_Year_PlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_Customer_Year_Plan", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_Report_RevenueDAO>(entity =>
+            {
+                entity.ToTable("Fact_Report_Revenue", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_Sale_Branch_Month_PlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_Sale_Branch_Month_Plan", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_Sale_Branch_Quarter_PlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_Sale_Branch_Quarter_Plan", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_Sale_Branch_Year_PlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_Sale_Branch_Year_Plan", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_Sale_Channel_Month_PlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_Sale_Channel_Month_Plan", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_Sale_Channel_Quarter_PlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_Sale_Channel_Quarter_Plan", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_Sale_Channel_Year_PlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_Sale_Channel_Year_Plan", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_Sale_Room_Month_PlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_Sale_Room_Month_Plan", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_Sale_Room_Quarter_PlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_Sale_Room_Quarter_Plan", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_Sale_Room_Year_PlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_Sale_Room_Year_Plan", "SAP");
+
+                entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
             });
 
             modelBuilder.Entity<Raw_B1_5_ActualExportReport_RepDAO>(entity =>
@@ -309,7 +553,7 @@ namespace DW_Test.Models
             {
                 entity.ToTable("Raw_Product_Group", "SAP");
 
-                entity.Property(e => e.GTGT_Endate).HasColumnType("datetime");
+                entity.Property(e => e.GTGT_EndDate).HasColumnType("datetime");
 
                 entity.Property(e => e.GTGT_StartDate).HasColumnType("datetime");
 

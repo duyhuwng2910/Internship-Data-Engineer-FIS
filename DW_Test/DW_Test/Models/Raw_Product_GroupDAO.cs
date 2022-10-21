@@ -18,6 +18,6 @@ namespace DW_Test.Models
         public DateTime? M_StartDate { get; set; }
         public DateTime? M_EndDate { get; set; }
         public DateTime? GTGT_StartDate { get; set; }
-        public DateTime? GTGT_Endate { get; set; }
+        public DateTime? GTGT_EndDate { get; set; }
     }
 }

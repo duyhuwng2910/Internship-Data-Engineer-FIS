@@ -1,6 +1,6 @@
 ﻿using DW_Test.Models;
 using DW_Test.Rpc.unit_sale_plan_report;
-using DW_Test.Services.MUnit_SalePlanService;
+using DW_Test.Services.MPlan_RevenueService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
@@ -11,22 +11,22 @@ using System.Threading.Tasks;
 
 namespace DW_Test.Rpc
 {
-    public class Unit_SalePlanController : ControllerBase
+    public class Plan_RevenueController : ControllerBase
     {
         // hai thuộc tính private của class
         private DataContext DataContext;
 
-        private IUnit_SalePlanService Unit_SalePlanService;
+        private IPlan_RevenueService Plan_RevenueService;
 
         // hàm khởi tạo constructor
-        public Unit_SalePlanController(DataContext DataContext, IUnit_SalePlanService Unit_SalePlanService)
+        public Plan_RevenueController(DataContext DataContext, IPlan_RevenueService Plan_RevenueService)
         {
             this.DataContext = DataContext;
-            this.Unit_SalePlanService = Unit_SalePlanService;
+            this.Plan_RevenueService = Plan_RevenueService;
         }
 
-        [HttpPost, Route(Unit_SalePlanRoute.Init)]
-        public async Task<ActionResult> Unit_SalePlanUpExcel(IFormFile file)
+        [HttpPost, Route(Plan_RevenueRoute.Init)]
+        public async Task<ActionResult> Plan_RevenueUpExcel(IFormFile file)
         {
             List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueRemoteDAOs = new List<Raw_Plan_RevenueDAO>();
 
@@ -123,7 +123,7 @@ namespace DW_Test.Rpc
                             }
                         }
                     }
-                    await Unit_SalePlanService.Import(Raw_Plan_RevenueRemoteDAOs);
+                    await Plan_RevenueService.Import(Raw_Plan_RevenueRemoteDAOs);
 
                     return Ok();
                 }
