@@ -7,6 +7,5 @@ namespace DW_Test.Models
     {
         public long SaleChannelId { get; set; }
         public string SaleChannelName { get; set; }
-        public string SaleChannelCode { get; set; }
     }
 }

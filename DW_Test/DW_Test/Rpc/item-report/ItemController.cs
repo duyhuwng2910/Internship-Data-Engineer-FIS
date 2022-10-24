@@ -22,8 +22,16 @@ namespace DW_Test.Rpc.item_report
         public async Task<ActionResult> Init()
         {
             var a = await ItemService.ItemInit();
-            //await ItemService.ItemInit();
+
             return Ok(a);
+        }
+
+        [HttpGet, Route(ItemRoute.Transform)]
+        public async Task<ActionResult> Transform()
+        {
+            await ItemService.ItemTransform();
+
+            return Ok();
         }
     }
 }

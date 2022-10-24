@@ -21,9 +21,17 @@ namespace DW_Test.Rpc.customer_report
         [HttpGet, Route(CustomerRoute.Init)]
         public async Task<ActionResult> Init()
         {
-            var a = await CustomerService.CustomerInit();
-            //await CustomerService.CustomerInit();
-            return Ok(a);
+            await CustomerService.CustomerInit();
+
+            return Ok();
+        }
+
+        [HttpGet, Route(CustomerRoute.Transform)]
+        public async Task<ActionResult> Transform()
+        {
+            await CustomerService.CustomerTransform();
+
+            return Ok();
         }
     }
 }

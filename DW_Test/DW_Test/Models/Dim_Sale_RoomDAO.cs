@@ -7,6 +7,5 @@ namespace DW_Test.Models
     {
         public long SaleRoomId { get; set; }
         public string SaleRoomName { get; set; }
-        public string SaleRoomCode { get; set; }
     }
 }

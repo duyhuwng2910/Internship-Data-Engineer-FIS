@@ -62,7 +62,7 @@ namespace DW_Test.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("data source=192.168.20.200;initial catalog=DW_TEST;persist security info=True;user id=TTS_Data;password=1234567;multipleactiveresultsets=True;");
+                optionsBuilder.UseSqlServer("data source=NGUYENDUYHUNG;initial catalog=DW_TEST;Integrated Security=True");
             }
         }
 
@@ -251,8 +251,6 @@ namespace DW_Test.Models
 
                 entity.ToTable("Dim_Sale_Branch", "SAP");
 
-                entity.Property(e => e.SaleBranchCode).HasMaxLength(500);
-
                 entity.Property(e => e.SaleBranchName).HasMaxLength(500);
             });
 
@@ -263,8 +261,6 @@ namespace DW_Test.Models
 
                 entity.ToTable("Dim_Sale_Channel", "SAP");
 
-                entity.Property(e => e.SaleChannelCode).HasMaxLength(500);
-
                 entity.Property(e => e.SaleChannelName).HasMaxLength(500);
             });
 
@@ -274,8 +270,6 @@ namespace DW_Test.Models
                     .HasName("PK_Dim_SaleRoom");
 
                 entity.ToTable("Dim_Sale_Room", "SAP");
-
-                entity.Property(e => e.SaleRoomCode).HasMaxLength(500);
 
                 entity.Property(e => e.SaleRoomName).HasMaxLength(500);
             });

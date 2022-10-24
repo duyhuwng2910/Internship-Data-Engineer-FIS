@@ -7,6 +7,5 @@ namespace DW_Test.Models
     {
         public long SaleBranchId { get; set; }
         public string SaleBranchName { get; set; }
-        public string SaleBranchCode { get; set; }
     }
 }

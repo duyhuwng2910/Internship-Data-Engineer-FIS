@@ -13,7 +13,7 @@ namespace DW_Test.Services.MItemService
     public interface IItemService : IServiceScoped
     {
         Task<bool> ItemInit();
-        Task Transform();
+        Task ItemTransform();
     }
     public class ItemService : IItemService
     {
@@ -42,7 +42,7 @@ namespace DW_Test.Services.MItemService
 
             return true;
         }
-        public async Task Transform()
+        public async Task ItemTransform()
         {
             await Build_Dim_Item();
         }
@@ -54,7 +54,6 @@ namespace DW_Test.Services.MItemService
             foreach (var Raw_Item_RepDAO in Raw_Item_RepDAOs)
             {
                 Dim_ItemDAO Dim_Item = Dim_ItemDAOs.Where(x => x.ItemCode == Raw_Item_RepDAO.ItemCode).FirstOrDefault();
-
 
                 if (Dim_Item == null)
                 {
@@ -70,9 +69,8 @@ namespace DW_Test.Services.MItemService
                     Dim_Item.ItemName = Raw_Item_RepDAO.ItemName;
                 }
             }
-
-
             await DataContext.BulkMergeAsync(Dim_ItemDAOs);
+            
             return true;
         }
     }
