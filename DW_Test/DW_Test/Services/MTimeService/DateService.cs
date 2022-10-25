@@ -44,8 +44,14 @@ namespace DW_Date.Services.MTimeService
                         Month = month,
                         Year = year,
                     };
-
                     Dim_DateDAOs.Add(Dim_DateDAO);
+                }
+                else
+                {
+                    Dim_DateDAO.Date = date;
+                    Dim_DateDAO.Day = day;
+                    Dim_DateDAO.Month = month;
+                    Dim_DateDAO.Year = year;
                 }
             }
 

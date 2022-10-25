@@ -21,9 +21,17 @@ namespace DW_Test.Rpc.actual_report
         [HttpGet, Route(ActualRoute.Init)]
         public async Task<ActionResult> Init()
         {
-            var a = await ActualService.ActualInit();
-            //await ActualService.ActualInit();
-            return Ok(a);
+            await ActualService.ActualInit();
+
+            return Ok();
+        }
+
+        [HttpGet, Route(ActualRoute.Transform)]
+        public async Task<ActionResult> Transform()
+        {
+            await ActualService.Transform();
+
+            return Ok();
         }
     }
 }

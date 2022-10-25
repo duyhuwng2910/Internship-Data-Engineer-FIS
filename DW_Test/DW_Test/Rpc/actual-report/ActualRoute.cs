@@ -5,5 +5,7 @@
         private const string Default = Rpc + Module + "/actual-report";
 
         public const string Init = Default + "/init";
+
+        public const string Transform = Default + "/transform";
     }
 }

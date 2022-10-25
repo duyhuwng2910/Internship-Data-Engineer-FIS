@@ -7,34 +7,35 @@ using TrueSight.Common;
 
 namespace DW_Test.Services.MPlan_RevenueService
 {
-    public interface ISale_Channel_PlanService : IServiceScoped
+    public interface ISaleRoom_PlanService : IServiceScoped
     {
-        Task Sale_Channel_PlanTransform();
+        Task SaleRoom_PlanTransform();
     }
-    public class Sale_Channel_PlanService : ISale_Channel_PlanService
+    public class SaleRoom_PlanService : ISaleRoom_PlanService
     {
         private DataContext DataContext;
 
-        public Sale_Channel_PlanService(DataContext DataContext)
+        public SaleRoom_PlanService(DataContext DataContext)
         {
             this.DataContext = DataContext;
         }
 
-        public async Task Sale_Channel_PlanTransform()
+        public async Task SaleRoom_PlanTransform()
         {
-            await Build_Fact_Sale_Channel_Month_Plan();
-            await Build_Fact_Sale_Channel_Quarter_Plan();
-            await Build_Fact_Sale_Channel_Year_Plan();
+            await Build_Fact_SaleRoom_Month_Plan();
+            await Build_Fact_SaleRoom_Quarter_Plan();
+            await Build_Fact_SaleRoom_Year_Plan();
         }
 
-        // Tạo bảng Fact_Sale_Channel_Month_Plan
-        public async Task<bool> Build_Fact_Sale_Channel_Month_Plan()
+        // Tạo bảng Fact_SaleRoom_Month_Plan
+        private async Task<bool> Build_Fact_SaleRoom_Month_Plan()
         {
-            List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = await DataContext.Raw_Plan_Revenue.Where(x => x.Kenh != null).ToListAsync();
+            List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = await DataContext.Raw_Plan_Revenue
+                .Where(x => !string.IsNullOrEmpty(x.PhongBanHang)).ToListAsync();
 
-            List<Fact_Sale_Channel_Month_PlanDAO> Fact_Sale_Channel_Month_PlanDAOs = new List<Fact_Sale_Channel_Month_PlanDAO>();
+            List<Fact_SaleRoom_Month_PlanDAO> Fact_SaleRoom_Month_PlanDAOs = new List<Fact_SaleRoom_Month_PlanDAO>();
 
-            List<Dim_Sale_ChannelDAO> Dim_Sale_ChannelDAOs = await DataContext.Dim_Sale_Channel.ToListAsync();
+            List<Dim_SaleRoomDAO> Dim_SaleRoomDAOs = await DataContext.Dim_SaleRoom.ToListAsync();
 
             List<Dim_MonthDAO> Dim_MonthDAOs = await DataContext.Dim_Month.ToListAsync();
 
@@ -44,7 +45,7 @@ namespace DW_Test.Services.MPlan_RevenueService
 
                 decimal revenue = 0;
 
-                var Sale_ChannelID = Dim_Sale_ChannelDAOs.Where(x => x.SaleChannelName == Raw_Plan_RevenueDAO.Kenh).Select(x => x.SaleChannelId).FirstOrDefault();
+                var SaleRoomID = Dim_SaleRoomDAOs.Where(x => x.SaleRoomName == Raw_Plan_RevenueDAO.PhongBanHang).Select(x => x.SaleRoomId).FirstOrDefault();
 
                 for (int i = 1; i <= 12; i++)
                 {
@@ -87,33 +88,34 @@ namespace DW_Test.Services.MPlan_RevenueService
                             revenue = Raw_Plan_RevenueDAO.KHThang12;
                             break;
                     }
-                    if (Sale_ChannelID != 0)
+                    if (SaleRoomID != 0)
                     {
-                        Fact_Sale_Channel_Month_PlanDAO Fact_Sale_Channel_Month_Plan = new Fact_Sale_Channel_Month_PlanDAO()
+                        Fact_SaleRoom_Month_PlanDAO Fact_SaleRoom_Month_Plan = new Fact_SaleRoom_Month_PlanDAO()
                         {
-                            SaleChannelId = Sale_ChannelID,
+                            SaleRoomId = SaleRoomID,
                             MonthKey = Dim_MonthDAOs.Where(x => x.Year == year && x.Month == i).Select(x => x.MonthKey).FirstOrDefault(),
                             Revenue = revenue,
                         };
-                        Fact_Sale_Channel_Month_PlanDAOs.Add(Fact_Sale_Channel_Month_Plan);
+                        Fact_SaleRoom_Month_PlanDAOs.Add(Fact_SaleRoom_Month_Plan);
                     }
                 }
             }
-            await DataContext.Fact_Sale_Channel_Month_Plan.DeleteFromQueryAsync();
+            await DataContext.Fact_SaleRoom_Month_Plan.DeleteFromQueryAsync();
 
-            await DataContext.BulkMergeAsync(Fact_Sale_Channel_Month_PlanDAOs);
+            await DataContext.BulkMergeAsync(Fact_SaleRoom_Month_PlanDAOs);
 
             return true;
         }
 
-        // Tạo bảng Fact_Sale_Channel_Quarter_Plan
-        public async Task<bool> Build_Fact_Sale_Channel_Quarter_Plan()
+        // Tạo bảng Fact_SaleRoom_Quarter_Plan
+        private async Task<bool> Build_Fact_SaleRoom_Quarter_Plan()
         {
-            List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = await DataContext.Raw_Plan_Revenue.Where(x => x.Kenh != null).ToListAsync();
+            List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = await DataContext.Raw_Plan_Revenue
+                .Where(x => !string.IsNullOrEmpty(x.PhongBanHang)).ToListAsync();
 
-            List<Fact_Sale_Channel_Quarter_PlanDAO> Fact_Sale_Channel_Quarter_PlanDAOs = new List<Fact_Sale_Channel_Quarter_PlanDAO>();
+            List<Fact_SaleRoom_Quarter_PlanDAO> Fact_SaleRoom_Quarter_PlanDAOs = new List<Fact_SaleRoom_Quarter_PlanDAO>();
 
-            List<Dim_Sale_ChannelDAO> Dim_Sale_ChannelDAOs = await DataContext.Dim_Sale_Channel.ToListAsync();
+            List<Dim_SaleRoomDAO> Dim_SaleRoomDAOs = await DataContext.Dim_SaleRoom.ToListAsync();
 
             List<Dim_QuarterDAO> Dim_QuarterDAOs = await DataContext.Dim_Quarter.ToListAsync();
 
@@ -123,7 +125,7 @@ namespace DW_Test.Services.MPlan_RevenueService
 
                 decimal revenue = 0;
 
-                var Sale_ChannelID = Dim_Sale_ChannelDAOs.Where(x => x.SaleChannelName == Raw_Plan_RevenueDAO.Kenh).Select(x => x.SaleChannelId).FirstOrDefault();
+                var SaleRoomID = Dim_SaleRoomDAOs.Where(x => x.SaleRoomName == Raw_Plan_RevenueDAO.PhongBanHang).Select(x => x.SaleRoomId).FirstOrDefault();
 
                 for (int i = 1; i <= 4; i++)
                 {
@@ -142,33 +144,34 @@ namespace DW_Test.Services.MPlan_RevenueService
                             revenue = Raw_Plan_RevenueDAO.KHQuy4;
                             break;
                     }
-                    if (Sale_ChannelID != 0)
+                    if (SaleRoomID != 0)
                     {
-                        Fact_Sale_Channel_Quarter_PlanDAO Fact_Sale_Channel_Quarter_Plan = new Fact_Sale_Channel_Quarter_PlanDAO()
+                        Fact_SaleRoom_Quarter_PlanDAO Fact_SaleRoom_Quarter_Plan = new Fact_SaleRoom_Quarter_PlanDAO()
                         {
-                            SaleChannelId = Sale_ChannelID,
+                            SaleRoomId = SaleRoomID,
                             QuarterKey = Dim_QuarterDAOs.Where(x => x.Year == year && x.Quarter == i).Select(x => x.QuarterKey).FirstOrDefault(),
                             Revenue = revenue,
                         };
-                        Fact_Sale_Channel_Quarter_PlanDAOs.Add(Fact_Sale_Channel_Quarter_Plan);
+                        Fact_SaleRoom_Quarter_PlanDAOs.Add(Fact_SaleRoom_Quarter_Plan);
                     }
                 }
             }
-            await DataContext.Fact_Sale_Channel_Quarter_Plan.DeleteFromQueryAsync();
+            await DataContext.Fact_SaleRoom_Quarter_Plan.DeleteFromQueryAsync();
 
-            await DataContext.BulkMergeAsync(Fact_Sale_Channel_Quarter_PlanDAOs);
+            await DataContext.BulkMergeAsync(Fact_SaleRoom_Quarter_PlanDAOs);
 
             return true;
         }
 
-        // Tạo bảng Fact_Sale_Channel_Year_Plan
-        public async Task<bool> Build_Fact_Sale_Channel_Year_Plan()
+        // Tạo bảng Fact_SaleRoom_Year_Plan
+        private async Task<bool> Build_Fact_SaleRoom_Year_Plan()
         {
-            List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = await DataContext.Raw_Plan_Revenue.Where(x => x.Kenh != null).ToListAsync();
+            List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = await DataContext.Raw_Plan_Revenue
+                .Where(x => !string.IsNullOrEmpty(x.PhongBanHang)).ToListAsync();
 
-            List<Fact_Sale_Channel_Year_PlanDAO> Fact_Sale_Channel_Year_PlanDAOs = new List<Fact_Sale_Channel_Year_PlanDAO>();
+            List<Fact_SaleRoom_Year_PlanDAO> Fact_SaleRoom_Year_PlanDAOs = new List<Fact_SaleRoom_Year_PlanDAO>();
 
-            List<Dim_Sale_ChannelDAO> Dim_Sale_ChannelDAOs = await DataContext.Dim_Sale_Channel.ToListAsync();
+            List<Dim_SaleRoomDAO> Dim_SaleRoomDAOs = await DataContext.Dim_SaleRoom.ToListAsync();
 
             List<Dim_YearDAO> Dim_YearDAOs = await DataContext.Dim_Year.ToListAsync();
 
@@ -178,22 +181,22 @@ namespace DW_Test.Services.MPlan_RevenueService
 
                 decimal revenue = Raw_Plan_RevenueDAO.KHNam;
 
-                var Sale_ChannelID = Dim_Sale_ChannelDAOs.Where(x => x.SaleChannelName == Raw_Plan_RevenueDAO.Kenh).Select(x => x.SaleChannelId).FirstOrDefault();
+                var SaleRoomID = Dim_SaleRoomDAOs.Where(x => x.SaleRoomName == Raw_Plan_RevenueDAO.PhongBanHang).Select(x => x.SaleRoomId).FirstOrDefault();
 
-                if (Sale_ChannelID != 0)
+                if (SaleRoomID != 0)
                 {
-                    Fact_Sale_Channel_Year_PlanDAO Fact_Sale_Channel_Year_Plan = new Fact_Sale_Channel_Year_PlanDAO
+                    Fact_SaleRoom_Year_PlanDAO Fact_SaleRoom_Year_Plan = new Fact_SaleRoom_Year_PlanDAO
                     {
-                        SaleChannelId = Sale_ChannelID,
-                        Year = Dim_YearDAOs.Where(x => x.Year == year).Select(x => x.Year).FirstOrDefault(),
+                        SaleRoomId = SaleRoomID,
+                        Year = Dim_YearDAOs.Where(x => x.Year == year).Select(x => x.Yearkey).FirstOrDefault(),
                         Revenue = revenue,
                     };
-                    Fact_Sale_Channel_Year_PlanDAOs.Add(Fact_Sale_Channel_Year_Plan);
+                    Fact_SaleRoom_Year_PlanDAOs.Add(Fact_SaleRoom_Year_Plan);
                 }
             }
-            await DataContext.Fact_Sale_Channel_Year_Plan.DeleteFromQueryAsync();
+            await DataContext.Fact_SaleRoom_Year_Plan.DeleteFromQueryAsync();
 
-            await DataContext.BulkMergeAsync(Fact_Sale_Channel_Year_PlanDAOs);
+            await DataContext.BulkMergeAsync(Fact_SaleRoom_Year_PlanDAOs);
 
             return true;
         }

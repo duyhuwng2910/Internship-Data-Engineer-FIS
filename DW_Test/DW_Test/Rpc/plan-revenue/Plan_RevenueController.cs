@@ -24,26 +24,26 @@ namespace DW_Test.Rpc
 
         private ICounty_PlanService County_PlanService;
 
-        private ISale_Room_PlanService Sale_Room_PlanService;
+        private ISaleRoom_PlanService SaleRoom_PlanService;
 
-        private ISale_Channel_PlanService Sale_Channel_PlanService;
+        private ISaleChannel_PlanService SaleChannel_PlanService;
 
-        private ISale_Branch_PlanService Sale_Branch_PlanService;
+        private ISaleBranch_PlanService SaleBranch_PlanService;
 
         // hàm khởi tạo constructor
         public Plan_RevenueController(DataContext DataContext, IPlan_RevenueService Plan_RevenueService
             , ICompany_PlanService Company_PlanService, ICustomer_PlanService Customer_PlanService
-            , ICounty_PlanService County_PlanService, ISale_Room_PlanService Sale_Room_PlanService
-            , ISale_Channel_PlanService Sale_Channel_PlanService, ISale_Branch_PlanService Sale_Branch_Plan_Service)
+            , ICounty_PlanService County_PlanService, ISaleRoom_PlanService SaleRoom_PlanService
+            , ISaleChannel_PlanService SaleChannel_PlanService, ISaleBranch_PlanService SaleBranch_Plan_Service)
         {
             this.DataContext = DataContext;
             this.Plan_RevenueService = Plan_RevenueService;
             this.Company_PlanService = Company_PlanService;
             this.Customer_PlanService = Customer_PlanService;
             this.County_PlanService = County_PlanService;
-            this.Sale_Room_PlanService = Sale_Room_PlanService;
-            this.Sale_Channel_PlanService = Sale_Channel_PlanService;
-            this.Sale_Branch_PlanService = Sale_Branch_Plan_Service;
+            this.SaleRoom_PlanService = SaleRoom_PlanService;
+            this.SaleChannel_PlanService = SaleChannel_PlanService;
+            this.SaleBranch_PlanService = SaleBranch_Plan_Service;
         }
 
         [HttpPost, Route(Plan_RevenueRoute.Init)]
@@ -175,11 +175,11 @@ namespace DW_Test.Rpc
 
             await County_PlanService.County_PlanTransform();
 
-            await Sale_Room_PlanService.Sale_Room_PlanTransform();
+            await SaleRoom_PlanService.SaleRoom_PlanTransform();
 
-            await Sale_Channel_PlanService.Sale_Channel_PlanTransform();
+            await SaleChannel_PlanService.SaleChannel_PlanTransform();
 
-            await Sale_Branch_PlanService.Sale_Branch_PlanTransform();
+            await SaleBranch_PlanService.SaleBranch_PlanTransform();
 
             return Ok();
         }

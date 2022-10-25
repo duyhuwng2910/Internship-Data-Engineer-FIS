@@ -37,21 +37,25 @@ namespace DW_Test.Services.MTimeService
 
                 var Dim_YearDAO = Dim_YearDAOs.Where(x =>
                 x.Year == year).FirstOrDefault();
-                
+
                 if (Dim_YearDAO == null)
                 {
                     Dim_YearDAO = new Dim_YearDAO
                     {
-                        Id = year,
+                        Yearkey = year,
                         Year = year,
                         StartAt = date,
                         EndAt = date.AddYears(1).AddDays(-1).Add(Interval),
                     };
-
                     Dim_YearDAOs.Add(Dim_YearDAO);
                 }
+                else
+                {
+                    Dim_YearDAO.Year = year;
+                    Dim_YearDAO.StartAt = date;
+                    Dim_YearDAO.EndAt = date.AddYears(1).AddDays(-1).Add(Interval);
+                }
             }
-
             await DataContext.BulkMergeAsync(Dim_YearDAOs);
 
             return true;

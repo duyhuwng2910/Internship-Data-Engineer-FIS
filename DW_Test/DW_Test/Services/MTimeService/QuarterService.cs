@@ -69,11 +69,17 @@ namespace DW_Test.Services.MTimeService
                             StartAt = date,
                             EndAt = date.AddMonths(3).AddDays(-1).Add(Interval),
                         };
-
                         Dim_QuarterDAOs.Add(Dim_QuarterDAO);
                     }
+                    else
+                    {
+                        Dim_QuarterDAO.Quarter = quarter;
+                        Dim_QuarterDAO.Year = year;
+                        Dim_QuarterDAO.QuarterName = "Quý " + quarter;
+                        Dim_QuarterDAO.StartAt = date;
+                        Dim_QuarterDAO.EndAt = date.AddMonths(3).AddDays(-1).Add(Interval);
+                    }
                 }
-
                 await DataContext.BulkMergeAsync(Dim_QuarterDAOs);
 
                 return true;

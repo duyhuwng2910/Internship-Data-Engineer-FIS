@@ -29,10 +29,10 @@ namespace DW_Test.Services.MPlan_RevenueService
         }
 
         // Tạo bảng Fact_Company_Month_Plan
-        public async Task<bool> Build_Fact_Company_Month_Plan()
+        private async Task<bool> Build_Fact_Company_Month_Plan()
         {
             List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = await DataContext.Raw_Plan_Revenue
-                .Where(x => x.MaKhachHang != null).ToListAsync();
+                .Where(x => !string.IsNullOrEmpty(x.TongCongTy)).ToListAsync();
 
             List<Fact_Company_Month_PlanDAO> Fact_Company_Month_PlanDAOs = new List<Fact_Company_Month_PlanDAO>();
 
@@ -103,9 +103,10 @@ namespace DW_Test.Services.MPlan_RevenueService
         }
 
         // Tạo bảng Fact_Company_Quarter_Plan
-        public async Task<bool> Build_Fact_Company_Quarter_Plan()
+        private async Task<bool> Build_Fact_Company_Quarter_Plan()
         {
-            List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = await DataContext.Raw_Plan_Revenue.Where(x => x.TongCongTy != null).ToListAsync();
+            List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = await DataContext.Raw_Plan_Revenue
+                .Where(x => !string.IsNullOrEmpty(x.TongCongTy)).ToListAsync();
 
             List<Fact_Company_Quarter_PlanDAO> Fact_Company_Quarter_PlanDAOs = new List<Fact_Company_Quarter_PlanDAO>();
 
@@ -150,9 +151,10 @@ namespace DW_Test.Services.MPlan_RevenueService
         }
 
         // Tạo bảng Fact_Company_Year_Plan
-        public async Task<bool> Build_Fact_Company_Year_Plan()
+        private async Task<bool> Build_Fact_Company_Year_Plan()
         {
-            List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = await DataContext.Raw_Plan_Revenue.Where(x => x.TongCongTy != null).ToListAsync();
+            List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = await DataContext.Raw_Plan_Revenue
+                .Where(x => !string.IsNullOrEmpty(x.TongCongTy)).ToListAsync();
 
             List<Fact_Company_Year_PlanDAO> Fact_Company_Year_PlanDAOs = new List<Fact_Company_Year_PlanDAO>();
 
@@ -166,7 +168,7 @@ namespace DW_Test.Services.MPlan_RevenueService
 
                 Fact_Company_Year_PlanDAO Fact_Company_Year_Plan = new Fact_Company_Year_PlanDAO
                 {
-                    Year = Dim_YearDAOs.Where(x => x.Year == year).Select(x => x.Year).FirstOrDefault(),
+                    Year = Dim_YearDAOs.Where(x => x.Year == year).Select(x => x.Yearkey).FirstOrDefault(),
                     Revenue = revenue,
                 };
                 Fact_Company_Year_PlanDAOs.Add(Fact_Company_Year_Plan);

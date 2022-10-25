@@ -46,9 +46,12 @@ namespace DW_Test.Services.MItemService
         {
             await Build_Dim_Item();
         }
+
+        // Tạo bảng dim_item
         private async Task<bool> Build_Dim_Item()
         {
-            List<Raw_Item_RepDAO> Raw_Item_RepDAOs = await DataContext.Raw_Item_Rep.ToListAsync();
+            List<Raw_Item_RepDAO> Raw_Item_RepDAOs = await DataContext.Raw_Item_Rep
+                .Where(x => !string.IsNullOrEmpty(x.ItemCode)).ToListAsync();
             List<Dim_ItemDAO> Dim_ItemDAOs = await DataContext.Dim_Item.ToListAsync();
 
             foreach (var Raw_Item_RepDAO in Raw_Item_RepDAOs)
@@ -57,14 +60,14 @@ namespace DW_Test.Services.MItemService
 
                 if (Dim_Item == null)
                 {
-                    var Dim_ItemDAO = new Dim_ItemDAO
+                    Dim_Item = new Dim_ItemDAO
                     {
                         ItemName = Raw_Item_RepDAO.ItemName,
                         ItemCode = Raw_Item_RepDAO.ItemCode,
                     };
-                    Dim_ItemDAOs.Add(Dim_ItemDAO);
+                    Dim_ItemDAOs.Add(Dim_Item);
                 }
-                else if (Dim_Item != null)
+                else
                 {
                     Dim_Item.ItemName = Raw_Item_RepDAO.ItemName;
                 }

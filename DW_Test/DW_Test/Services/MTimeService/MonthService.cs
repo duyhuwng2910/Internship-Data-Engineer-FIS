@@ -1,4 +1,5 @@
 ﻿using DW_Test.Models;
+using Microsoft.CodeAnalysis.Differencing;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -48,8 +49,15 @@ namespace DW_Test.Services.MTimeService
                         StartAt = date,
                         EndAt = date.AddMonths(1).AddDays(-1).Add(Interval),
                     };
-
                     Dim_MonthDAOs.Add(Dim_MonthDAO);
+                } 
+                else
+                {
+                    Dim_MonthDAO.Month = month;
+                    Dim_MonthDAO.Year = year;
+                    Dim_MonthDAO.MonthName = "Tháng " + month;
+                    Dim_MonthDAO.StartAt = date;
+                    Dim_MonthDAO.EndAt = date.AddMonths(1).AddDays(-1).Add(Interval);
                 }
             }
 

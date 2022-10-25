@@ -1,6 +1,7 @@
 ﻿using DW_Test.DWEModels;
 using DW_Test.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +9,9 @@ using TrueSight.Common;
 using Dim_CountryDAO = DW_Test.Models.Dim_CountryDAO;
 using Dim_CountyDAO = DW_Test.Models.Dim_CountyDAO;
 using Dim_CustomerDAO = DW_Test.Models.Dim_CustomerDAO;
+using Dim_SaleBranchDAO = DW_Test.Models.Dim_SaleBranchDAO;
+using Dim_SaleChannelDAO = DW_Test.Models.Dim_SaleChannelDAO;
+using Dim_SaleRoomDAO = DW_Test.Models.Dim_SaleRoomDAO;
 using Raw_Customer_RepDAO = DW_Test.Models.Raw_Customer_RepDAO;
 
 namespace DW_Test.Services.MCustomerService
@@ -72,7 +76,7 @@ namespace DW_Test.Services.MCustomerService
         private async Task<bool> Build_Dim_Customer()
         {
             // List kiểu Raw_Customer_RepDAO gán cho bảng ở trong DataContext local
-            List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep.ToListAsync();
+            List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep.Where(x => !string.IsNullOrEmpty(x.CustomerCode)).ToListAsync();
 
             // List kiểu Dim_CustomerDAO gán cho bảng dim trong local
             List<Dim_CustomerDAO> Dim_CustomerDAOs = await DataContext.Dim_Customer.ToListAsync();
@@ -106,7 +110,8 @@ namespace DW_Test.Services.MCustomerService
         // Tạo bảng dim_country
         private async Task<bool> Build_Dim_Country()
         {
-            List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep.ToListAsync();
+            List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep
+                .Where(x => string.IsNullOrEmpty(x.CountryCode)).ToListAsync();
 
             List<Dim_CountryDAO> Dim_CountryDAOs = await DataContext.Dim_Country.ToListAsync();
 
@@ -136,7 +141,8 @@ namespace DW_Test.Services.MCustomerService
         // Tạo bảng dim_county
         private async Task<bool> Build_Dim_County()
         {
-            List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep.ToListAsync();
+            List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep
+                .Where(x => !string.IsNullOrEmpty(x.CountyCode)).ToListAsync();
 
             List<Dim_CountyDAO> Dim_CountyDAOs = await DataContext.Dim_County.ToListAsync();
 
@@ -166,17 +172,18 @@ namespace DW_Test.Services.MCustomerService
         // Tạo bảng dim_sale_branch
         private async Task<bool> Build_Dim_Sale_Branch()
         {
-            List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep.ToListAsync();
+            List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep
+                .Where(x => !string.IsNullOrEmpty(x.SaleBranch)).ToListAsync();
 
-            List<Dim_Sale_BranchDAO> Dim_Sale_BranchDAOs = await DataContext.Dim_Sale_Branch.ToListAsync();
+            List<Dim_SaleBranchDAO> Dim_Sale_BranchDAOs = await DataContext.Dim_SaleBranch.ToListAsync();
 
             foreach (var Raw_Customer_RepDAO in Raw_Customer_RepDAOs)
             {
-                Dim_Sale_BranchDAO Dim_Sale_Branch = Dim_Sale_BranchDAOs.Where(x => x.SaleBranchName == Raw_Customer_RepDAO.SaleBranch).FirstOrDefault();
+                Dim_SaleBranchDAO Dim_Sale_Branch = Dim_Sale_BranchDAOs.Where(x => x.SaleBranchName == Raw_Customer_RepDAO.SaleBranch).FirstOrDefault();
 
                 if (Dim_Sale_Branch == null)
                 {
-                    Dim_Sale_Branch = new Dim_Sale_BranchDAO
+                    Dim_Sale_Branch = new Dim_SaleBranchDAO
                     {
                         SaleBranchName = Raw_Customer_RepDAO.SaleBranch,
                     };
@@ -191,17 +198,18 @@ namespace DW_Test.Services.MCustomerService
         // Tạo bảng dim_sale_channel
         private async Task<bool> Build_Dim_Sale_Channel()
         {
-            List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep.ToListAsync();
+            List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep
+                .Where(x => !string.IsNullOrEmpty(x.SaleChannel)).ToListAsync();
 
-            List<Dim_Sale_ChannelDAO> Dim_Sale_ChannelDAOs = await DataContext.Dim_Sale_Channel.ToListAsync();
+            List<Dim_SaleChannelDAO> Dim_Sale_ChannelDAOs = await DataContext.Dim_SaleChannel.ToListAsync();
 
             foreach (var Raw_Customer_RepDAO in Raw_Customer_RepDAOs)
             {
-                Dim_Sale_ChannelDAO Dim_Sale_Channel = Dim_Sale_ChannelDAOs.Where(x => x.SaleChannelName == Raw_Customer_RepDAO.SaleChannel).FirstOrDefault();
+                Dim_SaleChannelDAO Dim_Sale_Channel = Dim_Sale_ChannelDAOs.Where(x => x.SaleChannelName == Raw_Customer_RepDAO.SaleChannel).FirstOrDefault();
 
                 if (Dim_Sale_Channel == null)
                 {
-                    Dim_Sale_Channel = new Dim_Sale_ChannelDAO
+                    Dim_Sale_Channel = new Dim_SaleChannelDAO
                     {
                         SaleChannelName = Raw_Customer_RepDAO.SaleChannel,
                     };
@@ -216,17 +224,18 @@ namespace DW_Test.Services.MCustomerService
         // Tạo bảng dim_sale_room
         public async Task<bool> Build_Dim_Sale_Room()
         {
-            List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep.ToListAsync();
+            List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep
+                .Where(x => !string.IsNullOrEmpty(x.SaleRoom)).ToListAsync();
 
-            List<Dim_Sale_RoomDAO> Dim_Sale_RoomDAOs = await DataContext.Dim_Sale_Room.ToListAsync();
+            List<Dim_SaleRoomDAO> Dim_Sale_RoomDAOs = await DataContext.Dim_SaleRoom.ToListAsync();
 
             foreach (var Raw_Customer_RepDAO in Raw_Customer_RepDAOs)
             {
-                Dim_Sale_RoomDAO Dim_Sale_Room = Dim_Sale_RoomDAOs.Where(x => x.SaleRoomName == Raw_Customer_RepDAO.SaleRoom).FirstOrDefault();
+                Dim_SaleRoomDAO Dim_Sale_Room = Dim_Sale_RoomDAOs.Where(x => x.SaleRoomName == Raw_Customer_RepDAO.SaleRoom).FirstOrDefault();
 
                 if (Dim_Sale_Room == null)
                 {
-                    Dim_Sale_Room = new Dim_Sale_RoomDAO
+                    Dim_Sale_Room = new Dim_SaleRoomDAO
                     {
                         SaleRoomName = Raw_Customer_RepDAO.SaleRoom,
                     };
@@ -244,10 +253,10 @@ namespace DW_Test.Services.MCustomerService
             var Countries = await DataContext.Dim_Country.ToListAsync();
             var Counties = await DataContext.Dim_County.ToListAsync();
             var Customers = await DataContext.Dim_Customer.ToListAsync();
-            var SaleBranchs = await DataContext.Dim_Sale_Branch.ToListAsync();
-            var SaleChannels = await DataContext.Dim_Sale_Channel.ToListAsync();
-            var SaleRooms = await DataContext.Dim_Sale_Room.ToListAsync();
-            var Dim_Unit_MappingDAOs = await DataContext.Dim_Unit_Mapping.ToListAsync();
+            var SaleBranchs = await DataContext.Dim_SaleBranch.ToListAsync();
+            var SaleChannels = await DataContext.Dim_SaleChannel.ToListAsync();
+            var SaleRooms = await DataContext.Dim_SaleRoom.ToListAsync();
+            var Dim_Unit_MappingDAOs = await DataContext.Dim_UnitMapping.ToListAsync();
             
             List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep.ToListAsync();
 
@@ -264,14 +273,14 @@ namespace DW_Test.Services.MCustomerService
                 var SaleRoom = SaleRooms.Where(x => x.SaleRoomName == Raw_Customer_RepDAO.SaleRoom).FirstOrDefault();
 
                 // Kiểm tra xem trong bảng dim mapping đã có dữ liệu từ các bảng dim chưa
-                Dim_Unit_MappingDAO Dim_Unit_Mapping = Dim_Unit_MappingDAOs
+                Dim_UnitMappingDAO Dim_Unit_Mapping = Dim_Unit_MappingDAOs
                     .Where(x => x.CustomerId == Customer?.CustomerId).FirstOrDefault();
 
                 // Nếu chưa thì tạo mới, trước đó tiến hành ánh xạ giữa 6 bảng dim và bảng raw để nối và tạo ra các dòng
                 // trong bảng dim mapping
                 if (Dim_Unit_Mapping == null)
                 {
-                    Dim_Unit_Mapping = new Dim_Unit_MappingDAO
+                    Dim_Unit_Mapping = new Dim_UnitMappingDAO
                     {
                         CountyId = County?.CountyId ?? null,
                         CountryId = Country?.CountryId ?? null,

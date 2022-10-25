@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DW_Test.Models
 {
-    public partial class Dim_Unit_MappingDAO
+    public partial class Dim_UnitMappingDAO
     {
         public long Unit_MappingId { get; set; }
         public long? CountryId { get; set; }

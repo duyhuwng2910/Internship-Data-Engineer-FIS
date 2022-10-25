@@ -7,20 +7,20 @@ using TrueSight.Common;
 
 namespace DW_Test.Services.MPlan_RevenueService
 {
-    public interface ISale_Branch_PlanService : IServiceScoped
+    public interface ISaleBranch_PlanService : IServiceScoped
     {
-        Task Sale_Branch_PlanTransform();
+        Task SaleBranch_PlanTransform();
     }
-    public class Sale_Branch_PlanService : ISale_Branch_PlanService
+    public class SaleBranch_PlanService : ISaleBranch_PlanService
     {
         private DataContext DataContext;
 
-        public Sale_Branch_PlanService(DataContext DataContext)
+        public SaleBranch_PlanService(DataContext DataContext)
         {
             this.DataContext = DataContext;
         }
 
-        public async Task Sale_Branch_PlanTransform()
+        public async Task SaleBranch_PlanTransform()
         {
             await Build_Fact_Sale_Branch_Month_Plan();
             await Build_Fact_Sale_Branch_Quarter_Plan();
@@ -28,14 +28,14 @@ namespace DW_Test.Services.MPlan_RevenueService
         }
 
         // Tạo bảng Fact_Sale_Branch_Month_Plan
-        public async Task<bool> Build_Fact_Sale_Branch_Month_Plan()
+        private async Task<bool> Build_Fact_Sale_Branch_Month_Plan()
         {
             List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = await DataContext.Raw_Plan_Revenue
-                .Where(x => x.VungChiNhanh != null).ToListAsync();
+                .Where(x => !string.IsNullOrEmpty(x.VungChiNhanh)).ToListAsync();
 
-            List<Fact_Sale_Branch_Month_PlanDAO> Fact_Sale_Branch_Month_PlanDAOs = new List<Fact_Sale_Branch_Month_PlanDAO>();
+            List<Fact_SaleBranch_Month_PlanDAO> Fact_Sale_Branch_Month_PlanDAOs = new List<Fact_SaleBranch_Month_PlanDAO>();
 
-            List<Dim_Sale_BranchDAO> Dim_Sale_BranchDAOs = await DataContext.Dim_Sale_Branch.ToListAsync();
+            List<Dim_SaleBranchDAO> Dim_Sale_BranchDAOs = await DataContext.Dim_SaleBranch.ToListAsync();
 
             List<Dim_MonthDAO> Dim_MonthDAOs = await DataContext.Dim_Month.ToListAsync();
 
@@ -90,7 +90,7 @@ namespace DW_Test.Services.MPlan_RevenueService
                     }
                     if (Sale_BranchID != 0)
                     {
-                        Fact_Sale_Branch_Month_PlanDAO Fact_Sale_Branch_Month_Plan = new Fact_Sale_Branch_Month_PlanDAO()
+                        Fact_SaleBranch_Month_PlanDAO Fact_Sale_Branch_Month_Plan = new Fact_SaleBranch_Month_PlanDAO()
                         {
                             SaleBranchId = Sale_BranchID,
                             MonthKey = Dim_MonthDAOs.Where(x => x.Year == year && x.Month == i).Select(x => x.MonthKey).FirstOrDefault(),
@@ -100,7 +100,7 @@ namespace DW_Test.Services.MPlan_RevenueService
                     }
                 }
             }
-            await DataContext.Fact_Sale_Branch_Month_Plan.DeleteFromQueryAsync();
+            await DataContext.Fact_SaleBranch_Month_Plan.DeleteFromQueryAsync();
 
             await DataContext.BulkMergeAsync(Fact_Sale_Branch_Month_PlanDAOs);
 
@@ -108,13 +108,14 @@ namespace DW_Test.Services.MPlan_RevenueService
         }
 
         // Tạo bảng Fact_Sale_Branch_Quarter_Plan
-        public async Task<bool> Build_Fact_Sale_Branch_Quarter_Plan()
+        private async Task<bool> Build_Fact_Sale_Branch_Quarter_Plan()
         {
-            List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = await DataContext.Raw_Plan_Revenue.Where(x => x.VungChiNhanh != null).ToListAsync();
+            List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = await DataContext.Raw_Plan_Revenue
+                .Where(x => !string.IsNullOrEmpty(x.VungChiNhanh)).ToListAsync();
 
-            List<Fact_Sale_Branch_Quarter_PlanDAO> Fact_Sale_Branch_Quarter_PlanDAOs = new List<Fact_Sale_Branch_Quarter_PlanDAO>();
+            List<Fact_SaleBranch_Quarter_PlanDAO> Fact_Sale_Branch_Quarter_PlanDAOs = new List<Fact_SaleBranch_Quarter_PlanDAO>();
 
-            List<Dim_Sale_BranchDAO> Dim_Sale_BranchDAOs = await DataContext.Dim_Sale_Branch.ToListAsync();
+            List<Dim_SaleBranchDAO> Dim_Sale_BranchDAOs = await DataContext.Dim_SaleBranch.ToListAsync();
 
             List<Dim_QuarterDAO> Dim_QuarterDAOs = await DataContext.Dim_Quarter.ToListAsync();
 
@@ -145,7 +146,7 @@ namespace DW_Test.Services.MPlan_RevenueService
                     }
                     if (Sale_BranchID != 0)
                     {
-                        Fact_Sale_Branch_Quarter_PlanDAO Fact_Sale_Branch_Quarter_Plan = new Fact_Sale_Branch_Quarter_PlanDAO()
+                        Fact_SaleBranch_Quarter_PlanDAO Fact_Sale_Branch_Quarter_Plan = new Fact_SaleBranch_Quarter_PlanDAO()
                         {
                             SaleBranchId = Sale_BranchID,
                             QuarterKey = Dim_QuarterDAOs.Where(x => x.Year == year && x.Quarter == i).Select(x => x.QuarterKey).FirstOrDefault(),
@@ -155,7 +156,7 @@ namespace DW_Test.Services.MPlan_RevenueService
                     }
                 }
             }
-            await DataContext.Fact_Sale_Branch_Quarter_Plan.DeleteFromQueryAsync();
+            await DataContext.Fact_SaleBranch_Quarter_Plan.DeleteFromQueryAsync();
 
             await DataContext.BulkMergeAsync(Fact_Sale_Branch_Quarter_PlanDAOs);
 
@@ -163,13 +164,14 @@ namespace DW_Test.Services.MPlan_RevenueService
         }
 
         // Tạo bảng Fact_Sale_Branch_Year_Plan
-        public async Task<bool> Build_Fact_Sale_Branch_Year_Plan()
+        private async Task<bool> Build_Fact_Sale_Branch_Year_Plan()
         {
-            List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = await DataContext.Raw_Plan_Revenue.Where(x => x.VungChiNhanh != null).ToListAsync();
+            List<Raw_Plan_RevenueDAO> Raw_Plan_RevenueDAOs = await DataContext.Raw_Plan_Revenue
+                .Where(x => !string.IsNullOrEmpty(x.VungChiNhanh)).ToListAsync();
 
-            List<Fact_Sale_Branch_Year_PlanDAO> Fact_Sale_Branch_Year_PlanDAOs = new List<Fact_Sale_Branch_Year_PlanDAO>();
+            List<Fact_SaleBranch_Year_PlanDAO> Fact_Sale_Branch_Year_PlanDAOs = new List<Fact_SaleBranch_Year_PlanDAO>();
 
-            List<Dim_Sale_BranchDAO> Dim_Sale_BranchDAOs = await DataContext.Dim_Sale_Branch.ToListAsync();
+            List<Dim_SaleBranchDAO> Dim_Sale_BranchDAOs = await DataContext.Dim_SaleBranch.ToListAsync();
 
             List<Dim_YearDAO> Dim_YearDAOs = await DataContext.Dim_Year.ToListAsync();
 
@@ -183,16 +185,16 @@ namespace DW_Test.Services.MPlan_RevenueService
 
                 if (Sale_BranchID != 0)
                 {
-                    Fact_Sale_Branch_Year_PlanDAO Fact_Sale_Branch_Year_Plan = new Fact_Sale_Branch_Year_PlanDAO
+                    Fact_SaleBranch_Year_PlanDAO Fact_Sale_Branch_Year_Plan = new Fact_SaleBranch_Year_PlanDAO
                     {
                         SaleBranchId = Sale_BranchID,
-                        Year = Dim_YearDAOs.Where(x => x.Year == year).Select(x => x.Year).FirstOrDefault(),
+                        Year = Dim_YearDAOs.Where(x => x.Year == year).Select(x => x.Yearkey).FirstOrDefault(),
                         Revenue = revenue,
                     };
                     Fact_Sale_Branch_Year_PlanDAOs.Add(Fact_Sale_Branch_Year_Plan);
                 }
             }
-            await DataContext.Fact_Sale_Branch_Year_Plan.DeleteFromQueryAsync();
+            await DataContext.Fact_SaleBranch_Year_Plan.DeleteFromQueryAsync();
 
             await DataContext.BulkMergeAsync(Fact_Sale_Branch_Year_PlanDAOs);
 
