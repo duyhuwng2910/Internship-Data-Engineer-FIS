@@ -7,9 +7,7 @@ namespace DW_Test.Models
     {
         public long Id { get; set; }
         public long CustomerId { get; set; }
-        public long YearKey { get; set; }
-        public long? Quantity { get; set; }
-        public long? UnitPrice { get; set; }
+        public long Year { get; set; }
         public decimal? Revenue { get; set; }
     }
 }

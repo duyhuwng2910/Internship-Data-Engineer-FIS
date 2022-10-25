@@ -32,6 +32,7 @@ namespace DW_Test.Services.MCustomerService
         public async Task<bool> CustomerInit()
         {
             List<DWEModels.Raw_Customer_RepDAO> Raw_Customer_RepRemoteDAOs = await DWEContext.Raw_Customer_Rep.ToListAsync();
+            
             List<Raw_Customer_RepDAO> Raw_Customer_RepLocalDAOs = await DataContext.Raw_Customer_Rep.ToListAsync();
 
             // Hàm dùng để xoá dữ liệu nếu có trên bảng
@@ -47,7 +48,7 @@ namespace DW_Test.Services.MCustomerService
                 SaleChannel = x.SaleChannel,
                 SaleRoom = x.SaleRoom,
                 CountyCode = x.CountyCode,
-                CountyName = x.CountryName,
+                CountyName = x.CountyName,
             }).ToList();
 
             await DataContext.BulkMergeAsync(Raw_Customer_NewDAOs);

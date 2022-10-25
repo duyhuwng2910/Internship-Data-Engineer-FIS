@@ -18,11 +18,32 @@ namespace DW_Test.Rpc
 
         private IPlan_RevenueService Plan_RevenueService;
 
+        private ICompany_PlanService Company_PlanService;
+
+        private ICustomer_PlanService Customer_PlanService;
+
+        private ICounty_PlanService County_PlanService;
+
+        private ISale_Room_PlanService Sale_Room_PlanService;
+
+        private ISale_Channel_PlanService Sale_Channel_PlanService;
+
+        private ISale_Branch_PlanService Sale_Branch_PlanService;
+
         // hàm khởi tạo constructor
-        public Plan_RevenueController(DataContext DataContext, IPlan_RevenueService Plan_RevenueService)
+        public Plan_RevenueController(DataContext DataContext, IPlan_RevenueService Plan_RevenueService
+            , ICompany_PlanService Company_PlanService, ICustomer_PlanService Customer_PlanService
+            , ICounty_PlanService County_PlanService, ISale_Room_PlanService Sale_Room_PlanService
+            , ISale_Channel_PlanService Sale_Channel_PlanService, ISale_Branch_PlanService Sale_Branch_Plan_Service)
         {
             this.DataContext = DataContext;
             this.Plan_RevenueService = Plan_RevenueService;
+            this.Company_PlanService = Company_PlanService;
+            this.Customer_PlanService = Customer_PlanService;
+            this.County_PlanService = County_PlanService;
+            this.Sale_Room_PlanService = Sale_Room_PlanService;
+            this.Sale_Channel_PlanService = Sale_Channel_PlanService;
+            this.Sale_Branch_PlanService = Sale_Branch_Plan_Service;
         }
 
         [HttpPost, Route(Plan_RevenueRoute.Init)]
@@ -143,6 +164,24 @@ namespace DW_Test.Rpc
                 && String.IsNullOrWhiteSpace(Raw_Plan_RevenueDAO.MaKhachHang)
                 && String.IsNullOrWhiteSpace(Raw_Plan_RevenueDAO.KhachHang)
                 && (Raw_Plan_RevenueDAO.Year == 0);
+        }
+
+        [HttpGet, Route(Plan_RevenueRoute.Transform)]
+        public async Task<ActionResult> Transform()
+        {
+            await Company_PlanService.Company_PlanTransform();
+
+            await Customer_PlanService.Customer_PlanTransform();
+
+            await County_PlanService.County_PlanTransform();
+
+            await Sale_Room_PlanService.Sale_Room_PlanTransform();
+
+            await Sale_Channel_PlanService.Sale_Channel_PlanTransform();
+
+            await Sale_Branch_PlanService.Sale_Branch_PlanTransform();
+
+            return Ok();
         }
     }
 }

@@ -6,9 +6,7 @@ namespace DW_Test.Models
     public partial class Fact_Company_Year_PlanDAO
     {
         public long Id { get; set; }
-        public long YearKey { get; set; }
-        public long? Quantity { get; set; }
-        public long? UnitPrice { get; set; }
+        public long Year { get; set; }
         public decimal? Revenue { get; set; }
     }
 }
