@@ -111,7 +111,7 @@ namespace DW_Test.Services.MCustomerService
         private async Task<bool> Build_Dim_Country()
         {
             List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep
-                .Where(x => string.IsNullOrEmpty(x.CountryCode)).ToListAsync();
+                .Where(x => !string.IsNullOrEmpty(x.CountryCode)).ToListAsync();
 
             List<Dim_CountryDAO> Dim_CountryDAOs = await DataContext.Dim_Country.ToListAsync();
 

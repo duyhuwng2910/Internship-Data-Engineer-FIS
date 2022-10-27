@@ -21,10 +21,10 @@ namespace DW_Test.Services.MActualService
         Task Transform();
     }
     public class ActualService : IActualService
-    {   
+    {
         // ngữ cảnh data nằm trong local, tức là data của mình
         private DataContext DataContext;
-        
+
         // ngữ cảnh data của khách hàng (remote)
         private DWEContext DWEContext;
 
@@ -46,7 +46,7 @@ namespace DW_Test.Services.MActualService
 
             // Biến var dạng List<DWEModels.Raw_B1_5_ActualExportReport_RepDAO> => remote đi với DWEContext
             var Raw_B1_5_ActualServiceRemoteDAOs = await DWEContext.Raw_B1_5_ActualExportReport_Rep.ToListAsync();
-            
+
             // Hàm này dùng để xoá các data đang có ở trong local
             await DataContext.BulkDeleteAsync(Raw_B1_5_ActualServiceLocalDAOs);
 
@@ -105,28 +105,23 @@ namespace DW_Test.Services.MActualService
 
             foreach (var Raw_B1_5_AcutalExportReport_RepDAO in Raw_B1_5_ActualExportReport_RepDAOs)
             {
-                var CustomerDAO = Dim_CustomerDAOs.Where(x => x.CustomerName == Raw_B1_5_AcutalExportReport_RepDAO.Khach_hang
-                && x.CustomerCode == Raw_B1_5_AcutalExportReport_RepDAO.Ma_KH).FirstOrDefault();
+                var NgayXuat = Raw_B1_5_AcutalExportReport_RepDAO.Ngay_xuat;
+
+                var CustomerDAO = Dim_CustomerDAOs.Where(x => x.CustomerCode == Raw_B1_5_AcutalExportReport_RepDAO.Ma_KH).FirstOrDefault();
 
                 var DateDAO = Dim_DateDAOs.Where(x => x.Date == Raw_B1_5_AcutalExportReport_RepDAO.Ngay_xuat).FirstOrDefault();
 
-                var ItemDAO = Dim_ItemDAOs.Where(x => x.ItemCode == Raw_B1_5_AcutalExportReport_RepDAO.Ma_HH
-                && x.ItemName == Raw_B1_5_AcutalExportReport_RepDAO.Ten_HH).FirstOrDefault();
+                var ItemDAO = Dim_ItemDAOs.Where(x => x.ItemCode == Raw_B1_5_AcutalExportReport_RepDAO.Ma_HH).FirstOrDefault();
 
                 var NewItemDAO = Raw_Product_GroupDAOs.Where(x => x.ItemCode == Raw_B1_5_AcutalExportReport_RepDAO.Ma_HH
-                && ((x.M_StartDate <= Raw_B1_5_AcutalExportReport_RepDAO.Ngay_xuat && x.M_EndDate >= Raw_B1_5_AcutalExportReport_RepDAO.Ngay_xuat)
-                || (x.M_EndDate == null && x.M_StartDate <= Raw_B1_5_AcutalExportReport_RepDAO.Ngay_xuat))).FirstOrDefault();
+                && ((x.M_StartDate <= NgayXuat) && (x.M_EndDate == null || x.M_EndDate >= NgayXuat))).FirstOrDefault();
 
                 var VATItemDAO = Raw_Product_GroupDAOs.Where(x => x.ItemCode == Raw_B1_5_AcutalExportReport_RepDAO.Ma_HH
-                && ((x.GTGT_StartDate <= Raw_B1_5_AcutalExportReport_RepDAO.Ngay_xuat) && x.GTGT_EndDate >= Raw_B1_5_AcutalExportReport_RepDAO.Ngay_xuat)
-                || (x.GTGT_EndDate == null && x.GTGT_StartDate <= Raw_B1_5_AcutalExportReport_RepDAO.Ngay_xuat)).FirstOrDefault();
+                && ((x.GTGT_StartDate <= NgayXuat) && (x.GTGT_EndDate == null || x.GTGT_EndDate >= NgayXuat))).FirstOrDefault();
 
-                Fact_Report_RevenueDAO Fact_Report_Revenue = Fact_Report_RevenueDAOs
-                    .Where(x => x.CustomerId == CustomerDAO?.CustomerId).FirstOrDefault();
-
-                if (Fact_Report_Revenue == null)
+                if (CustomerDAO != null && ItemDAO != null && DateDAO != null)
                 {
-                    Fact_Report_Revenue = new Fact_Report_RevenueDAO
+                    Fact_Report_RevenueDAO Fact_Report_Revenue = new Fact_Report_RevenueDAO
                     {
                         CustomerId = CustomerDAO.CustomerId,
                         DateKey = DateDAO.DateKey,
@@ -143,6 +138,7 @@ namespace DW_Test.Services.MActualService
                     {
                         Fact_Report_Revenue.ItemVATGroupId = Dim_ItemVATGroupDAOs.Select(x => x.ItemVATGroupId).FirstOrDefault();
                     }
+                    Fact_Report_RevenueDAOs.Add(Fact_Report_Revenue);
                 }
             }
             await DataContext.Fact_Report_Revenue.DeleteFromQueryAsync();
