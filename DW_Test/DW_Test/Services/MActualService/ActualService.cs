@@ -1,6 +1,7 @@
 ﻿using DW_Test.DWEModels;
 using DW_Test.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,6 +18,8 @@ namespace DW_Test.Services.MActualService
     public interface IActualService : IServiceScoped
     {
         Task<bool> ActualInit();
+
+        Task<bool> ActualInit(DateTime Date);
 
         Task Transform();
     }
@@ -48,6 +51,48 @@ namespace DW_Test.Services.MActualService
             var Raw_B1_5_ActualServiceRemoteDAOs = await DWEContext.Raw_B1_5_ActualExportReport_Rep.ToListAsync();
 
             // Hàm này dùng để xoá các data đang có ở trong local
+            await DataContext.BulkDeleteAsync(Raw_B1_5_ActualServiceLocalDAOs);
+
+            var Raw_B1_5_NewDAOs = Raw_B1_5_ActualServiceRemoteDAOs.Select(x => new Raw_B1_5_ActualExportReport_RepDAO()
+            {
+                Ma_HH = x.Ma_HH,
+                Ten_HH = x.Ten_HH,
+                Donvitinh = x.Donvitinh,
+                XN = x.XN,
+                Loai_NX = x.Loai_NX,
+                SoHD = x.SoHD,
+                Seri = x.Seri,
+                KhoaHD = x.KhoaHD,
+                Ngay_xuat = x.Ngay_xuat,
+                thoidiem = x.thoidiem,
+                Soluong = x.Soluong,
+                DonGia = x.DonGia,
+                ThanhTien = x.ThanhTien,
+                coso = x.coso,
+                Ma_KH = x.Ma_KH,
+                Khach_hang = x.Khach_hang,
+                Huy = x.Huy,
+                DocEntry = x.DocEntry,
+                TT = x.TT,
+            }).ToList();
+
+            // Sau khi gắn/kéo data từ phía khách hàng (remote) thì sẽ tiến hành merge
+            await DataContext.BulkMergeAsync(Raw_B1_5_NewDAOs);
+
+            return true;
+        }
+
+        // Hàm init bảng Raw 1.5 có tham số là Ngày lấy dữ liệu 
+        // Tức là ta sẽ lấy dữ liệu trong bảng từ Ngày lấy dữ liệu
+        // đến hiện tại
+        public async Task<bool> ActualInit(DateTime Date)
+        {
+            var Raw_B1_5_ActualServiceLocalDAOs = await DataContext.Raw_B1_5_ActualExportReport_Rep
+                .Where(x => x.Ngay_xuat >= Date).ToListAsync();
+
+            var Raw_B1_5_ActualServiceRemoteDAOs = await DWEContext.Raw_B1_5_ActualExportReport_Rep
+                .Where(x => x.Ngay_xuat >= Date).ToListAsync();
+
             await DataContext.BulkDeleteAsync(Raw_B1_5_ActualServiceLocalDAOs);
 
             var Raw_B1_5_NewDAOs = Raw_B1_5_ActualServiceRemoteDAOs.Select(x => new Raw_B1_5_ActualExportReport_RepDAO()

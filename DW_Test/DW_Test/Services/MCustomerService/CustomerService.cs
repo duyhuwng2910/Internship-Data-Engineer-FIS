@@ -265,8 +265,8 @@ namespace DW_Test.Services.MCustomerService
                 /*
                  * 6 biến var ở dưới dùng để kiểm tra data trong các bảng dim tương ứng có ở trong bảng Raw_Customer_Rep không
                  */
-                var Country = Countries.Where(x => x.CountryName == Raw_Customer_RepDAO.CountryName).FirstOrDefault();
-                var County = Counties.Where(x => x.CountyName == Raw_Customer_RepDAO.CountyName).FirstOrDefault();
+                var Country = Countries.Where(x => x.CountryCode == Raw_Customer_RepDAO.CountryCode).FirstOrDefault();
+                var County = Counties.Where(x => x.CountyCode == Raw_Customer_RepDAO.CountyCode).FirstOrDefault();
                 var Customer = Customers.Where(x => x.CustomerCode == Raw_Customer_RepDAO.CustomerCode).FirstOrDefault();
                 var SaleBranch = SaleBranchs.Where(x => x.SaleBranchName == Raw_Customer_RepDAO.SaleBranch).FirstOrDefault();
                 var SaleChannel = SaleChannels.Where(x => x.SaleChannelName == Raw_Customer_RepDAO.SaleChannel).FirstOrDefault();
@@ -294,7 +294,7 @@ namespace DW_Test.Services.MCustomerService
                 else
                 {
                     Dim_Unit_Mapping.CountyId = County?.CountyId ?? null;
-                    Dim_Unit_Mapping.CountyId = Country?.CountryId ?? null;
+                    Dim_Unit_Mapping.CountryId = Country?.CountryId ?? null;
                     Dim_Unit_Mapping.SaleBranchId = SaleBranch?.SaleBranchId ?? null;
                     Dim_Unit_Mapping.SaleChannelId = SaleChannel?.SaleChannelId ?? null;
                     Dim_Unit_Mapping.SaleRoomId = SaleRoom?.SaleRoomId ?? null;
