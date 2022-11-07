@@ -1,7 +1,7 @@
 ﻿using DW_Test.DWEModels;
+using DW_Test.HashModels;
 using DW_Test.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,6 +19,9 @@ namespace DW_Test.Services.MCustomerService
     public interface ICustomerService : IServiceScoped
     {
         Task<bool> CustomerInit();
+
+        Task<bool> IncrementalLoadCustomerInit();
+
         Task CustomerTransform();
     }
 
@@ -33,10 +36,11 @@ namespace DW_Test.Services.MCustomerService
             this.DWEContext = DWEContext;
         }
 
+        // Phương thức init bảng Raw_Customer_Rep từ bảng nguồn trong DWE
         public async Task<bool> CustomerInit()
         {
             List<DWEModels.Raw_Customer_RepDAO> Raw_Customer_RepRemoteDAOs = await DWEContext.Raw_Customer_Rep.ToListAsync();
-            
+
             List<Raw_Customer_RepDAO> Raw_Customer_RepLocalDAOs = await DataContext.Raw_Customer_Rep.ToListAsync();
 
             // Hàm dùng để xoá dữ liệu nếu có trên bảng
@@ -56,6 +60,114 @@ namespace DW_Test.Services.MCustomerService
             }).ToList();
 
             await DataContext.BulkMergeAsync(Raw_Customer_NewDAOs);
+
+            return true;
+        }
+
+        public async Task<bool> IncrementalLoadCustomerInit()
+        {
+            // List data Local
+            List<Raw_Customer_RepDAO> Raw_Customer_RepLocalDAOs = await DataContext.Raw_Customer_Rep.ToListAsync();
+
+            // List data HashLocal
+            List<Raw_Customer_Rep> Raw_Customer_RepHashLocal = Raw_Customer_RepLocalDAOs
+                .Select(x => new Raw_Customer_Rep()
+                {
+                    CustomerCode = x.CustomerCode,
+                    CustomerName = x.CustomerName,
+                    CountryCode = x.CountryCode,
+                    CountryName = x.CountryName,
+                    SaleBranch = x.SaleBranch,
+                    SaleChannel = x.SaleChannel,
+                    SaleRoom = x.SaleRoom,
+                    CountyCode = x.CountyCode,
+                    CountyName = x.CountyName,
+                }).ToList();
+
+            // List data Remote
+            List<DWEModels.Raw_Customer_RepDAO> Raw_Customer_RepRemoteDAOs = await DWEContext.Raw_Customer_Rep.ToListAsync();
+
+            // List data HashRemote
+            List<Raw_Customer_Rep> Raw_Customer_RepHashRemote = Raw_Customer_RepRemoteDAOs
+                .Select(x => new Raw_Customer_Rep()
+                {
+                    CustomerCode = x.CustomerCode,
+                    CustomerName = x.CustomerName,
+                    CountryCode = x.CountryCode,
+                    CountryName = x.CountryName,
+                    SaleBranch = x.SaleBranch,
+                    SaleChannel = x.SaleChannel,
+                    SaleRoom = x.SaleRoom,
+                    CountyCode = x.CountyCode,
+                    CountyName = x.CountyName,
+                }).ToList();
+
+            // Sắp xếp List<> HashLocal theo key
+            Raw_Customer_RepHashLocal.OrderBy(x => x.key);
+
+            // Sắp xếp List<> HashRemote theo key
+            Raw_Customer_RepHashRemote.OrderBy(x => x.key);
+
+            int index = 0;
+
+            // Vòng lặp chạy incremental load
+            foreach (var HashRemote in Raw_Customer_RepHashRemote)
+            {
+                {
+                    // Kiểm tra xem key của HashLocal có bằng với key của HashRemote không
+                    // Remove HashLocal[index] đến khi hai key bằng nhau
+                    while (!HashRemote.key.Equals(Raw_Customer_RepHashLocal[index].key))
+                    {
+                        Raw_Customer_RepHashLocal.Remove(Raw_Customer_RepHashLocal[index]);
+                        Raw_Customer_RepLocalDAOs.Remove(Raw_Customer_RepHashLocal[index]);
+                    }
+
+                    // Nếu hai key đã bằng nhau thì kiểm tra value
+                    // Nếu hai value khác nhau thì chạy hàm cho HashLocal[index]
+                    if (!HashRemote.value.Equals(Raw_Customer_RepHashLocal[index].value))
+                    {
+                        Raw_Customer_RepLocalDAOs.Remove(Raw_Customer_RepHashLocal[index]);
+                        Raw_Customer_RepHashLocal[index].update(HashRemote);
+                    }
+
+                    // Tăng chỉ số index lên 1 để chạy sang vòng lặp for tiếp theo
+                    index++;
+
+                    // Kiểm tra xem là HashLocal đã chạy hết chưa
+                    // Nếu rồi thì sẽ gán index cho chỉ số của HashRemote + 1
+                    // Và thoát vòng lặp
+                    if (Raw_Customer_RepHashLocal[index] == null)
+                    {
+                        index = Raw_Customer_RepHashRemote.IndexOf(HashRemote) + 1;
+                        break;
+                    }
+                }
+            }
+
+            // Nếu HashLocal đã chạy hết thì ta tiến hành insert toàn bộ
+            // các dòng còn lại ở HashRemote vào HashLocal
+            while (index <= Raw_Customer_RepHashRemote.Count)
+            {
+                Raw_Customer_RepHashLocal.Add(Raw_Customer_RepHashRemote[index]);
+                index++;
+            }
+
+            // Type casting lại kiểu cho List
+            List<Raw_Customer_RepDAO> Raw_Customer_RepNewDAOs = Raw_Customer_RepHashLocal
+                .Select(x => new Raw_Customer_RepDAO()
+                {
+                    CustomerCode = x.CustomerCode,
+                    CustomerName = x.CustomerName,
+                    CountryCode = x.CountryCode,
+                    CountryName = x.CountryName,
+                    SaleBranch = x.SaleBranch,
+                    SaleChannel = x.SaleChannel,
+                    SaleRoom = x.SaleRoom,
+                    CountyCode = x.CountyCode,
+                    CountyName = x.CountyName,
+                }).ToList();
+
+            await DataContext.BulkMergeAsync(Raw_Customer_RepNewDAOs);
 
             return true;
         }
@@ -168,7 +280,7 @@ namespace DW_Test.Services.MCustomerService
 
             return true;
         }
-        
+
         // Tạo bảng dim_sale_branch
         private async Task<bool> Build_Dim_Sale_Branch()
         {
@@ -257,7 +369,7 @@ namespace DW_Test.Services.MCustomerService
             var SaleChannels = await DataContext.Dim_SaleChannel.ToListAsync();
             var SaleRooms = await DataContext.Dim_SaleRoom.ToListAsync();
             var Dim_Unit_MappingDAOs = await DataContext.Dim_UnitMapping.ToListAsync();
-            
+
             List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep.ToListAsync();
 
             foreach (var Raw_Customer_RepDAO in Raw_Customer_RepDAOs)

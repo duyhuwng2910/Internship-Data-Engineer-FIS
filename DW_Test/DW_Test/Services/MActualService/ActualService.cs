@@ -1,5 +1,6 @@
 ﻿using DW_Test.DWEModels;
 using DW_Test.Models;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,8 @@ namespace DW_Test.Services.MActualService
         Task<bool> ActualInit(DateTime Date);
 
         Task Transform();
+
+        Task TransformByDate();
     }
     public class ActualService : IActualService
     {
@@ -139,6 +142,78 @@ namespace DW_Test.Services.MActualService
             List<Dim_CustomerDAO> Dim_CustomerDAOs = await DataContext.Dim_Customer.ToListAsync();
 
             List<Dim_DateDAO> Dim_DateDAOs = await DataContext.Dim_Date.ToListAsync();
+
+            List<Dim_ItemDAO> Dim_ItemDAOs = await DataContext.Dim_Item.ToListAsync();
+
+            List<Dim_ItemNewItemGroupDAO> Dim_ItemNewItemGroupDAOs = await DataContext.Dim_ItemNewItemGroup.ToListAsync();
+
+            List<Dim_ItemVATGroupDAO> Dim_ItemVATGroupDAOs = await DataContext.Dim_ItemVATGroup.ToListAsync();
+
+            List<Fact_Report_RevenueDAO> Fact_Report_RevenueDAOs = new List<Fact_Report_RevenueDAO>();
+
+            foreach (var Raw_B1_5_AcutalExportReport_RepDAO in Raw_B1_5_ActualExportReport_RepDAOs)
+            {
+                var NgayXuat = Raw_B1_5_AcutalExportReport_RepDAO.Ngay_xuat;
+
+                var CustomerDAO = Dim_CustomerDAOs.Where(x => x.CustomerCode == Raw_B1_5_AcutalExportReport_RepDAO.Ma_KH).FirstOrDefault();
+
+                var DateDAO = Dim_DateDAOs.Where(x => x.Date == Raw_B1_5_AcutalExportReport_RepDAO.Ngay_xuat).FirstOrDefault();
+
+                var ItemDAO = Dim_ItemDAOs.Where(x => x.ItemCode == Raw_B1_5_AcutalExportReport_RepDAO.Ma_HH).FirstOrDefault();
+
+                var NewItemDAO = Raw_Product_GroupDAOs.Where(x => x.ItemCode == Raw_B1_5_AcutalExportReport_RepDAO.Ma_HH
+                && ((x.M_StartDate <= NgayXuat) && (x.M_EndDate == null || x.M_EndDate >= NgayXuat))).FirstOrDefault();
+
+                var VATItemDAO = Raw_Product_GroupDAOs.Where(x => x.ItemCode == Raw_B1_5_AcutalExportReport_RepDAO.Ma_HH
+                && ((x.GTGT_StartDate <= NgayXuat) && (x.GTGT_EndDate == null || x.GTGT_EndDate >= NgayXuat))).FirstOrDefault();
+
+                if (CustomerDAO != null && ItemDAO != null && DateDAO != null)
+                {
+                    Fact_Report_RevenueDAO Fact_Report_Revenue = new Fact_Report_RevenueDAO
+                    {
+                        CustomerId = CustomerDAO.CustomerId,
+                        DateKey = DateDAO.DateKey,
+                        ItemId = ItemDAO.ItemId,
+                        Quantity = Raw_B1_5_AcutalExportReport_RepDAO.Soluong ?? 0,
+                        UnitPrice = Raw_B1_5_AcutalExportReport_RepDAO.DonGia ?? 0,
+                        Revenue = Raw_B1_5_AcutalExportReport_RepDAO.ThanhTien ?? 0,
+                    };
+                    if (NewItemDAO != null)
+                    {
+                        Fact_Report_Revenue.ItemNewItemGroupId = Dim_ItemNewItemGroupDAOs.Select(x => x.ItemNewItemGroupId).FirstOrDefault();
+                    }
+                    if (VATItemDAO != null)
+                    {
+                        Fact_Report_Revenue.ItemVATGroupId = Dim_ItemVATGroupDAOs.Select(x => x.ItemVATGroupId).FirstOrDefault();
+                    }
+                    Fact_Report_RevenueDAOs.Add(Fact_Report_Revenue);
+                }
+            }
+            await DataContext.Fact_Report_Revenue.DeleteFromQueryAsync();
+
+            await DataContext.BulkMergeAsync(Fact_Report_RevenueDAOs);
+
+            return true;
+        }
+
+
+        public async Task TransformByDate()
+        {
+            await Build_Fact_Report_Revenue(DateTime.Today.AddMonths(-1));
+        }
+        
+        // Hàm transform bảng Fact theo thời gian xác định trước là 1 tháng kể từ hiện tại
+        public async Task<bool> Build_Fact_Report_Revenue(DateTime Date)
+        {
+            List<Raw_B1_5_ActualExportReport_RepDAO> Raw_B1_5_ActualExportReport_RepDAOs
+                = await DataContext.Raw_B1_5_ActualExportReport_Rep
+                .Where(x => x.Ngay_xuat >= Date).ToListAsync();
+
+            List<Raw_Product_GroupDAO> Raw_Product_GroupDAOs = await DataContext.Raw_Product_Group.ToListAsync();
+
+            List<Dim_CustomerDAO> Dim_CustomerDAOs = await DataContext.Dim_Customer.ToListAsync();
+
+            List<Dim_DateDAO> Dim_DateDAOs = await DataContext.Dim_Date.Where(x => x.Date >= Date).ToListAsync();
 
             List<Dim_ItemDAO> Dim_ItemDAOs = await DataContext.Dim_Item.ToListAsync();
 

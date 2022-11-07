@@ -6,6 +6,10 @@
 
         public const string Init = Default + "/init";
 
+        public const string InitByDate = Default + "/init-by-date";
+
         public const string Transform = Default + "/transform";
+
+        public const string TransformByDate = Default + "/transform-by-date";
     }
 }
