@@ -45,7 +45,7 @@ namespace DW_Test.Rpc.actual_report
         [HttpGet, Route(ActualRoute.TransformByDate)]
         public async Task<ActionResult> TransformByDate()
         {
-            await ActualService.Transform();
+            await ActualService.TransformByDate();
 
             return Ok();
         }

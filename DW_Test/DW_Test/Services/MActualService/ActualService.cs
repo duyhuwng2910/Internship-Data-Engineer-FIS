@@ -1,6 +1,5 @@
 ﻿using DW_Test.DWEModels;
 using DW_Test.Models;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -201,7 +200,7 @@ namespace DW_Test.Services.MActualService
         {
             await Build_Fact_Report_Revenue(DateTime.Today.AddMonths(-1));
         }
-        
+
         // Hàm transform bảng Fact theo thời gian xác định trước là 1 tháng kể từ hiện tại
         public async Task<bool> Build_Fact_Report_Revenue(DateTime Date)
         {
@@ -221,7 +220,8 @@ namespace DW_Test.Services.MActualService
 
             List<Dim_ItemVATGroupDAO> Dim_ItemVATGroupDAOs = await DataContext.Dim_ItemVATGroup.ToListAsync();
 
-            List<Fact_Report_RevenueDAO> Fact_Report_RevenueDAOs = new List<Fact_Report_RevenueDAO>();
+            List<Fact_Report_RevenueDAO> Fact_Report_RevenueDAOs = await DataContext.Fact_Report_Revenue
+                .Where(x => x.DateKey >= Dim_DateDAOs.First().DateKey).ToListAsync();
 
             foreach (var Raw_B1_5_AcutalExportReport_RepDAO in Raw_B1_5_ActualExportReport_RepDAOs)
             {
@@ -234,10 +234,10 @@ namespace DW_Test.Services.MActualService
                 var ItemDAO = Dim_ItemDAOs.Where(x => x.ItemCode == Raw_B1_5_AcutalExportReport_RepDAO.Ma_HH).FirstOrDefault();
 
                 var NewItemDAO = Raw_Product_GroupDAOs.Where(x => x.ItemCode == Raw_B1_5_AcutalExportReport_RepDAO.Ma_HH
-                && ((x.M_StartDate <= NgayXuat) && (x.M_EndDate == null || x.M_EndDate >= NgayXuat))).FirstOrDefault();
+                && (x.M_StartDate <= NgayXuat) && (x.M_EndDate == null || x.M_EndDate >= NgayXuat)).FirstOrDefault();
 
                 var VATItemDAO = Raw_Product_GroupDAOs.Where(x => x.ItemCode == Raw_B1_5_AcutalExportReport_RepDAO.Ma_HH
-                && ((x.GTGT_StartDate <= NgayXuat) && (x.GTGT_EndDate == null || x.GTGT_EndDate >= NgayXuat))).FirstOrDefault();
+                && (x.GTGT_StartDate <= NgayXuat) && (x.GTGT_EndDate == null || x.GTGT_EndDate >= NgayXuat)).FirstOrDefault();
 
                 if (CustomerDAO != null && ItemDAO != null && DateDAO != null)
                 {

@@ -13,6 +13,8 @@ namespace DW_Test.Services.MItemService
     public interface IItemService : IServiceScoped
     {
         Task<bool> ItemInit();
+
+        Task<bool> IncrementalItemInit();
         Task ItemTransform();
     }
     public class ItemService : IItemService
@@ -28,10 +30,10 @@ namespace DW_Test.Services.MItemService
 
         public async Task<bool> ItemInit()
         {
-            List<Raw_Item_RepDAO> Raw_Item_RepLocalDAOS = await DataContext.Raw_Item_Rep.ToListAsync();
+            List<Raw_Item_RepDAO> Raw_Item_RepLocalDAOs = await DataContext.Raw_Item_Rep.ToListAsync();
             List<DWEModels.Raw_Item_RepDAO> Raw_Item_RepRemoteDAOs = await DWEContext.Raw_Item_Rep.ToListAsync();
 
-            await DataContext.BulkDeleteAsync(Raw_Item_RepLocalDAOS);
+            await DataContext.BulkDeleteAsync(Raw_Item_RepLocalDAOs);
             List<Raw_Item_RepDAO> Raw_Item_RepNewDAOs = Raw_Item_RepRemoteDAOs.Select(x => new Raw_Item_RepDAO()
             {
                 ItemCode = x.ItemCode,
@@ -42,6 +44,98 @@ namespace DW_Test.Services.MItemService
 
             return true;
         }
+
+        public async Task<bool> IncrementalItemInit()
+        {
+            List<Raw_Item_RepDAO> Raw_Item_RepLocalDAOs = await DataContext.Raw_Item_Rep.ToListAsync();
+
+            List<DWEModels.Raw_Item_RepDAO> Raw_Item_RepRemoteDAOs = await DWEContext.Raw_Item_Rep.ToListAsync();
+
+            List<Raw_Item_RepDAO> InsertList = new List<Raw_Item_RepDAO>();
+
+            List<Raw_Item_RepDAO> UpdateList = new List<Raw_Item_RepDAO>();
+
+            List<Raw_Item_RepDAO> DeleteList = new List<Raw_Item_RepDAO>();
+
+            int index = 0;
+
+            for (int j = 0; j < Raw_Item_RepRemoteDAOs.Count && index < Raw_Item_RepLocalDAOs.Count;)
+            {
+                if (Raw_Item_RepRemoteDAOs[j].ItemCode.CompareTo
+                    (Raw_Item_RepLocalDAOs[index].ItemCode) < 0)
+                {
+                    InsertList.Add(new Raw_Item_RepDAO()
+                    {
+                        ItemCode = Raw_Item_RepRemoteDAOs[j].ItemCode,
+                        ItemName = Raw_Item_RepRemoteDAOs[j].ItemName,
+                    });
+                    
+                    j++;
+                }
+                else if (Raw_Item_RepRemoteDAOs[j].ItemCode.CompareTo
+                    (Raw_Item_RepLocalDAOs[index].ItemCode) == 0)
+                {
+                    if (Raw_Item_RepRemoteDAOs[j].ItemName != Raw_Item_RepLocalDAOs[index].ItemName)
+                    {
+                        UpdateList.Add(new Raw_Item_RepDAO()
+                        {
+                            Id = Raw_Item_RepLocalDAOs[index].Id,
+                            ItemCode = Raw_Item_RepRemoteDAOs[j].ItemCode,
+                            ItemName = Raw_Item_RepRemoteDAOs[j].ItemName
+                        });
+                    }
+
+                    index++;
+
+                    j++;
+                }
+                else
+                {
+                    DeleteList.Add(new Raw_Item_RepDAO()
+                    {
+                        Id = Raw_Item_RepLocalDAOs[index].Id,
+                        ItemCode = Raw_Item_RepLocalDAOs[index].ItemCode,
+                        ItemName = Raw_Item_RepLocalDAOs[index].ItemName
+                    });
+
+                    index++;
+                }
+            }
+
+            if (index == Raw_Item_RepLocalDAOs.Count)
+            {
+                while (index < Raw_Item_RepRemoteDAOs.Count)
+                {
+                    InsertList.Add(new Raw_Item_RepDAO()
+                    {
+                        ItemCode = Raw_Item_RepRemoteDAOs[index].ItemCode,
+                        ItemName = Raw_Item_RepRemoteDAOs[index].ItemName,
+                    });
+
+                    index++;
+                }
+            } else if (index < Raw_Item_RepLocalDAOs.Count)
+            {
+                while (index < Raw_Item_RepLocalDAOs.Count)
+                {
+                    DeleteList.Add(new Raw_Item_RepDAO()
+                    {
+                        Id = Raw_Item_RepLocalDAOs[index].Id,
+                        ItemCode = Raw_Item_RepLocalDAOs[index].ItemCode,
+                        ItemName = Raw_Item_RepLocalDAOs[index].ItemName
+                    });
+
+                    index++;
+                }
+            }
+
+            await DataContext.BulkDeleteAsync(DeleteList);
+            await DataContext.BulkMergeAsync(InsertList);
+            await DataContext.BulkMergeAsync(UpdateList);
+
+            return true;
+        }
+
         public async Task ItemTransform()
         {
             await Build_Dim_Item();

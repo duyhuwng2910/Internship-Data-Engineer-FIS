@@ -1,6 +1,4 @@
 ﻿using DW_Test.Models;
-using DW_Test.Rpc.actual_report;
-using DW_Test.Services.MActualService;
 using DW_Test.Services.MCustomerService;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -22,6 +20,14 @@ namespace DW_Test.Rpc.customer_report
         public async Task<ActionResult> Init()
         {
             await CustomerService.CustomerInit();
+
+            return Ok();
+        }
+
+        [HttpGet, Route(CustomerRoute.IncrementalInit)]
+        public async Task<ActionResult> IncrementalInit()
+        {
+            await CustomerService.IncrementalCustomerInit();
 
             return Ok();
         }

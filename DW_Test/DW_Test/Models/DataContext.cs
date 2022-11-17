@@ -1,6 +1,5 @@
-﻿using System;
+﻿using DW_Test.HashModels;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace DW_Test.Models
 {
@@ -53,7 +52,7 @@ namespace DW_Test.Models
         public virtual DbSet<Raw_Item_RepDAO> Raw_Item_Rep { get; set; }
         public virtual DbSet<Raw_Plan_RevenueDAO> Raw_Plan_Revenue { get; set; }
         public virtual DbSet<Raw_Product_GroupDAO> Raw_Product_Group { get; set; }
-
+        public virtual DbSet<Student> Student { get; set; }
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }
@@ -600,6 +599,19 @@ namespace DW_Test.Models
                 entity.Property(e => e.Nhom_SMARTDONLE).HasMaxLength(500);
 
                 entity.Property(e => e.Nhomchinh_KH).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Student>(entity =>
+            {
+                entity.ToTable("Student", "dbo");
+
+                entity.Property(e => e.StudentID).HasMaxLength(500);
+
+                entity.Property(e => e.Name).HasMaxLength(500);
+
+                entity.Property(e => e.Age).HasColumnType("bigint");
+
+                entity.Property(e => e.GPA).HasColumnType("bigint");
             });
 
             OnModelCreatingPartial(modelBuilder);

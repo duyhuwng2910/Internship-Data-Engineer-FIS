@@ -1,10 +1,8 @@
 ﻿using DW_Test.Models;
-using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
-using System;
 
 namespace DW_Test.HashModels
 {
-    public partial class Raw_Customer_Rep : Raw_Customer_RepDAO
+    public partial class Raw_Customer_Rep
     {
         public long Id { get; set; }
         public string CustomerCode { get; set; }
@@ -21,21 +19,17 @@ namespace DW_Test.HashModels
 
         public string GetKey()
         {
-            key = CustomerCode + "_" + CustomerName;
+            key = CustomerCode;
 
             return key.GetHashCode().ToString();
-        }
-
-        public void SetKey(string key)
-        {
-            this.key = key;
         }
 
         public string value;
 
         public string GetValue()
         {
-            value = CountryCode + "_"
+            value = CustomerName + "_"
+                    + CountryCode + "_"
                     + CountryName + "_"
                     + CountyCode + "_"
                     + CountyName + "_"
@@ -46,28 +40,37 @@ namespace DW_Test.HashModels
             return value.GetHashCode().ToString();
         }
 
-        public void SetValue(string value)
+
+        public Raw_Customer_Rep(Raw_Customer_RepDAO Raw_Customer_RepDAO)
         {
-            this.value = value;
+            Id = Raw_Customer_RepDAO.Id;
+            CustomerCode = Raw_Customer_RepDAO.CustomerCode;
+            CustomerName = Raw_Customer_RepDAO.CustomerName;
+            CountyCode = Raw_Customer_RepDAO.CountyCode;
+            CountyName = Raw_Customer_RepDAO.CountyName;
+            SaleBranch = Raw_Customer_RepDAO.SaleBranch;
+            SaleChannel = Raw_Customer_RepDAO.SaleChannel;
+            SaleRoom = Raw_Customer_RepDAO.SaleRoom;
+            CountryCode = Raw_Customer_RepDAO.CountryCode;
+            CountryName = Raw_Customer_RepDAO.CountryName;
+            GetKey();
+            GetValue();
         }
 
-        public Raw_Customer_Rep update(Raw_Customer_Rep Remote)
+        public Raw_Customer_Rep(DWEModels.Raw_Customer_RepDAO Raw_Customer_RepDAO)
         {
-            var New_Raw_Customer_Rep = new Raw_Customer_Rep
-            {
-                CustomerCode = Remote.CustomerCode,
-                CustomerName = Remote.CustomerName,
-                CountryCode = Remote.CountryCode,
-                CountryName = Remote.CountryName,
-                CountyCode = Remote.CountyCode,
-                CountyName = Remote.CountyName,
-                SaleBranch = Remote.SaleBranch,
-                SaleChannel = Remote.SaleChannel,
-                SaleRoom = Remote.SaleRoom,
-                key = Remote.key,
-                value = Remote.value,
-            };
-            return New_Raw_Customer_Rep;
+            Id = Raw_Customer_RepDAO.Id;
+            CustomerCode = Raw_Customer_RepDAO.CustomerCode;
+            CustomerName = Raw_Customer_RepDAO.CustomerName;
+            CountyCode = Raw_Customer_RepDAO.CountyCode;
+            CountyName = Raw_Customer_RepDAO.CountyName;
+            SaleBranch = Raw_Customer_RepDAO.SaleBranch;
+            SaleChannel = Raw_Customer_RepDAO.SaleChannel;
+            SaleRoom = Raw_Customer_RepDAO.SaleRoom;
+            CountryCode = Raw_Customer_RepDAO.CountryCode;
+            CountryName = Raw_Customer_RepDAO.CountryName;
+            GetKey();
+            GetValue();
         }
     }
 }

@@ -26,6 +26,14 @@ namespace DW_Test.Rpc.item_report
             return Ok(a);
         }
 
+        [HttpGet, Route(ItemRoute.IncrementalInit)]
+        public async Task<ActionResult> IncrementalInit()
+        {
+            await ItemService.IncrementalItemInit();
+
+            return Ok();
+        }
+
         [HttpGet, Route(ItemRoute.Transform)]
         public async Task<ActionResult> Transform()
         {

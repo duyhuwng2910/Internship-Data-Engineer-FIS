@@ -8,6 +8,8 @@ namespace DW_Test.Rpc.customer_report
 
         public const string Init = Default + "/init";
 
+        public const string IncrementalInit = Default + "/incremental-init";
+
         public const string Transform = Default + "/transform";
     }
 }

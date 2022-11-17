@@ -20,7 +20,7 @@ namespace DW_Test.Services.MCustomerService
     {
         Task<bool> CustomerInit();
 
-        Task<bool> IncrementalLoadCustomerInit();
+        Task<bool> IncrementalCustomerInit();
 
         Task CustomerTransform();
     }
@@ -64,43 +64,21 @@ namespace DW_Test.Services.MCustomerService
             return true;
         }
 
-        public async Task<bool> IncrementalLoadCustomerInit()
+        public async Task<bool> IncrementalCustomerInit()
         {
             // List data Local
             List<Raw_Customer_RepDAO> Raw_Customer_RepLocalDAOs = await DataContext.Raw_Customer_Rep.ToListAsync();
 
             // List data HashLocal
             List<Raw_Customer_Rep> Raw_Customer_RepHashLocal = Raw_Customer_RepLocalDAOs
-                .Select(x => new Raw_Customer_Rep()
-                {
-                    CustomerCode = x.CustomerCode,
-                    CustomerName = x.CustomerName,
-                    CountryCode = x.CountryCode,
-                    CountryName = x.CountryName,
-                    SaleBranch = x.SaleBranch,
-                    SaleChannel = x.SaleChannel,
-                    SaleRoom = x.SaleRoom,
-                    CountyCode = x.CountyCode,
-                    CountyName = x.CountyName,
-                }).ToList();
+                .Select(x => new Raw_Customer_Rep(x)).ToList();
 
             // List data Remote
             List<DWEModels.Raw_Customer_RepDAO> Raw_Customer_RepRemoteDAOs = await DWEContext.Raw_Customer_Rep.ToListAsync();
 
             // List data HashRemote
             List<Raw_Customer_Rep> Raw_Customer_RepHashRemote = Raw_Customer_RepRemoteDAOs
-                .Select(x => new Raw_Customer_Rep()
-                {
-                    CustomerCode = x.CustomerCode,
-                    CustomerName = x.CustomerName,
-                    CountryCode = x.CountryCode,
-                    CountryName = x.CountryName,
-                    SaleBranch = x.SaleBranch,
-                    SaleChannel = x.SaleChannel,
-                    SaleRoom = x.SaleRoom,
-                    CountyCode = x.CountyCode,
-                    CountyName = x.CountyName,
-                }).ToList();
+                .Select(x => new Raw_Customer_Rep(x)).ToList();
 
             // Sắp xếp List<> HashLocal theo key
             Raw_Customer_RepHashLocal.OrderBy(x => x.key);
@@ -108,68 +86,159 @@ namespace DW_Test.Services.MCustomerService
             // Sắp xếp List<> HashRemote theo key
             Raw_Customer_RepHashRemote.OrderBy(x => x.key);
 
+            List<Raw_Customer_RepDAO> InsertList = new List<Raw_Customer_RepDAO>();
+
+            List<Raw_Customer_RepDAO> DeleteList = new List<Raw_Customer_RepDAO>();
+
+            List<Raw_Customer_RepDAO> UpdateList = new List<Raw_Customer_RepDAO>();
+
             int index = 0;
 
             // Vòng lặp chạy incremental load
-            foreach (var HashRemote in Raw_Customer_RepHashRemote)
+            for (int j = 0; j < Raw_Customer_RepHashRemote.Count && index < Raw_Customer_RepHashLocal.Count;)
             {
+                // Nếu key của HashRemote nhỏ hơn tức là trong Local chưa có, ta thêm 
+                // dòng vào trong InsertList và cộng 1 vào j
+                if (Raw_Customer_RepHashRemote[j].key.CompareTo
+                        (Raw_Customer_RepHashLocal[index].key) < 0)
                 {
-                    // Kiểm tra xem key của HashLocal có bằng với key của HashRemote không
-                    // Remove HashLocal[index] đến khi hai key bằng nhau
-                    while (!HashRemote.key.Equals(Raw_Customer_RepHashLocal[index].key))
+                    var HashLocal = Raw_Customer_RepHashRemote[j];
+
+                    var customer = new Raw_Customer_RepDAO()
                     {
-                        Raw_Customer_RepHashLocal.Remove(Raw_Customer_RepHashLocal[index]);
-                        Raw_Customer_RepLocalDAOs.Remove(Raw_Customer_RepHashLocal[index]);
+                        CustomerCode = HashLocal.CustomerCode,
+                        CustomerName = HashLocal.CustomerName,
+                        CountyCode = HashLocal.CountyCode,
+                        CountyName = HashLocal.CountyName,
+                        SaleBranch = HashLocal.SaleBranch,
+                        SaleChannel = HashLocal.SaleChannel,
+                        SaleRoom = HashLocal.SaleRoom,
+                        CountryCode = HashLocal.CountryCode,
+                        CountryName = HashLocal.CountryName
+                    };
+
+                    InsertList.Add(customer);
+
+                    j++;
+                }
+                // Nếu hai key đã bằng nhau thì kiểm tra value
+                // Nếu hai value khác nhau thì thêm dòng vào UpdateList
+                // còn bằng nhau thì continue sau đó cộng 1 vào j và index
+                else if (Raw_Customer_RepHashRemote[j].key.CompareTo
+                        (Raw_Customer_RepHashLocal[index].key) == 0)
+                {
+                    if (Raw_Customer_RepHashRemote[j].value != Raw_Customer_RepHashLocal[index].value)
+                    {
+                        var HashLocal = Raw_Customer_RepHashRemote[j];
+
+                        var customer = new Raw_Customer_RepDAO()
+                        {
+                            Id = Raw_Customer_RepHashLocal[index].Id,
+                            CustomerCode = Raw_Customer_RepHashLocal[index].CustomerCode,
+                            CustomerName = HashLocal.CustomerName,
+                            CountyCode = HashLocal.CountyCode,
+                            CountyName = HashLocal.CountyName,
+                            SaleBranch = HashLocal.SaleBranch,
+                            SaleChannel = HashLocal.SaleChannel,
+                            SaleRoom = HashLocal.SaleRoom,
+                            CountryCode = HashLocal.CountryCode,
+                            CountryName = HashLocal.CountryName
+                        };
+                        
+                        UpdateList.Add(customer);
                     }
 
-                    // Nếu hai key đã bằng nhau thì kiểm tra value
-                    // Nếu hai value khác nhau thì chạy hàm cho HashLocal[index]
-                    if (!HashRemote.value.Equals(Raw_Customer_RepHashLocal[index].value))
-                    {
-                        Raw_Customer_RepLocalDAOs.Remove(Raw_Customer_RepHashLocal[index]);
-                        Raw_Customer_RepHashLocal[index].update(HashRemote);
-                    }
+                    j++;
 
-                    // Tăng chỉ số index lên 1 để chạy sang vòng lặp for tiếp theo
                     index++;
+                }
+                // Nếu key của HashRemote lớn hơn tức là dòng này của Local trong Remote
+                // không tồn tại, nên ta sẽ thêm dòng vào DeleteList
+                // đồng thời cộng 1 vào index
+                else
+                {
+                    var HashLocal = Raw_Customer_RepHashLocal[index];
 
-                    // Kiểm tra xem là HashLocal đã chạy hết chưa
-                    // Nếu rồi thì sẽ gán index cho chỉ số của HashRemote + 1
-                    // Và thoát vòng lặp
-                    if (Raw_Customer_RepHashLocal[index] == null)
+                    var customer = new Raw_Customer_RepDAO()
                     {
-                        index = Raw_Customer_RepHashRemote.IndexOf(HashRemote) + 1;
-                        break;
-                    }
+                        Id = HashLocal.Id,
+                        CustomerCode = HashLocal.CustomerCode,
+                        CustomerName = HashLocal.CustomerName,
+                        CountyCode = HashLocal.CountyCode,
+                        CountyName = HashLocal.CountyName,
+                        SaleBranch = HashLocal.SaleBranch,
+                        SaleChannel = HashLocal.SaleChannel,
+                        SaleRoom = HashLocal.SaleRoom,
+                        CountryCode = HashLocal.CountryCode,
+                        CountryName = HashLocal.CountryName
+                    };
+
+                    DeleteList.Add(customer);
+
+                    index++;
                 }
             }
 
-            // Nếu HashLocal đã chạy hết thì ta tiến hành insert toàn bộ
-            // các dòng còn lại ở HashRemote vào HashLocal
-            while (index <= Raw_Customer_RepHashRemote.Count)
+            // Nếu HashLocal đã chạy hết, index vẫn nhỏ hơn count của HashRemote
+            // thì ta tiến hành insert toàn bộ các dòng còn lại ở HashRemote vào HashLocal
+            if (index == Raw_Customer_RepHashRemote.Count)
             {
-                Raw_Customer_RepHashLocal.Add(Raw_Customer_RepHashRemote[index]);
-                index++;
+                while (index < Raw_Customer_RepHashRemote.Count)
+                {
+                    var HashLocal = Raw_Customer_RepHashRemote[index];
+
+                    var customer = new Raw_Customer_RepDAO()
+                    {
+                        CustomerCode = HashLocal.CustomerCode,
+                        CustomerName = HashLocal.CustomerName,
+                        CountyCode = HashLocal.CountyCode,
+                        CountyName = HashLocal.CountyName,
+                        SaleBranch = HashLocal.SaleBranch,
+                        SaleChannel = HashLocal.SaleChannel,
+                        SaleRoom = HashLocal.SaleRoom,
+                        CountryCode = HashLocal.CountryCode,
+                        CountryName = HashLocal.CountryName
+                    };
+
+                    InsertList.Add(customer);
+
+                    index++;
+                }
+            } 
+            // Nếu index < count của HashLocal tức là HashLocal còn thừa dữ liệu cũ
+            // Nên ta sẽ delete toàn bộ các dòng còn lại ở HashLocal
+            else if (index < Raw_Customer_RepHashLocal.Count)
+            {
+                while (index < Raw_Customer_RepHashLocal.Count)
+                {
+                    var HashLocal = Raw_Customer_RepHashLocal[index];
+
+                    var customer = new Raw_Customer_RepDAO()
+                    {
+                        Id = HashLocal.Id,
+                        CustomerCode = HashLocal.CustomerCode,
+                        CustomerName = HashLocal.CustomerName,
+                        CountyCode = HashLocal.CountyCode,
+                        CountyName = HashLocal.CountyName,
+                        SaleBranch = HashLocal.SaleBranch,
+                        SaleChannel = HashLocal.SaleChannel,
+                        SaleRoom = HashLocal.SaleRoom,
+                        CountryCode = HashLocal.CountryCode,
+                        CountryName = HashLocal.CountryName
+                    };
+
+                    DeleteList.Add(customer);
+
+                    index++;
+                }
             }
 
-            // Type casting lại kiểu cho List
-            List<Raw_Customer_RepDAO> Raw_Customer_RepNewDAOs = Raw_Customer_RepHashLocal
-                .Select(x => new Raw_Customer_RepDAO()
-                {
-                    CustomerCode = x.CustomerCode,
-                    CustomerName = x.CustomerName,
-                    CountryCode = x.CountryCode,
-                    CountryName = x.CountryName,
-                    SaleBranch = x.SaleBranch,
-                    SaleChannel = x.SaleChannel,
-                    SaleRoom = x.SaleRoom,
-                    CountyCode = x.CountyCode,
-                    CountyName = x.CountyName,
-                }).ToList();
-
-            await DataContext.BulkMergeAsync(Raw_Customer_RepNewDAOs);
+            //await DataContext.BulkDeleteAsync(DeleteList);
+            //await DataContext.BulkMergeAsync(InsertList);
+            //await DataContext.BulkMergeAsync(UpdateList);
 
             return true;
+
         }
 
         // Phương thức transform bảng raw thành bảng dim_customer
