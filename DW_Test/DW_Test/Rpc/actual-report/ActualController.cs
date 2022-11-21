@@ -2,6 +2,7 @@
 using DW_Test.Services;
 using DW_Test.Services.MActualService;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace DW_Test.Rpc.actual_report
@@ -22,6 +23,14 @@ namespace DW_Test.Rpc.actual_report
         public async Task<ActionResult> Init()
         {
             await ActualService.ActualInit();
+
+            return Ok();
+        }
+
+        [HttpGet, Route(ActualRoute.InitByDate)]
+        public async Task<ActionResult> InitByDate()
+        {
+            await ActualService.ActualInit(DateTime.Today.AddMonths(-1));
 
             return Ok();
         }
