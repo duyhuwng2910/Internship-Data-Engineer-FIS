@@ -34,6 +34,14 @@ namespace DW_Test.Rpc.actual_report
             return Ok();
         }
 
+        [HttpGet, Route(ActualRoute.InitByDate)]
+        public async Task<ActionResult> InitByDate()
+        {
+            await ActualService.ActualInit(DateTime.Today.AddMonths(-1));
+
+            return Ok();
+        }
+
         [HttpGet, Route(ActualRoute.Transform)]
         public async Task<ActionResult> Transform()
         {
