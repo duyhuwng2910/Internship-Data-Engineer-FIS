@@ -39,12 +39,13 @@ namespace DW_Test.Rpc.product_group
                     var worksheet = workbook.Worksheets[0];
 
                     int StartColumn = 1;
+
                     int StartRow = 1;
 
                     List<string> columns = new List<string>();
 
                     // Vòng lặp để lấy tên cột
-                    for (int column = StartColumn; column <= 13; column++)
+                    for (int column = StartColumn; column <= worksheet.Dimension.End.Column; column++)
                     {
                         string columnName = worksheet.Cells[StartRow, column].Value?.ToString() ?? "";
                         columns.Add(columnName);

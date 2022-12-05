@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DW_Test.Models
+﻿namespace DW_Test.Models
 {
     public partial class Raw_Item_RepDAO
     {

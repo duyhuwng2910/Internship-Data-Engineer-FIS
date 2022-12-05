@@ -1,5 +1,4 @@
 ﻿using DW_Test.Models;
-using DW_Test.Services;
 using DW_Test.Services.MActualService;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -23,6 +22,14 @@ namespace DW_Test.Rpc.actual_report
         public async Task<ActionResult> Init()
         {
             await ActualService.ActualInit();
+            
+            return Ok();
+        }
+
+        [HttpGet, Route(ActualRoute.IncrementalInit)]
+        public async Task<ActionResult> IncrementalInit()
+        {
+            await ActualService.IncrementalActualInit(DateTime.Today.AddMonths(-3));
 
             return Ok();
         }
@@ -39,6 +46,14 @@ namespace DW_Test.Rpc.actual_report
         public async Task<ActionResult> Transform()
         {
             await ActualService.Transform();
+
+            return Ok();
+        }
+
+        [HttpGet, Route(ActualRoute.TransformByDate)]
+        public async Task<ActionResult> TransformByDate()
+        {
+            await ActualService.TransformByDate();
 
             return Ok();
         }
