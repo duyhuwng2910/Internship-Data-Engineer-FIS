@@ -45,26 +45,41 @@ namespace DW_Test.Services.MItemService
             return true;
         }
 
+        /*
+         * Hàm IncrementalItemInit
+         * load dữ liệu trong bảng Raw_Item_Rep theo hướng gia tăng
+         */
         public async Task<bool> IncrementalItemInit()
         {
+            // List dữ liệu trong bảng Raw_Item_Rep của Local
             List<Raw_Item_RepDAO> Raw_Item_RepLocalDAOs = await DataContext.Raw_Item_Rep.ToListAsync();
 
+            // List dữ liệu trong bảng Raw_Item_Rep của Local
             List<DWEModels.Raw_Item_RepDAO> Raw_Item_RepRemoteDAOs = await DWEContext.Raw_Item_Rep.ToListAsync();
 
+            // Sắp xếp List của Local theo ItemCode
             Raw_Item_RepLocalDAOs = Raw_Item_RepLocalDAOs.OrderBy(x => x.ItemCode).ToList();
 
+            // Sắp xếp List của Remote theo ItemCode
             Raw_Item_RepRemoteDAOs = Raw_Item_RepRemoteDAOs.OrderBy(x => x.ItemCode).ToList();
 
+            // List dùng để insert các dòng dữ liệu mới
             List<Raw_Item_RepDAO> InsertList = new List<Raw_Item_RepDAO>();
 
+            // List dùng để update các dòng dữ liệu cũ
             List<Raw_Item_RepDAO> UpdateList = new List<Raw_Item_RepDAO>();
 
+            // List dùng để delete các dòng dữ liệu không còn tồn tại
             List<Raw_Item_RepDAO> DeleteList = new List<Raw_Item_RepDAO>();
 
+            // Chỉ số dùng cho Local
             int index = 0;
 
+            // Vòng lặp chạy incremental load
             for (int j = 0; j < Raw_Item_RepRemoteDAOs.Count && index < Raw_Item_RepLocalDAOs.Count;)
             {
+                // Nếu Key của remote nhỏ hơn tức là trong Local chưa có, ta thêm 
+                // dòng vào trong InsertList và cộng 1 vào j
                 if (CompareMethod.Compare(Raw_Item_RepRemoteDAOs[j].ItemCode,
                                     Raw_Item_RepLocalDAOs[index].ItemCode) < 0)
                 {
@@ -76,6 +91,11 @@ namespace DW_Test.Services.MItemService
                     
                     j++;
                 }
+
+                // Nếu hai Key đã bằng nhau thì kiểm tra Value
+                // Nếu hai Value khác nhau thì thêm dòng vào UpdateList
+                // còn bằng nhau thì continue
+                // sau đó cộng 1 vào j và index
                 else if (CompareMethod.Compare(Raw_Item_RepRemoteDAOs[j].ItemCode,
                                         Raw_Item_RepLocalDAOs[index].ItemCode) == 0)
                 {
@@ -93,7 +113,12 @@ namespace DW_Test.Services.MItemService
 
                     index++;
                 }
-                else
+
+                // Nếu Key của remote lớn hơn tức là dòng này của Local trong Remote
+                // không tồn tại, nên ta sẽ thêm dòng vào DeleteList
+                // đồng thời cộng 1 vào index
+                else if (CompareMethod.Compare(Raw_Item_RepRemoteDAOs[j].ItemCode,
+                                        Raw_Item_RepLocalDAOs[index].ItemCode) > 0)
                 {
                     DeleteList.Add(new Raw_Item_RepDAO()
                     {
@@ -106,6 +131,9 @@ namespace DW_Test.Services.MItemService
                 }
             }
 
+            // Nếu local đã chạy hết, index vẫn nhỏ hơn count của HashRemote
+            // đồng thời là hai key của dòng cuối cùng trong hai bảng là BẰNG NHAU
+            // thì ta tiến hành insert toàn bộ các dòng còn lại ở remote vào HashLocal
             if (index == Raw_Item_RepLocalDAOs.Count
                 && Raw_Item_RepLocalDAOs.Last().ItemCode != Raw_Item_RepRemoteDAOs.Last().ItemCode)
             {
@@ -119,7 +147,12 @@ namespace DW_Test.Services.MItemService
 
                     index++;
                 }
-            } else if (index < Raw_Item_RepLocalDAOs.Count)
+            }
+
+            // Nếu index < count của local tức là local còn thừa dữ liệu cũ
+            // KHÔNG còn tồn tại trong Remote
+            // Ta sẽ delete toàn bộ các dòng còn lại ở HashLocal
+            else if (index < Raw_Item_RepLocalDAOs.Count)
             {
                 while (index < Raw_Item_RepLocalDAOs.Count)
                 {
@@ -134,6 +167,9 @@ namespace DW_Test.Services.MItemService
                 }
             }
 
+            // Đến đây ta sẽ tiến hành BulkDelete cho DeleteList
+            // và BulkMerge cho InsertList và UpdateList
+            // đối với DataContext
             await DataContext.BulkDeleteAsync(DeleteList);
             await DataContext.BulkMergeAsync(InsertList);
             await DataContext.BulkMergeAsync(UpdateList);
@@ -146,7 +182,11 @@ namespace DW_Test.Services.MItemService
             await Build_Dim_Item();
         }
 
-        // Tạo bảng dim_item
+        /* 
+         * Tạo bảng Dim_Item
+         * Ở dây ta cũng sẽ sử dụng thuật toán IncrementalLoad cho hàm tạo bảng Dim_Item
+         * Các bước thực hiện tương tự với hàm IncrementalItemInit
+         */
         private async Task<bool> Build_Dim_Item()
         {
             List<Raw_Item_RepDAO> Raw_Item_RepDAOs = await DataContext.Raw_Item_Rep
