@@ -15,20 +15,20 @@ namespace DW_Test.HashModels
         public string CountryCode { get; set; }
         public string CountryName { get; set; }
 
-        public string key;
+        public string Key;
 
         public string GetKey()
         {
-            key = CustomerCode;
+            Key = CustomerCode;
 
-            return key.GetHashCode().ToString();
+            return Key.GetHashCode().ToString();
         }
 
-        public string value;
+        public string Value;
 
         public string GetValue()
         {
-            value = CustomerName + "_"
+            Value = CustomerName + "_"
                     + CountryCode + "_"
                     + CountryName + "_"
                     + CountyCode + "_"
@@ -37,7 +37,7 @@ namespace DW_Test.HashModels
                     + SaleChannel + "_"
                     + SaleRoom;
 
-            return value.GetHashCode().ToString();
+            return Value.GetHashCode().ToString();
         }
 
 

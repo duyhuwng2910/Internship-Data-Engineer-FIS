@@ -1,4 +1,5 @@
-﻿using DW_Test.Models;
+﻿using DW_Test.HashModels;
+using DW_Test.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,9 +27,151 @@ namespace DW_Test.Services.MProduct_GroupService
         {
             List<Raw_Product_GroupDAO> Raw_Product_GroupLocalDAOs = await DataContext.Raw_Product_Group.ToListAsync();
 
-            await DataContext.BulkDeleteAsync(Raw_Product_GroupLocalDAOs);
+            List<Raw_Product_Group> HashLocal = Raw_Product_GroupLocalDAOs
+                .Select(x => new Raw_Product_Group(x)).ToList();
 
-            DataContext.BulkMerge(Raw_Product_GroupRemoteDAOs);
+            List<Raw_Product_Group> HashRemote = Raw_Product_GroupRemoteDAOs
+                .Select(x => new Raw_Product_Group(x)).ToList();
+
+            HashLocal = HashLocal.OrderBy(x => x.Key).ToList();
+
+            HashRemote = HashRemote.OrderBy(x => x.Key).ToList();
+
+            List<Raw_Product_GroupDAO> InsertList = new List<Raw_Product_GroupDAO>();
+
+            List<Raw_Product_GroupDAO> UpdateList = new List<Raw_Product_GroupDAO>();
+
+            List<Raw_Product_GroupDAO> DeleteList = new List<Raw_Product_GroupDAO>();
+
+            int index = 0;
+
+            for (int j = 0; j < HashRemote.Count && index < HashLocal.Count;)
+            {
+                if (CompareMethod.Compare(HashRemote[j].Key, HashLocal[index].Key) > 0)
+                {
+                    var remote = HashRemote[j];
+
+                    var group = new Raw_Product_GroupDAO()
+                    {
+                        ItemCode = remote.ItemCode,
+                        ItemName = remote.ItemName,
+                        Loai_MHang_KH = remote.Loai_MHang_KH,
+                        Nhomchinh_KH = remote.Nhomchinh_KH,
+                        NhomC1 = remote.NhomC1,
+                        NhomC2 = remote.NhomC2,
+                        NhomC3 = remote.NhomC3,
+                        Nhom_LEDSMRT1 = remote.Nhom_LEDSMRT1,
+                        Nhom_SMARTDONLE = remote.Nhom_SMARTDONLE
+                    };
+
+                    InsertList.Add(group);
+
+                    j++;
+                }
+                else if (CompareMethod.Compare(HashRemote[j].Key, HashLocal[index].Key) == 0)
+                {
+                    if (HashRemote[j].Value != HashLocal[index].Value)
+                    {
+                        var remote = HashRemote[j];
+
+                        var group = new Raw_Product_GroupDAO()
+                        {
+                            Id = HashLocal[index].Id,
+                            ItemCode = HashLocal[index].ItemCode,
+                            ItemName = remote.ItemName,
+                            Loai_MHang_KH = remote.Loai_MHang_KH,
+                            Nhomchinh_KH = remote.Nhomchinh_KH,
+                            NhomC1 = remote.NhomC1,
+                            NhomC2 = remote.NhomC2,
+                            NhomC3 = remote.NhomC3,
+                            Nhom_LEDSMRT1 = remote.Nhom_LEDSMRT1,
+                            Nhom_SMARTDONLE = remote.Nhom_SMARTDONLE
+                        };
+
+                        UpdateList.Add(group);
+                    }
+
+                    index++;
+
+                    j++;
+                }
+                else if (CompareMethod.Compare(HashRemote[j].Key, HashLocal[index].Key) < 0)
+                {
+                    var local = HashLocal[index];
+
+                    var group = new Raw_Product_GroupDAO()
+                    {
+                        Id = local.Id,
+                        ItemCode = local.ItemCode,
+                        ItemName = local.ItemName,
+                        Loai_MHang_KH = local.Loai_MHang_KH,
+                        Nhomchinh_KH = local.Nhomchinh_KH,
+                        NhomC1 = local.NhomC1,
+                        NhomC2 = local.NhomC2,
+                        NhomC3 = local.NhomC3,
+                        Nhom_LEDSMRT1 = local.Nhom_LEDSMRT1,
+                        Nhom_SMARTDONLE = local.Nhom_SMARTDONLE
+                    };
+
+                    DeleteList.Add(group);
+
+                    index++;
+                }
+            }
+
+            if (index == HashLocal.Count && HashLocal.Last().Key != HashRemote.Last().Key)
+            {
+                while (index < HashRemote.Count)
+                {
+                    var remote = HashRemote[index];
+
+                    var group = new Raw_Product_GroupDAO()
+                    {
+                        ItemCode = remote.ItemCode,
+                        ItemName = remote.ItemName,
+                        Loai_MHang_KH = remote.Loai_MHang_KH,
+                        Nhomchinh_KH = remote.Nhomchinh_KH,
+                        NhomC1 = remote.NhomC1,
+                        NhomC2 = remote.NhomC2,
+                        NhomC3 = remote.NhomC3,
+                        Nhom_LEDSMRT1 = remote.Nhom_LEDSMRT1,
+                        Nhom_SMARTDONLE = remote.Nhom_SMARTDONLE
+                    };
+
+                    InsertList.Add(group);
+
+                    index++;
+                }
+            }
+            else if (index < HashLocal.Count)
+            {
+                while (index < HashLocal.Count)
+                {
+                    var local = HashLocal[index];
+
+                    var group = new Raw_Product_GroupDAO()
+                    {
+                        Id = local.Id,
+                        ItemCode = local.ItemCode,
+                        ItemName = local.ItemName,
+                        Loai_MHang_KH = local.Loai_MHang_KH,
+                        Nhomchinh_KH = local.Nhomchinh_KH,
+                        NhomC1 = local.NhomC1,
+                        NhomC2 = local.NhomC2,
+                        NhomC3 = local.NhomC3,
+                        Nhom_LEDSMRT1 = local.Nhom_LEDSMRT1,
+                        Nhom_SMARTDONLE = local.Nhom_SMARTDONLE
+                    };
+
+                    DeleteList.Add(group);
+
+                    index++;
+                }
+            }
+
+            await DataContext.BulkDeleteAsync(DeleteList);
+            await DataContext.BulkMergeAsync(InsertList);
+            await DataContext.BulkMergeAsync(UpdateList);
 
             return true;
         }
@@ -66,8 +209,8 @@ namespace DW_Test.Services.MProduct_GroupService
                     };
                     Dim_ItemTypeGroupDAOs.Add(Dim_ItemTypeGroupDAO);
                 }
-
             }
+
             await DataContext.BulkMergeAsync(Dim_ItemTypeGroupDAOs);
 
             return true;

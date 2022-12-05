@@ -24,7 +24,7 @@ namespace DW_Test.Services.MHangfireService
 
         public async Task InitData()
         {
-            await ActualService.ActualInit(DateTime.Today.AddMonths(-1));
+            await ActualService.IncrementalActualInit(DateTime.Today.AddMonths(-3));
         }
     }
 }

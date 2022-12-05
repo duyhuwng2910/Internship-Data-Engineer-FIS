@@ -26,10 +26,10 @@ namespace DW_Test.Rpc.actual_report
             return Ok();
         }
 
-        [HttpGet, Route(ActualRoute.InitByDate)]
-        public async Task<ActionResult> InitByDate()
+        [HttpGet, Route(ActualRoute.IncrementalInit)]
+        public async Task<ActionResult> IncrementalInit()
         {
-            await ActualService.ActualInit(DateTime.Today.AddMonths(-1));
+            await ActualService.IncrementalActualInit(DateTime.Today.AddMonths(-3));
 
             return Ok();
         }

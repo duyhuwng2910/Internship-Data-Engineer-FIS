@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TrueSight.Common;
-
 namespace DW_Test.Services
 {
     public interface ITestStudentService : IServiceScoped
@@ -59,6 +58,7 @@ namespace DW_Test.Services
                     if (StudentRemote[j].value != StudentLocal[index].value)
                     {
                         var student = StudentRemote[j];
+                        student.Id = StudentLocal[index].Id;
                         student.StudentID = StudentLocal[index].StudentID;
                         UpdateList.Add(student);
                     }

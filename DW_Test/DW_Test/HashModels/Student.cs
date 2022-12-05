@@ -2,6 +2,8 @@
 {
     public class Student
     {
+        public long Id { get; set; }
+
         public string StudentID { get; set; }
 
         public string Name { get; set; }
@@ -36,16 +38,6 @@
         public void setValue(string value)
         {
             this.value = value;
-        }
-
-        public void update(Student student)
-        {
-            StudentID = student.StudentID;
-            Name = student.Name;
-            Age = student.Age;
-            GPA = student.GPA;
-            key = student.key;
-            value = student.value;
         }
     }
 }

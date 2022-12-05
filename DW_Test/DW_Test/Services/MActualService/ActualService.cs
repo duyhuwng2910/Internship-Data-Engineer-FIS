@@ -1,4 +1,5 @@
 ﻿using DW_Test.DWEModels;
+using DW_Test.HashModels;
 using DW_Test.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -19,7 +20,7 @@ namespace DW_Test.Services.MActualService
     {
         Task<bool> ActualInit();
 
-        Task<bool> ActualInit(DateTime Date);
+        Task<bool> IncrementalActualInit(DateTime Date);
 
         Task Transform();
 
@@ -87,41 +88,209 @@ namespace DW_Test.Services.MActualService
         // Hàm init bảng Raw 1.5 có tham số là Ngày lấy dữ liệu 
         // Tức là ta sẽ lấy dữ liệu trong bảng từ Ngày lấy dữ liệu
         // đến hiện tại
-        public async Task<bool> ActualInit(DateTime Date)
+        public async Task<bool> IncrementalActualInit(DateTime Date)
         {
             var Raw_B1_5_ActualServiceLocalDAOs = await DataContext.Raw_B1_5_ActualExportReport_Rep
-                .Where(x => x.Ngay_xuat >= Date).ToListAsync();
+               .Where(x => x.Ngay_xuat >= Date).ToListAsync();
+
+            List<Raw_B1_5_ActualExportReport_Rep> HashLocal = Raw_B1_5_ActualServiceLocalDAOs
+                .Select(x => new Raw_B1_5_ActualExportReport_Rep(x)).ToList();
 
             var Raw_B1_5_ActualServiceRemoteDAOs = await DWEContext.Raw_B1_5_ActualExportReport_Rep
                 .Where(x => x.Ngay_xuat >= Date).ToListAsync();
 
-            await DataContext.BulkDeleteAsync(Raw_B1_5_ActualServiceLocalDAOs);
+            List<Raw_B1_5_ActualExportReport_Rep> HashRemote = Raw_B1_5_ActualServiceRemoteDAOs
+                .Select(x => new Raw_B1_5_ActualExportReport_Rep(x)).ToList();
 
-            var Raw_B1_5_NewDAOs = Raw_B1_5_ActualServiceRemoteDAOs.Select(x => new Raw_B1_5_ActualExportReport_RepDAO()
+            HashLocal = HashLocal.OrderBy(x => x.Key).ToList();
+
+            HashRemote = HashRemote.OrderBy(x => x.Key).ToList();
+
+            List<Raw_B1_5_ActualExportReport_RepDAO> InsertList = new List<Raw_B1_5_ActualExportReport_RepDAO>();
+
+            List<Raw_B1_5_ActualExportReport_RepDAO> UpdateList = new List<Raw_B1_5_ActualExportReport_RepDAO>();
+
+            List<Raw_B1_5_ActualExportReport_RepDAO> DeleteList = new List<Raw_B1_5_ActualExportReport_RepDAO>();
+
+            int index = 0;
+
+            for (int j = 0; j < HashRemote.Count && index < HashLocal.Count;)
             {
-                Ma_HH = x.Ma_HH,
-                Ten_HH = x.Ten_HH,
-                Donvitinh = x.Donvitinh,
-                XN = x.XN,
-                Loai_NX = x.Loai_NX,
-                SoHD = x.SoHD,
-                Seri = x.Seri,
-                KhoaHD = x.KhoaHD,
-                Ngay_xuat = x.Ngay_xuat,
-                thoidiem = x.thoidiem,
-                Soluong = x.Soluong,
-                DonGia = x.DonGia,
-                ThanhTien = x.ThanhTien,
-                coso = x.coso,
-                Ma_KH = x.Ma_KH,
-                Khach_hang = x.Khach_hang,
-                Huy = x.Huy,
-                DocEntry = x.DocEntry,
-                TT = x.TT,
-            }).ToList();
+                if (CompareMethod.Compare(HashRemote[j].Key, HashLocal[index].Key) < 0)
+                {
+                    var remote = HashRemote[j];
 
-            // Sau khi gắn/kéo data từ phía khách hàng (remote) thì sẽ tiến hành merge
-            await DataContext.BulkMergeAsync(Raw_B1_5_NewDAOs);
+                    var actual = new Raw_B1_5_ActualExportReport_RepDAO()
+                    {
+                        Ma_HH = remote.Ma_HH,
+                        Ten_HH = remote.Ten_HH,
+                        Donvitinh = remote.Donvitinh,
+                        XN = remote.XN,
+                        Loai_NX = remote.Loai_NX,
+                        SoHD = remote.SoHD,
+                        Seri = remote.Seri,
+                        KhoaHD = remote.KhoaHD,
+                        Ngay_xuat = remote.Ngay_xuat,
+                        thoidiem = remote.thoidiem,
+                        Soluong = remote.Soluong,
+                        DonGia = remote.DonGia,
+                        ThanhTien = remote.ThanhTien,
+                        coso = remote.coso,
+                        Ma_KH = remote.Ma_HH,
+                        Khach_hang = remote.Khach_hang,
+                        Huy = remote.Huy,
+                        DocEntry = remote.DocEntry,
+                        TT = remote.TT,
+                    };
+
+                    InsertList.Add(actual);
+
+                    j++;
+                }
+                else if (CompareMethod.Compare(HashRemote[j].Key, HashLocal[index].Key) > 0)
+                {
+                    var local = HashLocal[index];
+
+                    var actual = new Raw_B1_5_ActualExportReport_RepDAO()
+                    {
+                        Id = local.Id,
+                        Ma_HH = local.Ma_HH,
+                        Ten_HH = local.Ten_HH,
+                        Donvitinh = local.Donvitinh,
+                        XN = local.XN,
+                        Loai_NX = local.Loai_NX,
+                        SoHD = local.SoHD,
+                        Seri = local.Seri,
+                        KhoaHD = local.KhoaHD,
+                        Ngay_xuat = local.Ngay_xuat,
+                        thoidiem = local.thoidiem,
+                        Soluong = local.Soluong,
+                        DonGia = local.DonGia,
+                        ThanhTien = local.ThanhTien,
+                        coso = local.coso,
+                        Ma_KH = local.Ma_HH,
+                        Khach_hang = local.Khach_hang,
+                        Huy = local.Huy,
+                        DocEntry = local.DocEntry,
+                        TT = local.TT,
+                    };
+
+                    DeleteList.Add(actual);
+
+                    index++;
+                }
+                else if (CompareMethod.Compare(HashRemote[j].Key, HashLocal[index].Key) == 0)
+                {
+                    if (HashRemote[j].Value != HashLocal[index].Value)
+                    {
+                        var remote = HashRemote[j];
+
+                        var actual = new Raw_B1_5_ActualExportReport_RepDAO()
+                        {
+                            Id = HashLocal[index].Id,
+                            Ma_HH = HashLocal[index].Ma_HH,
+                            Ten_HH = remote.Ten_HH,
+                            Donvitinh = remote.Donvitinh,
+                            XN = remote.XN,
+                            Loai_NX = remote.Loai_NX,
+                            SoHD = remote.SoHD,
+                            Seri = remote.Seri,
+                            KhoaHD = remote.KhoaHD,
+                            Ngay_xuat = remote.Ngay_xuat,
+                            thoidiem = remote.thoidiem,
+                            Soluong = remote.Soluong,
+                            DonGia = remote.DonGia,
+                            ThanhTien = remote.ThanhTien,
+                            coso = remote.coso,
+                            Ma_KH = remote.Ma_HH,
+                            Khach_hang = remote.Khach_hang,
+                            Huy = remote.Huy,
+                            DocEntry = remote.DocEntry,
+                            TT = remote.TT,
+                        };
+
+                        UpdateList.Add(actual);
+                    }
+
+                    j++;
+
+                    index++;
+                }
+            }
+
+            if (index == HashLocal.Count && HashLocal.Last().Key != HashRemote.Last().Key)
+            {
+                while (index < HashRemote.Count)
+                {
+                    var remote = HashRemote[index];
+
+                    var actual = new Raw_B1_5_ActualExportReport_RepDAO()
+                    {
+                        Ma_HH = remote.Ma_HH,
+                        Ten_HH = remote.Ten_HH,
+                        Donvitinh = remote.Donvitinh,
+                        XN = remote.XN,
+                        Loai_NX = remote.Loai_NX,
+                        SoHD = remote.SoHD,
+                        Seri = remote.Seri,
+                        KhoaHD = remote.KhoaHD,
+                        Ngay_xuat = remote.Ngay_xuat,
+                        thoidiem = remote.thoidiem,
+                        Soluong = remote.Soluong,
+                        DonGia = remote.DonGia,
+                        ThanhTien = remote.ThanhTien,
+                        coso = remote.coso,
+                        Ma_KH = remote.Ma_HH,
+                        Khach_hang = remote.Khach_hang,
+                        Huy = remote.Huy,
+                        DocEntry = remote.DocEntry,
+                        TT = remote.TT,
+                    };
+
+                    InsertList.Add(actual);
+
+                    index++;
+                }
+            }
+            else if (index < HashLocal.Count)
+            {
+                while (index < HashLocal.Count)
+                {
+                    var local = HashLocal[index];
+
+                    var actual = new Raw_B1_5_ActualExportReport_RepDAO()
+                    {
+                        Id = local.Id,
+                        Ma_HH = local.Ma_HH,
+                        Ten_HH = local.Ten_HH,
+                        Donvitinh = local.Donvitinh,
+                        XN = local.XN,
+                        Loai_NX = local.Loai_NX,
+                        SoHD = local.SoHD,
+                        Seri = local.Seri,
+                        KhoaHD = local.KhoaHD,
+                        Ngay_xuat = local.Ngay_xuat,
+                        thoidiem = local.thoidiem,
+                        Soluong = local.Soluong,
+                        DonGia = local.DonGia,
+                        ThanhTien = local.ThanhTien,
+                        coso = local.coso,
+                        Ma_KH = local.Ma_HH,
+                        Khach_hang = local.Khach_hang,
+                        Huy = local.Huy,
+                        DocEntry = local.DocEntry,
+                        TT = local.TT,
+                    };
+
+                    DeleteList.Add(actual);
+
+                    index++;
+                }
+            }
+
+            await DataContext.BulkDeleteAsync(DeleteList);
+            await DataContext.BulkMergeAsync(InsertList);
+            await DataContext.BulkMergeAsync(UpdateList);
 
             return true;
         }
@@ -195,10 +364,9 @@ namespace DW_Test.Services.MActualService
             return true;
         }
 
-
         public async Task TransformByDate()
         {
-            await Build_Fact_Report_Revenue(DateTime.Today.AddMonths(-1));
+            await Build_Fact_Report_Revenue(DateTime.Today.AddMonths(-3));
         }
 
         // Hàm transform bảng Fact theo thời gian xác định trước là 1 tháng kể từ hiện tại
@@ -220,8 +388,7 @@ namespace DW_Test.Services.MActualService
 
             List<Dim_ItemVATGroupDAO> Dim_ItemVATGroupDAOs = await DataContext.Dim_ItemVATGroup.ToListAsync();
 
-            List<Fact_Report_RevenueDAO> Fact_Report_RevenueDAOs = await DataContext.Fact_Report_Revenue
-                .Where(x => x.DateKey >= Dim_DateDAOs.First().DateKey).ToListAsync();
+            List<Fact_Report_RevenueDAO> Fact_Report_RevenueDAOs = new List<Fact_Report_RevenueDAO>();
 
             foreach (var Raw_B1_5_AcutalExportReport_RepDAO in Raw_B1_5_ActualExportReport_RepDAOs)
             {
