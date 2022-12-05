@@ -90,32 +90,44 @@ namespace DW_Test.Services.MActualService
         // đến hiện tại
         public async Task<bool> IncrementalActualInit(DateTime Date)
         {
+            // List dữ liệu trong bảng Raw_B1_5_ActualExportReport_Rep của Local
             var Raw_B1_5_ActualServiceLocalDAOs = await DataContext.Raw_B1_5_ActualExportReport_Rep
                .Where(x => x.Ngay_xuat >= Date).ToListAsync();
 
+            // List dữ liệu đã tạo thêm thuộc tính Key và Value trong bảng của Local
             List<Raw_B1_5_ActualExportReport_Rep> HashLocal = Raw_B1_5_ActualServiceLocalDAOs
                 .Select(x => new Raw_B1_5_ActualExportReport_Rep(x)).ToList();
 
+            // List dữ liệu trong bảng Raw_B1_5_ActualExportReport_Rep của Remote
             var Raw_B1_5_ActualServiceRemoteDAOs = await DWEContext.Raw_B1_5_ActualExportReport_Rep
                 .Where(x => x.Ngay_xuat >= Date).ToListAsync();
 
+            // List dữ liệu đã tạo thêm thuộc tính Key và Value trong bảng của Remote
             List<Raw_B1_5_ActualExportReport_Rep> HashRemote = Raw_B1_5_ActualServiceRemoteDAOs
                 .Select(x => new Raw_B1_5_ActualExportReport_Rep(x)).ToList();
 
+            // Sắp xếp các dòng dữ liệu trong bảng theo thuộc tính Key của Local
             HashLocal = HashLocal.OrderBy(x => x.Key).ToList();
 
+            // Sắp xếp các dòng dữ liệu trong bảng theo thuộc tính Key của Remote
             HashRemote = HashRemote.OrderBy(x => x.Key).ToList();
 
+            // List dùng để insert dữ liệu mới vào Local
             List<Raw_B1_5_ActualExportReport_RepDAO> InsertList = new List<Raw_B1_5_ActualExportReport_RepDAO>();
 
+            // List dùng để update dữ liệu cũ trong Local
             List<Raw_B1_5_ActualExportReport_RepDAO> UpdateList = new List<Raw_B1_5_ActualExportReport_RepDAO>();
 
+            // List dùng để delete dữ liệu trong Local mà không còn tồn tại trong Remote
             List<Raw_B1_5_ActualExportReport_RepDAO> DeleteList = new List<Raw_B1_5_ActualExportReport_RepDAO>();
 
+            // Chỉ số dùng cho HashLocal
             int index = 0;
 
             for (int j = 0; j < HashRemote.Count && index < HashLocal.Count;)
             {
+                // Nếu Hàm compare trả về < 0, tức là dòng dữ liệu này trong Local chưa có
+                // Ta tiến hành thêm dòng này vào InsertList
                 if (CompareMethod.Compare(HashRemote[j].Key, HashLocal[index].Key) < 0)
                 {
                     var remote = HashRemote[j];
@@ -147,40 +159,13 @@ namespace DW_Test.Services.MActualService
 
                     j++;
                 }
-                else if (CompareMethod.Compare(HashRemote[j].Key, HashLocal[index].Key) > 0)
-                {
-                    var local = HashLocal[index];
-
-                    var actual = new Raw_B1_5_ActualExportReport_RepDAO()
-                    {
-                        Id = local.Id,
-                        Ma_HH = local.Ma_HH,
-                        Ten_HH = local.Ten_HH,
-                        Donvitinh = local.Donvitinh,
-                        XN = local.XN,
-                        Loai_NX = local.Loai_NX,
-                        SoHD = local.SoHD,
-                        Seri = local.Seri,
-                        KhoaHD = local.KhoaHD,
-                        Ngay_xuat = local.Ngay_xuat,
-                        thoidiem = local.thoidiem,
-                        Soluong = local.Soluong,
-                        DonGia = local.DonGia,
-                        ThanhTien = local.ThanhTien,
-                        coso = local.coso,
-                        Ma_KH = local.Ma_HH,
-                        Khach_hang = local.Khach_hang,
-                        Huy = local.Huy,
-                        DocEntry = local.DocEntry,
-                        TT = local.TT,
-                    };
-
-                    DeleteList.Add(actual);
-
-                    index++;
-                }
+                
+                // Nếu hàm Compare trả về = 0 tức là hai Key bằng nhau
+                // Ta tiến hành so sánh hai Value
                 else if (CompareMethod.Compare(HashRemote[j].Key, HashLocal[index].Key) == 0)
                 {
+                    // Nếu hai Value khác nhau
+                    // Ta tiến hành thêm dòng này vào UpdateList
                     if (HashRemote[j].Value != HashLocal[index].Value)
                     {
                         var remote = HashRemote[j];
@@ -216,8 +201,46 @@ namespace DW_Test.Services.MActualService
 
                     index++;
                 }
+
+                // Nếu hàm Compare trả về > 0, tức là dòng này không tồn tại trong Remote
+                // Ta tiến hành thêm dòng này vào DeleteList
+                else if (CompareMethod.Compare(HashRemote[j].Key, HashLocal[index].Key) > 0)
+                {
+                    var local = HashLocal[index];
+
+                    var actual = new Raw_B1_5_ActualExportReport_RepDAO()
+                    {
+                        Id = local.Id,
+                        Ma_HH = local.Ma_HH,
+                        Ten_HH = local.Ten_HH,
+                        Donvitinh = local.Donvitinh,
+                        XN = local.XN,
+                        Loai_NX = local.Loai_NX,
+                        SoHD = local.SoHD,
+                        Seri = local.Seri,
+                        KhoaHD = local.KhoaHD,
+                        Ngay_xuat = local.Ngay_xuat,
+                        thoidiem = local.thoidiem,
+                        Soluong = local.Soluong,
+                        DonGia = local.DonGia,
+                        ThanhTien = local.ThanhTien,
+                        coso = local.coso,
+                        Ma_KH = local.Ma_HH,
+                        Khach_hang = local.Khach_hang,
+                        Huy = local.Huy,
+                        DocEntry = local.DocEntry,
+                        TT = local.TT,
+                    };
+
+                    DeleteList.Add(actual);
+
+                    index++;
+                }
             }
 
+            // Nếu mà index bằng số lượng dòng của HashLocal, đồng thời Key của hai dòng cuối cùng
+            // ở hai bảng là khác nhau thì khi đó ta tiến thành thêm toàn bộ số dòng còn lại
+            // trong HashRemote vào InsertList
             if (index == HashLocal.Count && HashLocal.Last().Key != HashRemote.Last().Key)
             {
                 while (index < HashRemote.Count)
@@ -252,6 +275,10 @@ namespace DW_Test.Services.MActualService
                     index++;
                 }
             }
+
+            // Nếu index nhỏ hơn số dòng của HashLocal, tức là số dòng còn lại chưa được so sánh
+            // trong HashLocal là các dòng không còn tồn tại trong HashRemote
+            // Ta tiến hành thêm toàn bộ chúng vào DeleteList
             else if (index < HashLocal.Count)
             {
                 while (index < HashLocal.Count)
@@ -288,6 +315,9 @@ namespace DW_Test.Services.MActualService
                 }
             }
 
+            // Đến đây ta sẽ tiến hành BulkDelete cho DeleteList
+            // và BulkMerge cho InsertList và UpdateList
+            // đối với DataContext
             await DataContext.BulkDeleteAsync(DeleteList);
             await DataContext.BulkMergeAsync(InsertList);
             await DataContext.BulkMergeAsync(UpdateList);
@@ -369,7 +399,7 @@ namespace DW_Test.Services.MActualService
             await Build_Fact_Report_Revenue(DateTime.Today.AddMonths(-3));
         }
 
-        // Hàm transform bảng Fact theo thời gian xác định trước là 1 tháng kể từ hiện tại
+        // Hàm transform bảng Fact theo thời gian xác định trước là 3 tháng kể từ hiện tại
         public async Task<bool> Build_Fact_Report_Revenue(DateTime Date)
         {
             List<Raw_B1_5_ActualExportReport_RepDAO> Raw_B1_5_ActualExportReport_RepDAOs
@@ -382,11 +412,21 @@ namespace DW_Test.Services.MActualService
 
             List<Dim_DateDAO> Dim_DateDAOs = await DataContext.Dim_Date.Where(x => x.Date >= Date).ToListAsync();
 
+            Dim_DateDAOs = Dim_DateDAOs.OrderBy(x => x.DateKey).ToList();
+
             List<Dim_ItemDAO> Dim_ItemDAOs = await DataContext.Dim_Item.ToListAsync();
 
             List<Dim_ItemNewItemGroupDAO> Dim_ItemNewItemGroupDAOs = await DataContext.Dim_ItemNewItemGroup.ToListAsync();
 
             List<Dim_ItemVATGroupDAO> Dim_ItemVATGroupDAOs = await DataContext.Dim_ItemVATGroup.ToListAsync();
+
+            // List dữ liệu của bảng Fact trong Local trong 3 tháng gần nhất
+            // Ta sẽ tiến hành BulkDelete toàn bộ dữ liệu này để
+            // transform lại dữ liệu 3 tháng gần nhất
+            List<Fact_Report_RevenueDAO> Fact_Report_RevenueLocalDAOs = await DataContext.Fact_Report_Revenue
+                .Where(x => x.DateKey >= Dim_DateDAOs.First().DateKey).ToListAsync();
+
+            await DataContext.BulkDeleteAsync(Fact_Report_RevenueLocalDAOs);
 
             List<Fact_Report_RevenueDAO> Fact_Report_RevenueDAOs = new List<Fact_Report_RevenueDAO>();
 
@@ -428,7 +468,6 @@ namespace DW_Test.Services.MActualService
                     Fact_Report_RevenueDAOs.Add(Fact_Report_Revenue);
                 }
             }
-            await DataContext.Fact_Report_Revenue.DeleteFromQueryAsync();
 
             await DataContext.BulkMergeAsync(Fact_Report_RevenueDAOs);
 

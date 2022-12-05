@@ -64,6 +64,10 @@ namespace DW_Test.Services.MCustomerService
             return true;
         }
 
+        /*
+         * Hàm IncrementalCustomerInit
+         * load dữ liệu trong bảng Raw_Customer_Rep theo hướng gia tăng 
+         */
         public async Task<bool> IncrementalCustomerInit()
         {
             // List data Local
@@ -86,12 +90,16 @@ namespace DW_Test.Services.MCustomerService
             // Sắp xếp List<> remote theo Key
             HashRemote = HashRemote.OrderBy(x => x.Key).ToList();
 
+            // List dùng để insert các dòng dữ liệu mới
             List<Raw_Customer_RepDAO> InsertList = new List<Raw_Customer_RepDAO>();
 
+            // List dùng để update các dòng dữ liệu cũ
             List<Raw_Customer_RepDAO> UpdateList = new List<Raw_Customer_RepDAO>();
 
+            // List dùng delete các dòng dữ liệu không còn tồn tại
             List<Raw_Customer_RepDAO> DeleteList = new List<Raw_Customer_RepDAO>();
 
+            // Chỉ số dùng cho HashLocal
             int index = 0;
 
             // Vòng lặp chạy incremental load
@@ -121,9 +129,11 @@ namespace DW_Test.Services.MCustomerService
 
                     j++;
                 }
+
                 // Nếu hai Key đã bằng nhau thì kiểm tra Value
                 // Nếu hai Value khác nhau thì thêm dòng vào UpdateList
-                // còn bằng nhau thì continue sau đó cộng 1 vào j và index
+                // còn bằng nhau thì continue
+                // sau đó cộng 1 vào j và index
                 else if (CompareMethod.Compare(HashRemote[j].Key,
                                         HashLocal[index].Key) == 0)
                 {
@@ -152,6 +162,7 @@ namespace DW_Test.Services.MCustomerService
 
                     index++;
                 }
+
                 // Nếu Key của remote lớn hơn tức là dòng này của Local trong Remote
                 // không tồn tại, nên ta sẽ thêm dòng vào DeleteList
                 // đồng thời cộng 1 vào index
@@ -180,7 +191,7 @@ namespace DW_Test.Services.MCustomerService
             }
 
             // Nếu local đã chạy hết, index vẫn nhỏ hơn count của HashRemote
-            // đồng thời là hai key của phần tử thứ index của hai bảng là bằng nhau
+            // đồng thời là hai key của dòng cuối cùng trong hai bảng là BẰNG NHAU
             // thì ta tiến hành insert toàn bộ các dòng còn lại ở remote vào HashLocal
             if (index == HashLocal.Count && HashLocal.Last().Key != HashRemote.Last().Key)
             {
@@ -206,6 +217,7 @@ namespace DW_Test.Services.MCustomerService
                     index++;
                 }
             }
+
             // Nếu index < count của local tức là local còn thừa dữ liệu cũ
             // Nên ta sẽ delete toàn bộ các dòng còn lại ở HashLocal
             else if (index < HashLocal.Count)
@@ -234,14 +246,21 @@ namespace DW_Test.Services.MCustomerService
                 }
             }
 
+            // Đến đây ta sẽ tiến hành BulkDelete cho DeleteList
+            // và BulkMerge cho InsertList và UpdateList
+            // đối với DataContext
             await DataContext.BulkDeleteAsync(DeleteList);
             await DataContext.BulkMergeAsync(InsertList);
             await DataContext.BulkMergeAsync(UpdateList);
 
             return true;
         }
-
-        // Phương thức transform bảng raw thành bảng dim_customer
+ 
+        /*
+         * Phương thức transform bảng raw thành bảng dim_customer
+         * Ở đây có 6 bảng Dim đầu tiên (trừ bảng Dim_UnitMapping)
+         * có sử dụng thuật toán load dữ liệu theo hướng gia tăng
+         */
         public async Task CustomerTransform()
         {
             await Build_Dim_Customer();
@@ -593,6 +612,7 @@ namespace DW_Test.Services.MCustomerService
             await DataContext.BulkDeleteAsync(DeleteList);
             await DataContext.BulkMergeAsync(InsertList);
             await DataContext.BulkMergeAsync(UpdateList);
+
             //foreach (var Raw_Customer_RepDAO in Raw_Customer_RepDAOs)
             //{
             //    Dim_CountyDAO Dim_County = Dim_CountyDAOs.Where(x => x.CountyCode == Raw_Customer_RepDAO.CountyCode).FirstOrDefault();
@@ -622,22 +642,100 @@ namespace DW_Test.Services.MCustomerService
             List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep
                 .Where(x => !string.IsNullOrEmpty(x.SaleBranch)).ToListAsync();
 
-            List<Dim_SaleBranchDAO> Dim_Sale_BranchDAOs = await DataContext.Dim_SaleBranch.ToListAsync();
+            List<Dim_SaleBranchDAO> Dim_SaleBranchDAOs = await DataContext.Dim_SaleBranch.ToListAsync();
 
-            foreach (var Raw_Customer_RepDAO in Raw_Customer_RepDAOs)
+            Dim_SaleBranchDAOs = Dim_SaleBranchDAOs.OrderBy(x => x.SaleBranchName).ToList();
+
+            var dim = from customer in Raw_Customer_RepDAOs
+                      group customer by customer.SaleBranch into SaleBranch
+                      orderby SaleBranch.Key
+                      select SaleBranch.Key;
+
+            List<string> SaleBranchList = new List<string>();
+
+            foreach (var SaleBranch in dim)
             {
-                Dim_SaleBranchDAO Dim_Sale_Branch = Dim_Sale_BranchDAOs.Where(x => x.SaleBranchName == Raw_Customer_RepDAO.SaleBranch).FirstOrDefault();
+                SaleBranchList.Add(SaleBranch);
+            }
 
-                if (Dim_Sale_Branch == null)
+            List<Dim_SaleBranchDAO> InsertList = new List<Dim_SaleBranchDAO>();
+
+            List<Dim_SaleBranchDAO> DeleteList = new List<Dim_SaleBranchDAO>();
+
+            int index = 0;
+
+            for (int j = 0; j < SaleBranchList.Count && index < Dim_SaleBranchDAOs.Count;)
+            {
+                if (CompareMethod.Compare(SaleBranchList[j], Dim_SaleBranchDAOs[index].SaleBranchName) < 0)
                 {
-                    Dim_Sale_Branch = new Dim_SaleBranchDAO
+                    InsertList.Add(new Dim_SaleBranchDAO()
                     {
-                        SaleBranchName = Raw_Customer_RepDAO.SaleBranch,
-                    };
-                    Dim_Sale_BranchDAOs.Add(Dim_Sale_Branch);
+                        SaleBranchName = SaleBranchList[j]
+                    });
+
+                    j++;
+                }
+                else if (CompareMethod.Compare(SaleBranchList[j], Dim_SaleBranchDAOs[index].SaleBranchName) == 0)
+                {
+                    j++;
+
+                    index++;
+                }
+                else if (CompareMethod.Compare(SaleBranchList[j], Dim_SaleBranchDAOs[index].SaleBranchName) > 0)
+                {
+                    DeleteList.Add(new Dim_SaleBranchDAO()
+                    {
+                        SaleBranchId = Dim_SaleBranchDAOs[index].SaleBranchId,
+                        SaleBranchName = Dim_SaleBranchDAOs[index].SaleBranchName
+                    });
+
+                    index++;
                 }
             }
-            await DataContext.BulkMergeAsync(Dim_Sale_BranchDAOs);
+
+            if (index == Dim_SaleBranchDAOs.Count && SaleBranchList.Last() != Dim_SaleBranchDAOs.Last().SaleBranchName)
+            {
+                while (index < SaleBranchList.Count)
+                {
+                    InsertList.Add(new Dim_SaleBranchDAO()
+                    {
+                        SaleBranchName = SaleBranchList[index]
+                    });
+
+                    index++;
+                }
+            }
+            else if (index < Dim_SaleBranchDAOs.Count)
+            {
+                while (index < Dim_SaleBranchDAOs.Count)
+                {
+                    DeleteList.Add(new Dim_SaleBranchDAO()
+                    {
+                        SaleBranchId = Dim_SaleBranchDAOs[index].SaleBranchId,
+                        SaleBranchName = Dim_SaleBranchDAOs[index].SaleBranchName
+                    });
+
+                    index++;
+                }
+            }
+
+            await DataContext.BulkDeleteAsync(DeleteList);
+            await DataContext.BulkMergeAsync(InsertList);
+
+            //foreach (var Raw_Customer_RepDAO in Raw_Customer_RepDAOs)
+            //{
+            //    Dim_SaleBranchDAO Dim_SaleBranch = Dim_SaleBranchDAOs.Where(x => x.SaleBranchName == Raw_Customer_RepDAO.SaleBranch).FirstOrDefault();
+
+            //    if (Dim_SaleBranch == null)
+            //    {
+            //        Dim_SaleBranch = new Dim_SaleBranchDAO
+            //        {
+            //            SaleBranchName = Raw_Customer_RepDAO.SaleBranch,
+            //        };
+            //        Dim_SaleBranchDAOs.Add(Dim_SaleBranch);
+            //    }
+            //}
+            //await DataContext.BulkMergeAsync(Dim_SaleBranchDAOs);
 
             return true;
         }
@@ -648,48 +746,204 @@ namespace DW_Test.Services.MCustomerService
             List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep
                 .Where(x => !string.IsNullOrEmpty(x.SaleChannel)).ToListAsync();
 
-            List<Dim_SaleChannelDAO> Dim_Sale_ChannelDAOs = await DataContext.Dim_SaleChannel.ToListAsync();
+            List<Dim_SaleChannelDAO> Dim_SaleChannelDAOs = await DataContext.Dim_SaleChannel.ToListAsync();
 
-            foreach (var Raw_Customer_RepDAO in Raw_Customer_RepDAOs)
+            Dim_SaleChannelDAOs = Dim_SaleChannelDAOs.OrderBy(x => x.SaleChannelName).ToList();
+
+            var dim = from customer in Raw_Customer_RepDAOs
+                      group customer by customer.SaleChannel into SaleChannel
+                      orderby SaleChannel.Key
+                      select SaleChannel.Key;
+
+            List<string> SaleChannelList = new List<string>();
+
+            foreach (var SaleChannel in dim)
             {
-                Dim_SaleChannelDAO Dim_Sale_Channel = Dim_Sale_ChannelDAOs.Where(x => x.SaleChannelName == Raw_Customer_RepDAO.SaleChannel).FirstOrDefault();
+                SaleChannelList.Add(SaleChannel);
+            }
 
-                if (Dim_Sale_Channel == null)
+            List<Dim_SaleChannelDAO> InsertList = new List<Dim_SaleChannelDAO>();
+
+            List<Dim_SaleChannelDAO> DeleteList = new List<Dim_SaleChannelDAO>();
+
+            int index = 0;
+
+            for (int j = 0; j < SaleChannelList.Count && index < Dim_SaleChannelDAOs.Count;)
+            {
+                if (CompareMethod.Compare(SaleChannelList[j], Dim_SaleChannelDAOs[index].SaleChannelName) < 0)
                 {
-                    Dim_Sale_Channel = new Dim_SaleChannelDAO
+                    InsertList.Add(new Dim_SaleChannelDAO()
                     {
-                        SaleChannelName = Raw_Customer_RepDAO.SaleChannel,
-                    };
-                    Dim_Sale_ChannelDAOs.Add(Dim_Sale_Channel);
+                        SaleChannelName = SaleChannelList[j]
+                    });
+
+                    j++;
+                }
+                else if (CompareMethod.Compare(SaleChannelList[j], Dim_SaleChannelDAOs[index].SaleChannelName) == 0)
+                {
+                    j++;
+
+                    index++;
+                }
+                else if (CompareMethod.Compare(SaleChannelList[j], Dim_SaleChannelDAOs[index].SaleChannelName) > 0)
+                {
+                    DeleteList.Add(new Dim_SaleChannelDAO()
+                    {
+                        SaleChannelId = Dim_SaleChannelDAOs[index].SaleChannelId,
+                        SaleChannelName = Dim_SaleChannelDAOs[index].SaleChannelName
+                    });
+
+                    index++;
                 }
             }
-            await DataContext.BulkMergeAsync(Dim_Sale_ChannelDAOs);
+
+            if (index == Dim_SaleChannelDAOs.Count && SaleChannelList.Last() != Dim_SaleChannelDAOs.Last().SaleChannelName)
+            {
+                while (index < SaleChannelList.Count)
+                {
+                    InsertList.Add(new Dim_SaleChannelDAO()
+                    {
+                        SaleChannelName = SaleChannelList[index]
+                    });
+
+                    index++;
+                }
+            }
+            else if (index < Dim_SaleChannelDAOs.Count)
+            {
+                while (index < Dim_SaleChannelDAOs.Count)
+                {
+                    DeleteList.Add(new Dim_SaleChannelDAO()
+                    {
+                        SaleChannelId = Dim_SaleChannelDAOs[index].SaleChannelId,
+                        SaleChannelName = Dim_SaleChannelDAOs[index].SaleChannelName
+                    });
+
+                    index++;
+                }
+            }
+
+            await DataContext.BulkDeleteAsync(DeleteList);
+            await DataContext.BulkMergeAsync(InsertList);
+
+            //foreach (var Raw_Customer_RepDAO in Raw_Customer_RepDAOs)
+            //{
+            //    Dim_SaleChannelDAO Dim_SaleChannel = Dim_SaleChannelDAOs.Where(x => x.SaleChannelName == Raw_Customer_RepDAO.SaleChannel).FirstOrDefault();
+
+            //    if (Dim_SaleChannel == null)
+            //    {
+            //        Dim_SaleChannel = new Dim_SaleChannelDAO
+            //        {
+            //            SaleChannelName = Raw_Customer_RepDAO.SaleChannel,
+            //        };
+            //        Dim_SaleChannelDAOs.Add(Dim_SaleChannel);
+            //    }
+            //}
+            //await DataContext.BulkMergeAsync(Dim_SaleChannelDAOs);
 
             return true;
         }
 
         // Tạo bảng dim_sale_room
-        public async Task<bool> Build_Dim_SaleRoom()
+        private async Task<bool> Build_Dim_SaleRoom()
         {
             List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep
                 .Where(x => !string.IsNullOrEmpty(x.SaleRoom)).ToListAsync();
 
-            List<Dim_SaleRoomDAO> Dim_Sale_RoomDAOs = await DataContext.Dim_SaleRoom.ToListAsync();
+            List<Dim_SaleRoomDAO> Dim_SaleRoomDAOs = await DataContext.Dim_SaleRoom.ToListAsync();
 
-            foreach (var Raw_Customer_RepDAO in Raw_Customer_RepDAOs)
+            Dim_SaleRoomDAOs = Dim_SaleRoomDAOs.OrderBy(x => x.SaleRoomName).ToList();
+
+            var dim = from customer in Raw_Customer_RepDAOs
+                      group customer by customer.SaleRoom into SaleRoom
+                      orderby SaleRoom.Key
+                      select SaleRoom.Key;
+
+            List<string> SaleRoomList = new List<string>();
+
+            foreach (var SaleRoom in dim)
             {
-                Dim_SaleRoomDAO Dim_Sale_Room = Dim_Sale_RoomDAOs.Where(x => x.SaleRoomName == Raw_Customer_RepDAO.SaleRoom).FirstOrDefault();
+                SaleRoomList.Add(SaleRoom);
+            }
 
-                if (Dim_Sale_Room == null)
+            List<Dim_SaleRoomDAO> InsertList = new List<Dim_SaleRoomDAO>();
+
+            List<Dim_SaleRoomDAO> DeleteList = new List<Dim_SaleRoomDAO>();
+
+            int index = 0;
+
+            for (int j = 0; j < SaleRoomList.Count && index < Dim_SaleRoomDAOs.Count;)
+            {
+                if (CompareMethod.Compare(SaleRoomList[j], Dim_SaleRoomDAOs[index].SaleRoomName) < 0)
                 {
-                    Dim_Sale_Room = new Dim_SaleRoomDAO
+                    InsertList.Add(new Dim_SaleRoomDAO()
                     {
-                        SaleRoomName = Raw_Customer_RepDAO.SaleRoom,
-                    };
-                    Dim_Sale_RoomDAOs.Add(Dim_Sale_Room);
+                        SaleRoomName = SaleRoomList[j]
+                    });
+
+                    j++;
+                }
+                else if (CompareMethod.Compare(SaleRoomList[j], Dim_SaleRoomDAOs[index].SaleRoomName) == 0)
+                {
+                    j++;
+
+                    index++;
+                }
+                else if (CompareMethod.Compare(SaleRoomList[j], Dim_SaleRoomDAOs[index].SaleRoomName) > 0)
+                {
+                    DeleteList.Add(new Dim_SaleRoomDAO()
+                    {
+                        SaleRoomId = Dim_SaleRoomDAOs[index].SaleRoomId,
+                        SaleRoomName = Dim_SaleRoomDAOs[index].SaleRoomName
+                    });
+
+                    index++;
                 }
             }
-            await DataContext.BulkMergeAsync(Dim_Sale_RoomDAOs);
+
+            if (index == Dim_SaleRoomDAOs.Count && SaleRoomList.Last() != Dim_SaleRoomDAOs.Last().SaleRoomName)
+            {
+                while (index < SaleRoomList.Count)
+                {
+                    InsertList.Add(new Dim_SaleRoomDAO()
+                    {
+                        SaleRoomName = SaleRoomList[index]
+                    });
+
+                    index++;
+                }
+            }
+            else if (index < Dim_SaleRoomDAOs.Count)
+            {
+                while (index < Dim_SaleRoomDAOs.Count)
+                {
+                    DeleteList.Add(new Dim_SaleRoomDAO()
+                    {
+                        SaleRoomId = Dim_SaleRoomDAOs[index].SaleRoomId,
+                        SaleRoomName = Dim_SaleRoomDAOs[index].SaleRoomName
+                    });
+
+                    index++;
+                }
+            }
+
+            await DataContext.BulkDeleteAsync(DeleteList);
+            await DataContext.BulkMergeAsync(InsertList);
+
+            //foreach (var Raw_Customer_RepDAO in Raw_Customer_RepDAOs)
+            //{
+            //    Dim_SaleRoomDAO Dim_SaleRoom = Dim_SaleRoomDAOs.Where(x => x.SaleRoomName == Raw_Customer_RepDAO.SaleRoom).FirstOrDefault();
+
+            //    if (Dim_SaleRoom == null)
+            //    {
+            //        Dim_SaleRoom = new Dim_SaleRoomDAO
+            //        {
+            //            SaleRoomName = Raw_Customer_RepDAO.SaleRoom,
+            //        };
+            //        Dim_SaleRoomDAOs.Add(Dim_SaleRoom);
+            //    }
+            //}
+            //await DataContext.BulkMergeAsync(Dim_SaleRoomDAOs);
 
             return true;
         }
@@ -710,7 +964,8 @@ namespace DW_Test.Services.MCustomerService
             foreach (var Raw_Customer_RepDAO in Raw_Customer_RepDAOs)
             {
                 /*
-                 * 6 biến var ở dưới dùng để kiểm tra data trong các bảng dim tương ứng có ở trong bảng Raw_Customer_Rep không
+                 * 6 biến var ở dưới dùng để kiểm tra data trong các bảng dim tương ứng 
+                 * có ở trong bảng Raw_Customer_Rep không
                  */
                 var Country = Countries.Where(x => x.CountryCode == Raw_Customer_RepDAO.CountryCode).FirstOrDefault();
                 var County = Counties.Where(x => x.CountyCode == Raw_Customer_RepDAO.CountyCode).FirstOrDefault();
@@ -723,8 +978,8 @@ namespace DW_Test.Services.MCustomerService
                 Dim_UnitMappingDAO Dim_Unit_Mapping = Dim_Unit_MappingDAOs
                     .Where(x => x.CustomerId == Customer?.CustomerId).FirstOrDefault();
 
-                // Nếu chưa thì tạo mới, trước đó tiến hành ánh xạ giữa 6 bảng dim và bảng raw để nối và tạo ra các dòng
-                // trong bảng dim mapping
+                // Nếu chưa thì tạo mới, trước đó tiến hành ánh xạ giữa 6 bảng dim và bảng raw
+                // để nối và tạo ra các dòng trong bảng dim mapping
                 if (Dim_Unit_Mapping == null)
                 {
                     Dim_Unit_Mapping = new Dim_UnitMappingDAO
