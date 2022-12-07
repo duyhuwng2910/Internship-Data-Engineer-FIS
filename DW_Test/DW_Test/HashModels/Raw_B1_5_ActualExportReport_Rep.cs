@@ -73,7 +73,7 @@ namespace DW_Test.HashModels
             DonGia = Local.DonGia;
             ThanhTien = Local.ThanhTien;
             coso = Local.coso;
-            Ma_KH = Local.Ma_HH;
+            Ma_KH = Local.Ma_KH;
             Khach_hang = Local.Khach_hang;
             Huy = Local.Huy;
             DocEntry = Local.DocEntry;
@@ -99,7 +99,7 @@ namespace DW_Test.HashModels
             DonGia = Remote.DonGia;
             ThanhTien = Remote.ThanhTien;
             coso = Remote.coso;
-            Ma_KH = Remote.Ma_HH;
+            Ma_KH = Remote.Ma_KH;
             Khach_hang = Remote.Khach_hang;
             Huy = Remote.Huy;
             DocEntry = Remote.DocEntry;

@@ -310,7 +310,7 @@ namespace DW_Test.Services.MCustomerService
                 else if (CompareMethod.Compare(Raw_Customer_RepDAOs[j].CustomerCode,
                                                Dim_CustomerDAOs[index].CustomerCode) == 0)
                 {
-                    if (Raw_Customer_RepDAOs[j].CountyName != Dim_CustomerDAOs[index].CustomerName)
+                    if (Raw_Customer_RepDAOs[j].CustomerName != Dim_CustomerDAOs[index].CustomerName)
                     {
                         UpdateList.Add(new Dim_CustomerDAO()
                         {

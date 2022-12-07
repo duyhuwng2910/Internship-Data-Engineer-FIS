@@ -2,6 +2,7 @@
 using DW_Test.HashModels;
 using DW_Test.Models;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -148,7 +149,7 @@ namespace DW_Test.Services.MActualService
                         DonGia = remote.DonGia,
                         ThanhTien = remote.ThanhTien,
                         coso = remote.coso,
-                        Ma_KH = remote.Ma_HH,
+                        Ma_KH = remote.Ma_KH,
                         Khach_hang = remote.Khach_hang,
                         Huy = remote.Huy,
                         DocEntry = remote.DocEntry,
@@ -187,7 +188,7 @@ namespace DW_Test.Services.MActualService
                             DonGia = remote.DonGia,
                             ThanhTien = remote.ThanhTien,
                             coso = remote.coso,
-                            Ma_KH = remote.Ma_HH,
+                            Ma_KH = remote.Ma_KH,
                             Khach_hang = remote.Khach_hang,
                             Huy = remote.Huy,
                             DocEntry = remote.DocEntry,
@@ -225,7 +226,7 @@ namespace DW_Test.Services.MActualService
                         DonGia = local.DonGia,
                         ThanhTien = local.ThanhTien,
                         coso = local.coso,
-                        Ma_KH = local.Ma_HH,
+                        Ma_KH = local.Ma_KH,
                         Khach_hang = local.Khach_hang,
                         Huy = local.Huy,
                         DocEntry = local.DocEntry,
@@ -263,7 +264,7 @@ namespace DW_Test.Services.MActualService
                         DonGia = remote.DonGia,
                         ThanhTien = remote.ThanhTien,
                         coso = remote.coso,
-                        Ma_KH = remote.Ma_HH,
+                        Ma_KH = remote.Ma_KH,
                         Khach_hang = remote.Khach_hang,
                         Huy = remote.Huy,
                         DocEntry = remote.DocEntry,
@@ -302,7 +303,7 @@ namespace DW_Test.Services.MActualService
                         DonGia = local.DonGia,
                         ThanhTien = local.ThanhTien,
                         coso = local.coso,
-                        Ma_KH = local.Ma_HH,
+                        Ma_KH = local.Ma_KH,
                         Khach_hang = local.Khach_hang,
                         Huy = local.Huy,
                         DocEntry = local.DocEntry,
@@ -396,15 +397,14 @@ namespace DW_Test.Services.MActualService
 
         public async Task TransformByDate()
         {
-            await Build_Fact_Report_Revenue(DateTime.Today.AddMonths(-3));
+            await Build_Fact_Report_Revenue(DateTime.Today.AddMonths(-3).AddDays(-5));
         }
 
         // Hàm transform bảng Fact theo thời gian xác định trước là 3 tháng kể từ hiện tại
         public async Task<bool> Build_Fact_Report_Revenue(DateTime Date)
         {
             List<Raw_B1_5_ActualExportReport_RepDAO> Raw_B1_5_ActualExportReport_RepDAOs
-                = await DataContext.Raw_B1_5_ActualExportReport_Rep
-                .Where(x => x.Ngay_xuat >= Date).ToListAsync();
+                = await DataContext.Raw_B1_5_ActualExportReport_Rep.ToListAsync();
 
             List<Raw_Product_GroupDAO> Raw_Product_GroupDAOs = await DataContext.Raw_Product_Group.ToListAsync();
 
