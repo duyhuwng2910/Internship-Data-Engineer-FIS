@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace DW_Test
+﻿namespace DW_Test
 {
     public class CompareMethod
     {

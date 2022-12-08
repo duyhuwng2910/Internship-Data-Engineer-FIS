@@ -4,7 +4,7 @@ using System;
 
 namespace DW_Test.HashModels
 {
-    public class Raw_Product_Group
+    public partial class Raw_Product_Group
     {
         public long Id { get; set; }
         public string ItemCode { get; set; }
@@ -23,7 +23,7 @@ namespace DW_Test.HashModels
 
         public string Key;
 
-        public string getKey()
+        public string GetKey()
         {
             Key = ItemCode;
 
@@ -32,7 +32,7 @@ namespace DW_Test.HashModels
 
         public string Value;
 
-        public string getValue()
+        public string GetValue()
         {
             Value = ItemName + "_"
                     + Loai_MHang_KH + "_"
@@ -57,19 +57,8 @@ namespace DW_Test.HashModels
             NhomC3 = remote.NhomC3;
             Nhom_LEDSMRT1 = remote.Nhom_LEDSMRT1;
             Nhom_SMARTDONLE = remote.Nhom_SMARTDONLE;
-        }
-
-        public Raw_Product_Group(Raw_ProductGroupDAO remote)
-        {
-            ItemCode = remote.ItemCode;
-            ItemName = remote.ItemName;
-            Loai_MHang_KH = remote.Loai_MHang_KH;
-            Nhomchinh_KH = remote.NhomChinh_KH;
-            NhomC1 = remote.NhomC1;
-            NhomC2 = remote.NhomC2;
-            NhomC3 = remote.NhomC3;
-            Nhom_LEDSMRT1 = remote.Nhom_LEDSMRT1;
-            Nhom_SMARTDONLE = remote.Nhom_SMRTDONLEHT;
+            GetKey();
+            GetValue();
         }
     }
 }

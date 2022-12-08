@@ -255,7 +255,7 @@ namespace DW_Test.Services.MCustomerService
 
             return true;
         }
- 
+
         /*
          * Phương thức transform bảng raw thành bảng dim_customer
          * Ở đây có 6 bảng Dim đầu tiên (trừ bảng Dim_UnitMapping)
@@ -948,18 +948,69 @@ namespace DW_Test.Services.MCustomerService
             return true;
         }
 
-        // Tạo bảng dim_unit_mapping
+        // Tạo bảng dim_UnitMapping
         private async Task<bool> Build_Dim_UnitMapping()
         {
-            var Countries = await DataContext.Dim_Country.ToListAsync();
-            var Counties = await DataContext.Dim_County.ToListAsync();
-            var Customers = await DataContext.Dim_Customer.ToListAsync();
-            var SaleBranchs = await DataContext.Dim_SaleBranch.ToListAsync();
-            var SaleChannels = await DataContext.Dim_SaleChannel.ToListAsync();
-            var SaleRooms = await DataContext.Dim_SaleRoom.ToListAsync();
-            var Dim_Unit_MappingDAOs = await DataContext.Dim_UnitMapping.ToListAsync();
-
+            List<Dim_CountryDAO> Dim_Country = await DataContext.Dim_Country.ToListAsync();
+            List<Dim_CountyDAO> Dim_County = await DataContext.Dim_County.ToListAsync();
+            List<Dim_CustomerDAO> Dim_Customer = await DataContext.Dim_Customer.ToListAsync();
+            List<Dim_SaleBranchDAO> Dim_SaleBranch = await DataContext.Dim_SaleBranch.ToListAsync();
+            List<Dim_SaleChannelDAO> Dim_Channel = await DataContext.Dim_SaleChannel.ToListAsync();
+            List<Dim_SaleRoomDAO> Dim_SaleRoom = await DataContext.Dim_SaleRoom.ToListAsync();
+            
             List<Raw_Customer_RepDAO> Raw_Customer_RepDAOs = await DataContext.Raw_Customer_Rep.ToListAsync();
+
+            List<Dim_UnitMappingDAO> Dim_UnitMappingLocalDAOs = await DataContext.Dim_UnitMapping.ToListAsync();
+
+            List<Dim_UnitMapping> HashLocal = Dim_UnitMappingLocalDAOs
+                .Select(x => new Dim_UnitMapping(x)).ToList();
+
+            List<Dim_UnitMapping> HashRemote = new List<Dim_UnitMapping>();
+
+            #region code ban đầu
+            //foreach (var raw_customer_repdao in raw_customer_repdaos)
+            //{
+            //    /*
+            //     * 6 biến var ở dưới dùng để kiểm tra data trong các bảng dim tương ứng 
+            //     * có ở trong bảng raw_customer_rep không
+            //     */
+            //    var country = Dim_Country.where(x => x.countrycode == raw_customer_repdao.countrycode).firstordefault();
+            //    var county = Dim_County.where(x => x.countycode == raw_customer_repdao.countycode).firstordefault();
+            //    var customer = Dim_Customer.where(x => x.customercode == raw_customer_repdao.customercode).firstordefault();
+            //    var salebranch = Dim_SaleBranch.where(x => x.salebranchname == raw_customer_repdao.salebranch).firstordefault();
+            //    var salechannel = Dim_Channel.where(x => x.salechannelname == raw_customer_repdao.salechannel).firstordefault();
+            //    var saleroom = Dim_SaleRoom.where(x => x.saleroomname == raw_customer_repdao.saleroom).firstordefault();
+
+            //    // kiểm tra xem trong bảng dim mapping đã có dữ liệu từ các bảng dim chưa
+            //    dim_unitmappingdao dim_unitmapping = Dim_UnitMappingLocalDAOs
+            //        .where(x => x.customerid == customer?.customerid).firstordefault();
+
+            //    // nếu chưa thì tạo mới, trước đó tiến hành ánh xạ giữa 6 bảng dim và bảng raw
+            //    // để nối và tạo ra các dòng trong bảng dim mapping
+            //    if (dim_unitmapping == null)
+            //    {
+            //        dim_unitmapping = new dim_unitmappingdao
+            //        {
+            //            countyid = county?.countyid ?? null,
+            //            countryid = country?.countryid ?? null,
+            //            customerid = customer?.customerid ?? null,
+            //            salebranchid = salebranch?.salebranchid ?? null,
+            //            salechannelid = salechannel?.salechannelid ?? null,
+            //            saleroomid = saleroom?.saleroomid ?? null,
+            //        };
+            //        Dim_UnitMappingLocalDAOs.add(dim_unitmapping);
+            //    }
+            //    else
+            //    {
+            //        dim_unitmapping.countyid = county?.countyid ?? null;
+            //        dim_unitmapping.countryid = country?.countryid ?? null;
+            //        dim_unitmapping.salebranchid = salebranch?.salebranchid ?? null;
+            //        dim_unitmapping.salechannelid = salechannel?.salechannelid ?? null;
+            //        dim_unitmapping.saleroomid = saleroom?.saleroomid ?? null;
+            //    }
+            //}
+            //await datacontext.bulkmergeasync(Dim_UnitMappingLocalDAOs);
+            #endregion
 
             foreach (var Raw_Customer_RepDAO in Raw_Customer_RepDAOs)
             {
@@ -967,42 +1018,130 @@ namespace DW_Test.Services.MCustomerService
                  * 6 biến var ở dưới dùng để kiểm tra data trong các bảng dim tương ứng 
                  * có ở trong bảng Raw_Customer_Rep không
                  */
-                var Country = Countries.Where(x => x.CountryCode == Raw_Customer_RepDAO.CountryCode).FirstOrDefault();
-                var County = Counties.Where(x => x.CountyCode == Raw_Customer_RepDAO.CountyCode).FirstOrDefault();
-                var Customer = Customers.Where(x => x.CustomerCode == Raw_Customer_RepDAO.CustomerCode).FirstOrDefault();
-                var SaleBranch = SaleBranchs.Where(x => x.SaleBranchName == Raw_Customer_RepDAO.SaleBranch).FirstOrDefault();
-                var SaleChannel = SaleChannels.Where(x => x.SaleChannelName == Raw_Customer_RepDAO.SaleChannel).FirstOrDefault();
-                var SaleRoom = SaleRooms.Where(x => x.SaleRoomName == Raw_Customer_RepDAO.SaleRoom).FirstOrDefault();
+                var Country = Dim_Country.Where(x => x.CountryCode == Raw_Customer_RepDAO.CountryCode).FirstOrDefault();
+                var County = Dim_County.Where(x => x.CountyCode == Raw_Customer_RepDAO.CountyCode).FirstOrDefault();
+                var Customer = Dim_Customer.Where(x => x.CustomerCode == Raw_Customer_RepDAO.CustomerCode).FirstOrDefault();
+                var SaleBranch = Dim_SaleBranch.Where(x => x.SaleBranchName == Raw_Customer_RepDAO.SaleBranch).FirstOrDefault();
+                var SaleChannel = Dim_Channel.Where(x => x.SaleChannelName == Raw_Customer_RepDAO.SaleChannel).FirstOrDefault();
+                var SaleRoom = Dim_SaleRoom.Where(x => x.SaleRoomName == Raw_Customer_RepDAO.SaleRoom).FirstOrDefault();
 
-                // Kiểm tra xem trong bảng dim mapping đã có dữ liệu từ các bảng dim chưa
-                Dim_UnitMappingDAO Dim_Unit_Mapping = Dim_Unit_MappingDAOs
-                    .Where(x => x.CustomerId == Customer?.CustomerId).FirstOrDefault();
-
-                // Nếu chưa thì tạo mới, trước đó tiến hành ánh xạ giữa 6 bảng dim và bảng raw
-                // để nối và tạo ra các dòng trong bảng dim mapping
-                if (Dim_Unit_Mapping == null)
+                Dim_UnitMappingDAO UnitMapping = new Dim_UnitMappingDAO()
                 {
-                    Dim_Unit_Mapping = new Dim_UnitMappingDAO
+                    CountyId = County?.CountyId ?? null,
+                    CountryId = Country?.CountryId ?? null,
+                    CustomerId = Customer?.CustomerId ?? null,
+                    SaleBranchId = SaleBranch?.SaleBranchId ?? null,
+                    SaleChannelId = SaleChannel?.SaleChannelId ?? null,
+                    SaleRoomId = SaleRoom?.SaleRoomId ?? null
+                };
+
+                HashRemote.Add(new Dim_UnitMapping(UnitMapping));
+            }
+
+            HashLocal = HashLocal.OrderBy(x => x.Key).ToList();
+
+            HashRemote = HashRemote.OrderBy(x => x.Key).ToList();
+
+            List<Dim_UnitMappingDAO> InsertList = new List<Dim_UnitMappingDAO>();
+
+            List<Dim_UnitMappingDAO> UpdateList = new List<Dim_UnitMappingDAO>();
+
+            List<Dim_UnitMappingDAO> DeleteList = new List<Dim_UnitMappingDAO>();
+
+            int index = 0;
+
+            for (int j = 0; j < HashRemote.Count && index < HashLocal.Count;)
+            {
+                if (CompareMethod.Compare(HashRemote[j].Key, HashLocal[index].Key) < 0)
+                {
+                    InsertList.Add(new Dim_UnitMappingDAO()
                     {
-                        CountyId = County?.CountyId ?? null,
-                        CountryId = Country?.CountryId ?? null,
-                        CustomerId = Customer?.CustomerId ?? null,
-                        SaleBranchId = SaleBranch?.SaleBranchId ?? null,
-                        SaleChannelId = SaleChannel?.SaleChannelId ?? null,
-                        SaleRoomId = SaleRoom?.SaleRoomId ?? null,
-                    };
-                    Dim_Unit_MappingDAOs.Add(Dim_Unit_Mapping);
+                        CountryId = HashRemote[j].CountryId ?? null,
+                        CountyId = HashRemote[j].CountyId ?? null,
+                        CustomerId = HashRemote[j].CustomerId ?? null,
+                        SaleBranchId = HashRemote[j].SaleBranchId ?? null,
+                        SaleChannelId = HashRemote[j].SaleChannelId ?? null,
+                        SaleRoomId = HashRemote[j].SaleRoomId ?? null,
+                    });
+
+                    j++;
                 }
-                else
+                else if (CompareMethod.Compare(HashRemote[j].Key, HashLocal[index].Key) == 0)
                 {
-                    Dim_Unit_Mapping.CountyId = County?.CountyId ?? null;
-                    Dim_Unit_Mapping.CountryId = Country?.CountryId ?? null;
-                    Dim_Unit_Mapping.SaleBranchId = SaleBranch?.SaleBranchId ?? null;
-                    Dim_Unit_Mapping.SaleChannelId = SaleChannel?.SaleChannelId ?? null;
-                    Dim_Unit_Mapping.SaleRoomId = SaleRoom?.SaleRoomId ?? null;
+                    if (HashRemote[j].Value != HashLocal[index].Value)
+                    {
+                        UpdateList.Add(new Dim_UnitMappingDAO()
+                        {
+                            Unit_MappingId = HashLocal[index].Unit_MappingId,
+                            CountryId = HashRemote[j].CountryId ?? null,
+                            CountyId = HashRemote[j].CountyId ?? null,
+                            CustomerId = HashLocal[index].CustomerId ?? null,
+                            SaleBranchId = HashRemote[j].SaleBranchId ?? null,
+                            SaleChannelId = HashRemote[j].SaleChannelId ?? null,
+                            SaleRoomId = HashRemote[j].SaleRoomId ?? null,
+                        });
+                    }
+
+                    j++;
+
+                    index++;
+                }
+                else if (CompareMethod.Compare(HashRemote[j].Key, HashLocal[index].Key) > 0)
+                {
+                    DeleteList.Add(new Dim_UnitMappingDAO()
+                    {
+                        Unit_MappingId = HashLocal[index].Unit_MappingId,
+                        CountryId = HashLocal[index].CountryId ?? null,
+                        CountyId = HashLocal[index].CountyId ?? null,
+                        CustomerId = HashLocal[index].CustomerId ?? null,
+                        SaleBranchId = HashLocal[index].SaleBranchId ?? null,
+                        SaleChannelId = HashLocal[index].SaleChannelId ?? null,
+                        SaleRoomId = HashLocal[index].SaleRoomId ?? null,
+                    });
+
+                    index++;
                 }
             }
-            await DataContext.BulkMergeAsync(Dim_Unit_MappingDAOs);
+
+            if (index == HashLocal.Count && HashRemote.Last().Key != HashLocal.Last().Key)
+            {
+                while (index < HashRemote.Count)
+                {
+                    InsertList.Add(new Dim_UnitMappingDAO()
+                    {
+                        CountryId = HashRemote[index].CountryId ?? null,
+                        CountyId = HashRemote[index].CountyId ?? null,
+                        CustomerId = HashRemote[index].CustomerId ?? null,
+                        SaleBranchId = HashRemote[index].SaleBranchId ?? null,
+                        SaleChannelId = HashRemote[index].SaleChannelId ?? null,
+                        SaleRoomId = HashRemote[index].SaleRoomId ?? null,
+                    });
+
+                    index++;
+                }
+            }
+            else if (index < HashLocal.Count)
+            {
+                while (index < HashLocal.Count)
+                {
+                    DeleteList.Add(new Dim_UnitMappingDAO()
+                    {
+                        Unit_MappingId = HashLocal[index].Unit_MappingId,
+                        CountryId = HashLocal[index].CountryId ?? null,
+                        CountyId = HashLocal[index].CountyId ?? null,
+                        CustomerId = HashLocal[index].CustomerId ?? null,
+                        SaleBranchId = HashLocal[index].SaleBranchId ?? null,
+                        SaleChannelId = HashLocal[index].SaleChannelId ?? null,
+                        SaleRoomId = HashLocal[index].SaleRoomId ?? null,
+                    });
+
+                    index++;
+                }
+            }
+
+            await DataContext.BulkDeleteAsync(DeleteList);
+            await DataContext.BulkMergeAsync(InsertList);
+            await DataContext.BulkMergeAsync(UpdateList);
 
             return true;
         }

@@ -2,7 +2,7 @@
 
 namespace DW_Test.HashModels
 {
-    public class Raw_B1_5_ActualExportReport_Rep
+    public partial class Raw_B1_5_ActualExportReport_Rep
     {
         public long Id { get; set; }
         public string Ma_HH { get; set; }
@@ -26,7 +26,7 @@ namespace DW_Test.HashModels
         public long? TT { get; set; }
 
         public string Key;
-        public string getKey()
+        public string GetKey()
         {
             Key = Ma_HH + "_"
                  + SoHD + "_"
@@ -37,7 +37,7 @@ namespace DW_Test.HashModels
         }
 
         public string Value;
-        public string getValue()
+        public string GetValue()
         {
             Value = Ten_HH + "_"
                     + Donvitinh + "_"
@@ -78,8 +78,8 @@ namespace DW_Test.HashModels
             Huy = Local.Huy;
             DocEntry = Local.DocEntry;
             TT = Local.TT;
-            getKey();
-            getValue();
+            GetKey();
+            GetValue();
         }
 
         public Raw_B1_5_ActualExportReport_Rep(DWEModels.Raw_B1_5_ActualExportReport_RepDAO Remote)
@@ -104,8 +104,8 @@ namespace DW_Test.HashModels
             Huy = Remote.Huy;
             DocEntry = Remote.DocEntry;
             TT = Remote.TT;
-            getKey();
-            getValue();
+            GetKey();
+            GetValue();
         }
     }
 }
