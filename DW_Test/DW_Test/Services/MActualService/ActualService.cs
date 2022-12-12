@@ -397,7 +397,7 @@ namespace DW_Test.Services.MActualService
 
         public async Task TransformByDate()
         {
-            await Build_Fact_Report_Revenue(DateTime.Today.AddMonths(-3).AddDays(-5));
+            await Build_Fact_Report_Revenue(DateTime.Today.AddMonths(-3));
         }
 
         // Hàm transform bảng Fact theo thời gian xác định trước là 3 tháng kể từ hiện tại
