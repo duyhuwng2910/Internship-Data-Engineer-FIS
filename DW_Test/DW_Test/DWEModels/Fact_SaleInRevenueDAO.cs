@@ -13,6 +13,6 @@ namespace DW_Test.DWEModels
         public long ProductGroupingId { get; set; }
         public long? SaleTeamId { get; set; }
         public long? OrganizationProductId { get; set; }
-        public long TransactionId { get; set; }
+        public long ActualRevenueId { get; set; }
     }
 }

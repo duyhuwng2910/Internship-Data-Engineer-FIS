@@ -1,15 +1,22 @@
-﻿using DW_Test.HashModels;
+﻿using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace DW_Test.Models
 {
     public partial class DataContext : DbContext
     {
+        public virtual DbSet<AggregatedCounterDAO> AggregatedCounter { get; set; }
+        public virtual DbSet<CT_PBH1DAO> CT_PBH1 { get; set; }
+        public virtual DbSet<CT_PBH2DAO> CT_PBH2 { get; set; }
+        public virtual DbSet<CounterDAO> Counter { get; set; }
         public virtual DbSet<Dim_CountryDAO> Dim_Country { get; set; }
         public virtual DbSet<Dim_CountyDAO> Dim_County { get; set; }
         public virtual DbSet<Dim_CustomerDAO> Dim_Customer { get; set; }
+        public virtual DbSet<Dim_CustomerEmployeeMappingDAO> Dim_CustomerEmployeeMapping { get; set; }
         public virtual DbSet<Dim_DateDAO> Dim_Date { get; set; }
         public virtual DbSet<Dim_DateMappingDAO> Dim_DateMapping { get; set; }
+        public virtual DbSet<Dim_Date_FilterDAO> Dim_Date_Filter { get; set; }
         public virtual DbSet<Dim_ItemDAO> Dim_Item { get; set; }
         public virtual DbSet<Dim_ItemGroupLevel1DAO> Dim_ItemGroupLevel1 { get; set; }
         public virtual DbSet<Dim_ItemGroupLevel2DAO> Dim_ItemGroupLevel2 { get; set; }
@@ -22,10 +29,20 @@ namespace DW_Test.Models
         public virtual DbSet<Dim_ItemTypeGroupDAO> Dim_ItemTypeGroup { get; set; }
         public virtual DbSet<Dim_ItemVATGroupDAO> Dim_ItemVATGroup { get; set; }
         public virtual DbSet<Dim_MonthDAO> Dim_Month { get; set; }
+        public virtual DbSet<Dim_ProductMappingDAO> Dim_ProductMapping { get; set; }
+        public virtual DbSet<Dim_ProductSaleChannelMappingDAO> Dim_ProductSaleChannelMapping { get; set; }
         public virtual DbSet<Dim_QuarterDAO> Dim_Quarter { get; set; }
+        public virtual DbSet<Dim_RD_CustomerDAO> Dim_RD_Customer { get; set; }
+        public virtual DbSet<Dim_RD_ItemDAO> Dim_RD_Item { get; set; }
+        public virtual DbSet<Dim_RD_ItemGroupLevel1DAO> Dim_RD_ItemGroupLevel1 { get; set; }
+        public virtual DbSet<Dim_RD_ItemGroupLevel2DAO> Dim_RD_ItemGroupLevel2 { get; set; }
+        public virtual DbSet<Dim_RD_SaleChannelDAO> Dim_RD_SaleChannel { get; set; }
+        public virtual DbSet<Dim_RegionDAO> Dim_Region { get; set; }
         public virtual DbSet<Dim_SaleBranchDAO> Dim_SaleBranch { get; set; }
         public virtual DbSet<Dim_SaleChannelDAO> Dim_SaleChannel { get; set; }
+        public virtual DbSet<Dim_SaleEmployeeDAO> Dim_SaleEmployee { get; set; }
         public virtual DbSet<Dim_SaleRoomDAO> Dim_SaleRoom { get; set; }
+        public virtual DbSet<Dim_SpecializedChannelMappingDAO> Dim_SpecializedChannelMapping { get; set; }
         public virtual DbSet<Dim_UnitMappingDAO> Dim_UnitMapping { get; set; }
         public virtual DbSet<Dim_YearDAO> Dim_Year { get; set; }
         public virtual DbSet<Fact_Company_Month_PlanDAO> Fact_Company_Month_Plan { get; set; }
@@ -37,6 +54,16 @@ namespace DW_Test.Models
         public virtual DbSet<Fact_Customer_Month_PlanDAO> Fact_Customer_Month_Plan { get; set; }
         public virtual DbSet<Fact_Customer_Quarter_PlanDAO> Fact_Customer_Quarter_Plan { get; set; }
         public virtual DbSet<Fact_Customer_Year_PlanDAO> Fact_Customer_Year_Plan { get; set; }
+        public virtual DbSet<Fact_Item_Whs_ConsignmentDAO> Fact_Item_Whs_Consignment { get; set; }
+        public virtual DbSet<Fact_RD_CustomerMonthPlanDAO> Fact_RD_CustomerMonthPlan { get; set; }
+        public virtual DbSet<Fact_RD_CustomerQuarterPlanDAO> Fact_RD_CustomerQuarterPlan { get; set; }
+        public virtual DbSet<Fact_RD_CustomerYearPlanDAO> Fact_RD_CustomerYearPlan { get; set; }
+        public virtual DbSet<Fact_RD_RegionMonthPlanDAO> Fact_RD_RegionMonthPlan { get; set; }
+        public virtual DbSet<Fact_RD_RegionQuarterPlanDAO> Fact_RD_RegionQuarterPlan { get; set; }
+        public virtual DbSet<Fact_RD_RegionYearPlanDAO> Fact_RD_RegionYearPlan { get; set; }
+        public virtual DbSet<Fact_RD_SaleChannelMonthPlanDAO> Fact_RD_SaleChannelMonthPlan { get; set; }
+        public virtual DbSet<Fact_RD_SaleChannelQuarterPlanDAO> Fact_RD_SaleChannelQuarterPlan { get; set; }
+        public virtual DbSet<Fact_RD_SaleChannelYearPlanDAO> Fact_RD_SaleChannelYearPlan { get; set; }
         public virtual DbSet<Fact_Report_RevenueDAO> Fact_Report_Revenue { get; set; }
         public virtual DbSet<Fact_SaleBranch_Month_PlanDAO> Fact_SaleBranch_Month_Plan { get; set; }
         public virtual DbSet<Fact_SaleBranch_Quarter_PlanDAO> Fact_SaleBranch_Quarter_Plan { get; set; }
@@ -47,12 +74,29 @@ namespace DW_Test.Models
         public virtual DbSet<Fact_SaleRoom_Month_PlanDAO> Fact_SaleRoom_Month_Plan { get; set; }
         public virtual DbSet<Fact_SaleRoom_Quarter_PlanDAO> Fact_SaleRoom_Quarter_Plan { get; set; }
         public virtual DbSet<Fact_SaleRoom_Year_PlanDAO> Fact_SaleRoom_Year_Plan { get; set; }
+        public virtual DbSet<FormulaDAO> Formula { get; set; }
+        public virtual DbSet<HashDAO> Hash { get; set; }
+        public virtual DbSet<JobDAO> Job { get; set; }
+        public virtual DbSet<JobParameterDAO> JobParameter { get; set; }
+        public virtual DbSet<JobQueueDAO> JobQueue { get; set; }
+        public virtual DbSet<ListDAO> List { get; set; }
+        public virtual DbSet<Raw_A009DAO> Raw_A009 { get; set; }
+        public virtual DbSet<Raw_A012DAO> Raw_A012 { get; set; }
+        public virtual DbSet<Raw_B003DAO> Raw_B003 { get; set; }
         public virtual DbSet<Raw_B1_5_ActualExportReport_RepDAO> Raw_B1_5_ActualExportReport_Rep { get; set; }
         public virtual DbSet<Raw_Customer_RepDAO> Raw_Customer_Rep { get; set; }
         public virtual DbSet<Raw_Item_RepDAO> Raw_Item_Rep { get; set; }
         public virtual DbSet<Raw_Plan_RevenueDAO> Raw_Plan_Revenue { get; set; }
         public virtual DbSet<Raw_Product_GroupDAO> Raw_Product_Group { get; set; }
-        public virtual DbSet<Student> Student { get; set; }
+        public virtual DbSet<Raw_Product_ProductGroupDAO> Raw_Product_ProductGroup { get; set; }
+        public virtual DbSet<Raw_SaleEmployee_CustomerDAO> Raw_SaleEmployee_Customer { get; set; }
+        public virtual DbSet<Raw_SpecializedChannelDAO> Raw_SpecializedChannel { get; set; }
+        public virtual DbSet<Raw_SpecializedChannel_SalePlan_RevenueDAO> Raw_SpecializedChannel_SalePlan_Revenue { get; set; }
+        public virtual DbSet<SchemaDAO> Schema { get; set; }
+        public virtual DbSet<ServerDAO> Server { get; set; }
+        public virtual DbSet<SetDAO> Set { get; set; }
+        public virtual DbSet<StateDAO> State { get; set; }
+
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }
@@ -62,12 +106,59 @@ namespace DW_Test.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("data source=NGUYENDUYHUNG;initial catalog=DW_TEST;Integrated Security=True");
+                optionsBuilder.UseSqlServer("data source=192.168.20.200;initial catalog=DW_TEST;persist security info=True;user id=TTS_Data;password=1234567;multipleactiveresultsets=True;");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<AggregatedCounterDAO>(entity =>
+            {
+                entity.HasKey(e => e.Key)
+                    .HasName("PK_HangFire_CounterAggregated");
+
+                entity.ToTable("AggregatedCounter", "HangFire");
+
+                entity.HasIndex(e => e.ExpireAt)
+                    .HasName("IX_HangFire_AggregatedCounter_ExpireAt")
+                    .HasFilter("([ExpireAt] IS NOT NULL)");
+
+                entity.Property(e => e.Key).HasMaxLength(100);
+
+                entity.Property(e => e.ExpireAt).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<CT_PBH1DAO>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("CT PBH1");
+            });
+
+            modelBuilder.Entity<CT_PBH2DAO>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("CT PBH2");
+            });
+
+            modelBuilder.Entity<CounterDAO>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("Counter", "HangFire");
+
+                entity.HasIndex(e => e.Key)
+                    .HasName("CX_HangFire_Counter")
+                    .IsClustered();
+
+                entity.Property(e => e.ExpireAt).HasColumnType("datetime");
+
+                entity.Property(e => e.Key)
+                    .IsRequired()
+                    .HasMaxLength(100);
+            });
+
             modelBuilder.Entity<Dim_CountryDAO>(entity =>
             {
                 entity.HasKey(e => e.CountryId);
@@ -101,6 +192,13 @@ namespace DW_Test.Models
                 entity.Property(e => e.CustomerName).HasMaxLength(500);
             });
 
+            modelBuilder.Entity<Dim_CustomerEmployeeMappingDAO>(entity =>
+            {
+                entity.HasKey(e => e.MappingId);
+
+                entity.ToTable("Dim_CustomerEmployeeMapping", "RD");
+            });
+
             modelBuilder.Entity<Dim_DateDAO>(entity =>
             {
                 entity.HasKey(e => e.DateKey);
@@ -119,6 +217,15 @@ namespace DW_Test.Models
                 entity.ToTable("Dim_DateMapping", "SAP");
 
                 entity.Property(e => e.DateKey).ValueGeneratedNever();
+
+                entity.Property(e => e.Date).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<Dim_Date_FilterDAO>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("Dim_Date_Filter");
 
                 entity.Property(e => e.Date).HasColumnType("datetime");
             });
@@ -194,10 +301,6 @@ namespace DW_Test.Models
                 entity.Property(e => e.ItemCode)
                     .HasMaxLength(500)
                     .IsFixedLength();
-
-                entity.Property(e => e.ItemSingleLedSmartGroupId)
-                    .HasMaxLength(10)
-                    .IsFixedLength();
             });
 
             modelBuilder.Entity<Dim_ItemNewItemGroupDAO>(entity =>
@@ -255,6 +358,20 @@ namespace DW_Test.Models
                 entity.Property(e => e.StartAt).HasColumnType("datetime");
             });
 
+            modelBuilder.Entity<Dim_ProductMappingDAO>(entity =>
+            {
+                entity.HasKey(e => e.MappingId);
+
+                entity.ToTable("Dim_ProductMapping", "RD");
+            });
+
+            modelBuilder.Entity<Dim_ProductSaleChannelMappingDAO>(entity =>
+            {
+                entity.HasKey(e => e.MappingId);
+
+                entity.ToTable("Dim_ProductSaleChannelMapping", "RD");
+            });
+
             modelBuilder.Entity<Dim_QuarterDAO>(entity =>
             {
                 entity.HasKey(e => e.QuarterKey);
@@ -268,6 +385,80 @@ namespace DW_Test.Models
                 entity.Property(e => e.QuarterName).HasMaxLength(50);
 
                 entity.Property(e => e.StartAt).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<Dim_RD_CustomerDAO>(entity =>
+            {
+                entity.HasKey(e => e.CustomerId);
+
+                entity.ToTable("Dim_RD_Customer", "RD");
+
+                entity.Property(e => e.CustomerCode)
+                    .IsRequired()
+                    .HasMaxLength(1000);
+
+                entity.Property(e => e.CustomerName).HasMaxLength(1000);
+            });
+
+            modelBuilder.Entity<Dim_RD_ItemDAO>(entity =>
+            {
+                entity.HasKey(e => e.ItemId);
+
+                entity.ToTable("Dim_RD_Item", "RD");
+
+                entity.Property(e => e.ItemCode)
+                    .IsRequired()
+                    .HasMaxLength(1000);
+
+                entity.Property(e => e.ItemName).HasMaxLength(1000);
+
+                entity.Property(e => e.LightColor).HasMaxLength(1000);
+
+                entity.Property(e => e.Performance).HasMaxLength(1000);
+
+                entity.Property(e => e.Quality).HasMaxLength(1000);
+
+                entity.Property(e => e.UnitPrice).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Dim_RD_ItemGroupLevel1DAO>(entity =>
+            {
+                entity.HasKey(e => e.ItemGroupLevel1Id);
+
+                entity.ToTable("Dim_RD_ItemGroupLevel1", "RD");
+
+                entity.Property(e => e.ItemGroupLevel1Name).HasMaxLength(1000);
+            });
+
+            modelBuilder.Entity<Dim_RD_ItemGroupLevel2DAO>(entity =>
+            {
+                entity.HasKey(e => e.ItemGroupLevel2Id);
+
+                entity.ToTable("Dim_RD_ItemGroupLevel2", "RD");
+
+                entity.Property(e => e.ItemGroupLevel2Name).HasMaxLength(1000);
+            });
+
+            modelBuilder.Entity<Dim_RD_SaleChannelDAO>(entity =>
+            {
+                entity.HasKey(e => e.SaleChannelId);
+
+                entity.ToTable("Dim_RD_SaleChannel", "RD");
+
+                entity.Property(e => e.SaleChannelName)
+                    .IsRequired()
+                    .HasMaxLength(1000);
+            });
+
+            modelBuilder.Entity<Dim_RegionDAO>(entity =>
+            {
+                entity.HasKey(e => e.RegionId);
+
+                entity.ToTable("Dim_Region", "RD");
+
+                entity.Property(e => e.RegionCode).HasMaxLength(1000);
+
+                entity.Property(e => e.RegionName).HasMaxLength(1000);
             });
 
             modelBuilder.Entity<Dim_SaleBranchDAO>(entity =>
@@ -288,6 +479,19 @@ namespace DW_Test.Models
                 entity.Property(e => e.SaleChannelName).HasMaxLength(500);
             });
 
+            modelBuilder.Entity<Dim_SaleEmployeeDAO>(entity =>
+            {
+                entity.HasKey(e => e.EmployeeId);
+
+                entity.ToTable("Dim_SaleEmployee", "RD");
+
+                entity.Property(e => e.EmployeeCode)
+                    .IsRequired()
+                    .HasMaxLength(1000);
+
+                entity.Property(e => e.EmployeeName).HasMaxLength(1000);
+            });
+
             modelBuilder.Entity<Dim_SaleRoomDAO>(entity =>
             {
                 entity.HasKey(e => e.SaleRoomId);
@@ -297,12 +501,23 @@ namespace DW_Test.Models
                 entity.Property(e => e.SaleRoomName).HasMaxLength(500);
             });
 
+            modelBuilder.Entity<Dim_SpecializedChannelMappingDAO>(entity =>
+            {
+                entity.HasKey(e => e.MappingId);
+
+                entity.ToTable("Dim_SpecializedChannelMapping", "RD");
+            });
+
             modelBuilder.Entity<Dim_UnitMappingDAO>(entity =>
             {
                 entity.HasKey(e => e.Unit_MappingId)
                     .HasName("PK_Dim_Unit_Mapping");
 
                 entity.ToTable("Dim_UnitMapping", "SAP");
+
+                entity.Property(e => e.dem)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Dim_YearDAO>(entity =>
@@ -382,6 +597,76 @@ namespace DW_Test.Models
                 entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
             });
 
+            modelBuilder.Entity<Fact_Item_Whs_ConsignmentDAO>(entity =>
+            {
+                entity.ToTable("Fact_Item_Whs_Consignment", "RD");
+
+                entity.Property(e => e.Consignment).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_RD_CustomerMonthPlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_RD_CustomerMonthPlan", "RD");
+
+                entity.Property(e => e.RevenuePlan).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_RD_CustomerQuarterPlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_RD_CustomerQuarterPlan", "RD");
+
+                entity.Property(e => e.RevenuePlan).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_RD_CustomerYearPlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_RD_CustomerYearPlan", "RD");
+
+                entity.Property(e => e.RevenuePlan).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_RD_RegionMonthPlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_RD_RegionMonthPlan", "RD");
+
+                entity.Property(e => e.RevenuePlan).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_RD_RegionQuarterPlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_RD_RegionQuarterPlan", "RD");
+
+                entity.Property(e => e.RevenuePlan).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_RD_RegionYearPlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_RD_RegionYearPlan", "RD");
+
+                entity.Property(e => e.RevenuePlan).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_RD_SaleChannelMonthPlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_RD_SaleChannelMonthPlan", "RD");
+
+                entity.Property(e => e.RevenuePlan).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_RD_SaleChannelQuarterPlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_RD_SaleChannelQuarterPlan", "RD");
+
+                entity.Property(e => e.RevenuePlan).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<Fact_RD_SaleChannelYearPlanDAO>(entity =>
+            {
+                entity.ToTable("Fact_RD_SaleChannelYearPlan", "RD");
+
+                entity.Property(e => e.RevenuePlan).HasColumnType("decimal(22, 10)");
+            });
+
             modelBuilder.Entity<Fact_Report_RevenueDAO>(entity =>
             {
                 entity.ToTable("Fact_Report_Revenue", "SAP");
@@ -450,6 +735,245 @@ namespace DW_Test.Models
                 entity.ToTable("Fact_SaleRoom_Year_Plan", "SAP");
 
                 entity.Property(e => e.Revenue).HasColumnType("decimal(22, 10)");
+            });
+
+            modelBuilder.Entity<HashDAO>(entity =>
+            {
+                entity.HasKey(e => new { e.Key, e.Field })
+                    .HasName("PK_HangFire_Hash");
+
+                entity.ToTable("Hash", "HangFire");
+
+                entity.HasIndex(e => e.ExpireAt)
+                    .HasName("IX_HangFire_Hash_ExpireAt")
+                    .HasFilter("([ExpireAt] IS NOT NULL)");
+
+                entity.Property(e => e.Key).HasMaxLength(100);
+
+                entity.Property(e => e.Field).HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<JobDAO>(entity =>
+            {
+                entity.ToTable("Job", "HangFire");
+
+                entity.HasIndex(e => e.StateName)
+                    .HasName("IX_HangFire_Job_StateName")
+                    .HasFilter("([StateName] IS NOT NULL)");
+
+                entity.HasIndex(e => new { e.StateName, e.ExpireAt })
+                    .HasName("IX_HangFire_Job_ExpireAt")
+                    .HasFilter("([ExpireAt] IS NOT NULL)");
+
+                entity.Property(e => e.Arguments).IsRequired();
+
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+
+                entity.Property(e => e.ExpireAt).HasColumnType("datetime");
+
+                entity.Property(e => e.InvocationData).IsRequired();
+
+                entity.Property(e => e.StateName).HasMaxLength(20);
+            });
+
+            modelBuilder.Entity<JobParameterDAO>(entity =>
+            {
+                entity.HasKey(e => new { e.JobId, e.Name })
+                    .HasName("PK_HangFire_JobParameter");
+
+                entity.ToTable("JobParameter", "HangFire");
+
+                entity.Property(e => e.Name).HasMaxLength(40);
+
+                entity.HasOne(d => d.Job)
+                    .WithMany(p => p.JobParameters)
+                    .HasForeignKey(d => d.JobId)
+                    .HasConstraintName("FK_HangFire_JobParameter_Job");
+            });
+
+            modelBuilder.Entity<JobQueueDAO>(entity =>
+            {
+                entity.HasKey(e => new { e.Queue, e.Id })
+                    .HasName("PK_HangFire_JobQueue");
+
+                entity.ToTable("JobQueue", "HangFire");
+
+                entity.Property(e => e.Queue).HasMaxLength(50);
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.FetchedAt).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<ListDAO>(entity =>
+            {
+                entity.HasKey(e => new { e.Key, e.Id })
+                    .HasName("PK_HangFire_List");
+
+                entity.ToTable("List", "HangFire");
+
+                entity.HasIndex(e => e.ExpireAt)
+                    .HasName("IX_HangFire_List_ExpireAt")
+                    .HasFilter("([ExpireAt] IS NOT NULL)");
+
+                entity.Property(e => e.Key).HasMaxLength(100);
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.ExpireAt).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<Raw_A009DAO>(entity =>
+            {
+                entity.ToTable("Raw_A009", "SAP");
+
+                entity.Property(e => e.HangGui).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.ItemCode).HasMaxLength(50);
+
+                entity.Property(e => e.ItemName).HasMaxLength(100);
+
+                entity.Property(e => e.Loai_SP).HasMaxLength(500);
+
+                entity.Property(e => e.Nhap).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.NhapLKThang).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.Nhom_SP).HasMaxLength(500);
+
+                entity.Property(e => e.TenThuKho).HasMaxLength(500);
+
+                entity.Property(e => e.ThucXuat).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.ThucXuatLKThang).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.TonChungTu).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.TonThucTe).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.WhsCode).HasMaxLength(50);
+
+                entity.Property(e => e.XuatBan).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.XuatBanLKThang).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.XuatChungTu).HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.XuatChungTuLKThang).HasColumnType("decimal(18, 0)");
+            });
+
+            modelBuilder.Entity<Raw_A012DAO>(entity =>
+            {
+                entity.ToTable("Raw_A012", "SAP");
+
+                entity.Property(e => e.ItemCode).HasMaxLength(4000);
+
+                entity.Property(e => e.ItemName).HasMaxLength(4000);
+
+                entity.Property(e => e.P0000_GiaCoSo).HasMaxLength(1000);
+
+                entity.Property(e => e.P0001_GiaXuatChoChiNhanh).HasMaxLength(1000);
+
+                entity.Property(e => e.P0002_Price_Level1).HasMaxLength(4000);
+
+                entity.Property(e => e.P0003_GiaC1MN).HasMaxLength(1000);
+
+                entity.Property(e => e.P0004_GiaC2MN).HasMaxLength(1000);
+
+                entity.Property(e => e.P0005_GiaXuatCPC).HasMaxLength(1000);
+
+                entity.Property(e => e.P0006_GiaXK).HasMaxLength(1000);
+
+                entity.Property(e => e.P0007_GiaKenhSTMB).HasMaxLength(1000);
+
+                entity.Property(e => e.P0008_GiaKenhSTMN).HasMaxLength(1000);
+
+                entity.Property(e => e.P0009_GiaMegaEB).HasMaxLength(1000);
+
+                entity.Property(e => e.P0010_GiaTMDT).HasMaxLength(1000);
+
+                entity.Property(e => e.P0011_GiaBanLeTruCoChe).HasMaxLength(1000);
+
+                entity.Property(e => e.P0012_GiaNoiBo).HasMaxLength(1000);
+
+                entity.Property(e => e.P0013_GiaCBCNV).HasMaxLength(1000);
+
+                entity.Property(e => e.P0014_GiaBNGiaLe).HasMaxLength(1000);
+
+                entity.Property(e => e.P0015_GiaBNTruCoChe).HasMaxLength(1000);
+
+                entity.Property(e => e.P0016_GiaTheoDonHang).HasMaxLength(1000);
+
+                entity.Property(e => e.P0017_GiaCoSoGLP).HasMaxLength(1000);
+
+                entity.Property(e => e.P0018_GiaLeNiemYet).HasMaxLength(1000);
+
+                entity.Property(e => e.U_IGroupName).HasMaxLength(1000);
+            });
+
+            modelBuilder.Entity<Raw_B003DAO>(entity =>
+            {
+                entity.ToTable("Raw_B003", "SAP");
+
+                entity.Property(e => e.BP).HasMaxLength(50);
+
+                entity.Property(e => e.BPLName).HasMaxLength(100);
+
+                entity.Property(e => e.Conton).HasColumnType("decimal(22, 6)");
+
+                entity.Property(e => e.DocEntry).HasMaxLength(100);
+
+                entity.Property(e => e.DonGiaHoaDon).HasColumnType("decimal(22, 6)");
+
+                entity.Property(e => e.Donvitinh).HasMaxLength(100);
+
+                entity.Property(e => e.ItemCode)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.Kho)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.KhoaHD).HasMaxLength(500);
+
+                entity.Property(e => e.LineNum).HasMaxLength(100);
+
+                entity.Property(e => e.Loai_NX).HasMaxLength(50);
+
+                entity.Property(e => e.Luongxuat).HasColumnType("decimal(22, 6)");
+
+                entity.Property(e => e.Ma_KH).HasMaxLength(100);
+
+                entity.Property(e => e.NgayHoaDon).HasColumnType("datetime");
+
+                entity.Property(e => e.PhongBH).HasMaxLength(100);
+
+                entity.Property(e => e.Seri).HasMaxLength(100);
+
+                entity.Property(e => e.SoHD).HasMaxLength(100);
+
+                entity.Property(e => e.Soluong_gui).HasColumnType("decimal(22, 6)");
+
+                entity.Property(e => e.TenKH).HasMaxLength(500);
+
+                entity.Property(e => e.TenKHLe).HasMaxLength(500);
+
+                entity.Property(e => e.Ten_HH).HasMaxLength(500);
+
+                entity.Property(e => e.ThanhTien).HasColumnType("decimal(22, 6)");
+
+                entity.Property(e => e.Thuesuat).HasColumnType("decimal(22, 6)");
+
+                entity.Property(e => e.Thukho).HasMaxLength(500);
+
+                entity.Property(e => e.U_Code).HasMaxLength(100);
+
+                entity.Property(e => e.U_Description_vn).HasMaxLength(500);
+
+                entity.Property(e => e.U_KM).HasMaxLength(100);
+
+                entity.Property(e => e.XN).HasMaxLength(10);
             });
 
             modelBuilder.Entity<Raw_B1_5_ActualExportReport_RepDAO>(entity =>
@@ -601,17 +1125,168 @@ namespace DW_Test.Models
                 entity.Property(e => e.Nhomchinh_KH).HasMaxLength(500);
             });
 
-            modelBuilder.Entity<Student>(entity =>
+            modelBuilder.Entity<Raw_Product_ProductGroupDAO>(entity =>
             {
-                entity.ToTable("Student", "dbo");
+                entity.ToTable("Raw_Product_ProductGroup", "RD");
 
-                entity.Property(e => e.StudentID).HasMaxLength(500);
+                entity.Property(e => e.ChatLuong).HasMaxLength(1000);
 
-                entity.Property(e => e.Name).HasMaxLength(500);
+                entity.Property(e => e.CongSuat).HasMaxLength(1000);
 
-                entity.Property(e => e.Age).HasColumnType("bigint");
+                entity.Property(e => e.MaSP).HasMaxLength(1000);
 
-                entity.Property(e => e.GPA).HasColumnType("bigint");
+                entity.Property(e => e.NhietDoMau).HasMaxLength(1000);
+
+                entity.Property(e => e.SPC1).HasMaxLength(1000);
+
+                entity.Property(e => e.SPC2).HasMaxLength(1000);
+
+                entity.Property(e => e.TenSP).HasMaxLength(1000);
+            });
+
+            modelBuilder.Entity<Raw_SaleEmployee_CustomerDAO>(entity =>
+            {
+                entity.ToTable("Raw_SaleEmployee_Customer", "RD");
+
+                entity.Property(e => e.MaKH).HasMaxLength(1000);
+
+                entity.Property(e => e.MaNV).HasMaxLength(1000);
+
+                entity.Property(e => e.TenKH).HasMaxLength(1000);
+
+                entity.Property(e => e.TenNV).HasMaxLength(1000);
+            });
+
+            modelBuilder.Entity<Raw_SpecializedChannelDAO>(entity =>
+            {
+                entity.ToTable("Raw_SpecializedChannel", "RD");
+
+                entity.Property(e => e.MaKenh)
+                    .HasMaxLength(1000)
+                    .IsFixedLength();
+
+                entity.Property(e => e.MaMien)
+                    .HasMaxLength(1000)
+                    .IsFixedLength();
+
+                entity.Property(e => e.SPC1).HasColumnType("decimal(22, 10)");
+
+                entity.Property(e => e.TenKenh).HasMaxLength(1000);
+
+                entity.Property(e => e.TenMien).HasMaxLength(1000);
+            });
+
+            modelBuilder.Entity<Raw_SpecializedChannel_SalePlan_RevenueDAO>(entity =>
+            {
+                entity.ToTable("Raw_SpecializedChannel_SalePlan_Revenue", "RD");
+
+                entity.Property(e => e.KHNam).HasColumnType("decimal(22, 10)");
+
+                entity.Property(e => e.KHQuy1).HasColumnType("decimal(22, 10)");
+
+                entity.Property(e => e.KHQuy2).HasColumnType("decimal(22, 10)");
+
+                entity.Property(e => e.KHQuy3).HasColumnType("decimal(22, 10)");
+
+                entity.Property(e => e.KHQuy4).HasColumnType("decimal(22, 10)");
+
+                entity.Property(e => e.KHThang1).HasColumnType("decimal(22, 10)");
+
+                entity.Property(e => e.KHThang10).HasColumnType("decimal(22, 10)");
+
+                entity.Property(e => e.KHThang11).HasColumnType("decimal(22, 10)");
+
+                entity.Property(e => e.KHThang12).HasColumnType("decimal(22, 10)");
+
+                entity.Property(e => e.KHThang2).HasColumnType("decimal(22, 10)");
+
+                entity.Property(e => e.KHThang3).HasColumnType("decimal(22, 10)");
+
+                entity.Property(e => e.KHThang4).HasColumnType("decimal(22, 10)");
+
+                entity.Property(e => e.KHThang5).HasColumnType("decimal(22, 10)");
+
+                entity.Property(e => e.KHThang6).HasColumnType("decimal(22, 10)");
+
+                entity.Property(e => e.KHThang7).HasColumnType("decimal(22, 10)");
+
+                entity.Property(e => e.KHThang8).HasColumnType("decimal(22, 10)");
+
+                entity.Property(e => e.KHThang9).HasColumnType("decimal(22, 10)");
+
+                entity.Property(e => e.MaKH).HasMaxLength(1000);
+
+                entity.Property(e => e.TenKH).HasMaxLength(1000);
+
+                entity.Property(e => e.TenKenh).HasMaxLength(1000);
+
+                entity.Property(e => e.TenMien).HasMaxLength(1000);
+            });
+
+            modelBuilder.Entity<SchemaDAO>(entity =>
+            {
+                entity.HasKey(e => e.Version)
+                    .HasName("PK_HangFire_Schema");
+
+                entity.ToTable("Schema", "HangFire");
+
+                entity.Property(e => e.Version).ValueGeneratedNever();
+            });
+
+            modelBuilder.Entity<ServerDAO>(entity =>
+            {
+                entity.ToTable("Server", "HangFire");
+
+                entity.HasIndex(e => e.LastHeartbeat)
+                    .HasName("IX_HangFire_Server_LastHeartbeat");
+
+                entity.Property(e => e.Id).HasMaxLength(200);
+
+                entity.Property(e => e.LastHeartbeat).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<SetDAO>(entity =>
+            {
+                entity.HasKey(e => new { e.Key, e.Value })
+                    .HasName("PK_HangFire_Set");
+
+                entity.ToTable("Set", "HangFire");
+
+                entity.HasIndex(e => e.ExpireAt)
+                    .HasName("IX_HangFire_Set_ExpireAt")
+                    .HasFilter("([ExpireAt] IS NOT NULL)");
+
+                entity.HasIndex(e => new { e.Key, e.Score })
+                    .HasName("IX_HangFire_Set_Score");
+
+                entity.Property(e => e.Key).HasMaxLength(100);
+
+                entity.Property(e => e.Value).HasMaxLength(256);
+
+                entity.Property(e => e.ExpireAt).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<StateDAO>(entity =>
+            {
+                entity.HasKey(e => new { e.JobId, e.Id })
+                    .HasName("PK_HangFire_State");
+
+                entity.ToTable("State", "HangFire");
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(20);
+
+                entity.Property(e => e.Reason).HasMaxLength(100);
+
+                entity.HasOne(d => d.Job)
+                    .WithMany(p => p.States)
+                    .HasForeignKey(d => d.JobId)
+                    .HasConstraintName("FK_HangFire_State_Job");
             });
 
             OnModelCreatingPartial(modelBuilder);

@@ -8,6 +8,7 @@ namespace DW_Test.DWEModels
         public long Id { get; set; }
         public long? OrderId { get; set; }
         public DateTime? Date { get; set; }
+        public string OrderCode { get; set; }
         public long? OrderSourceId { get; set; }
         public long? OrderStatusId { get; set; }
         public long? ProcessingDepartmentId { get; set; }

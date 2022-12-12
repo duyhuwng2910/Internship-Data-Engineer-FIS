@@ -17,5 +17,6 @@ namespace DW_Test.DWEModels
         public long? OrderNumberMonth { get; set; }
         public string PeriodCode { get; set; }
         public long? PeriodTypeId { get; set; }
+        public string PeriodBIName { get; set; }
     }
 }

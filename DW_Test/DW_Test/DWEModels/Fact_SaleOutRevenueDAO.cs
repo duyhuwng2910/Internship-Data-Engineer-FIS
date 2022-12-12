@@ -9,7 +9,7 @@ namespace DW_Test.DWEModels
         public long EmployeeId { get; set; }
         public long ItemId { get; set; }
         public decimal? Revenue { get; set; }
-        public long OrderDateKey { get; set; }
+        public long DateKey { get; set; }
         public long? ProductGroupingId { get; set; }
         public long? SaleTeamId { get; set; }
         public long? OrganizationProductId { get; set; }
