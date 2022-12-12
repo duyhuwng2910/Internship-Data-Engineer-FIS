@@ -18,5 +18,6 @@ namespace DW_Test.DWEModels
         public long? ItemVATGroupId { get; set; }
         public long? RawId { get; set; }
         public long ItemGroupId { get; set; }
+        public long? ItemRDGroupLevel1Id { get; set; }
     }
 }

@@ -1,5 +1,4 @@
-﻿using DW_Test.HashModels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace DW_Test.Models

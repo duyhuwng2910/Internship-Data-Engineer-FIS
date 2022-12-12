@@ -12,5 +12,6 @@ namespace DW_Test.Models
         public long? SaleBranchId { get; set; }
         public long? SaleChannelId { get; set; }
         public long? SaleRoomId { get; set; }
+        public string dem { get; set; }
     }
 }

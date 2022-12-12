@@ -21,5 +21,7 @@ namespace DW_Test.DWEModels
         public long? EmployeeId { get; set; }
         public long? ItemNewItemGroupId { get; set; }
         public long? ItemVATGroupId { get; set; }
+        public long? ItemRDGroupLevel1Id { get; set; }
+        public long? SaleChannelRDId { get; set; }
     }
 }
