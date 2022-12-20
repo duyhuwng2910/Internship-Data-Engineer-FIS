@@ -89,6 +89,7 @@ namespace DW_Test.Models
         public virtual DbSet<Raw_Plan_RevenueDAO> Raw_Plan_Revenue { get; set; }
         public virtual DbSet<Raw_Product_GroupDAO> Raw_Product_Group { get; set; }
         public virtual DbSet<Raw_Product_ProductGroupDAO> Raw_Product_ProductGroup { get; set; }
+        public virtual DbSet<Raw_SaleEmployeeDAO> Raw_SaleEmployee { get; set; }
         public virtual DbSet<Raw_SaleEmployee_CustomerDAO> Raw_SaleEmployee_Customer { get; set; }
         public virtual DbSet<Raw_SpecializedChannelDAO> Raw_SpecializedChannel { get; set; }
         public virtual DbSet<Raw_SpecializedChannel_SalePlan_RevenueDAO> Raw_SpecializedChannel_SalePlan_Revenue { get; set; }
@@ -1144,6 +1145,17 @@ namespace DW_Test.Models
                 entity.Property(e => e.TenSP).HasMaxLength(1000);
             });
 
+            modelBuilder.Entity<Raw_SaleEmployeeDAO>(entity =>
+            {
+                entity.ToTable("Raw_SaleEmployee", "RD");
+
+                entity.Property(e => e.MaNV)
+                    .IsRequired()
+                    .HasMaxLength(1000);
+
+                entity.Property(e => e.TenNV).HasMaxLength(1000);
+            });
+
             modelBuilder.Entity<Raw_SaleEmployee_CustomerDAO>(entity =>
             {
                 entity.ToTable("Raw_SaleEmployee_Customer", "RD");
@@ -1161,15 +1173,7 @@ namespace DW_Test.Models
             {
                 entity.ToTable("Raw_SpecializedChannel", "RD");
 
-                entity.Property(e => e.MaKenh)
-                    .HasMaxLength(1000)
-                    .IsFixedLength();
-
-                entity.Property(e => e.MaMien)
-                    .HasMaxLength(1000)
-                    .IsFixedLength();
-
-                entity.Property(e => e.SPC1).HasColumnType("decimal(22, 10)");
+                entity.Property(e => e.SPC1).HasMaxLength(1000);
 
                 entity.Property(e => e.TenKenh).HasMaxLength(1000);
 

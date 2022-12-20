@@ -6,9 +6,13 @@
 	
 	<ItemGroup>
 		<Compile Remove="CodeTemplates\**" />
+		<Compile Remove="HashModels\NewFolder\**" />
 		<Content Remove="CodeTemplates\**" />
+		<Content Remove="HashModels\NewFolder\**" />
 		<EmbeddedResource Remove="CodeTemplates\**" />
+		<EmbeddedResource Remove="HashModels\NewFolder\**" />
 		<None Remove="CodeTemplates\**" />
+		<None Remove="HashModels\NewFolder\**" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Hangfire.AspNetCore" Version="1.7.31" />

@@ -13,9 +13,6 @@ namespace DW_Test.Rpc
 {
     public class Plan_RevenueController : ControllerBase
     {
-        // hai thuộc tính private của class
-        private DataContext DataContext;
-
         private IPlan_RevenueService Plan_RevenueService;
 
         private ICompany_PlanService Company_PlanService;
@@ -31,19 +28,18 @@ namespace DW_Test.Rpc
         private ISaleBranch_PlanService SaleBranch_PlanService;
 
         // hàm khởi tạo constructor
-        public Plan_RevenueController(DataContext DataContext, IPlan_RevenueService Plan_RevenueService
+        public Plan_RevenueController(IPlan_RevenueService Plan_RevenueService
             , ICompany_PlanService Company_PlanService, ICustomer_PlanService Customer_PlanService
             , ICounty_PlanService County_PlanService, ISaleRoom_PlanService SaleRoom_PlanService
-            , ISaleChannel_PlanService SaleChannel_PlanService, ISaleBranch_PlanService SaleBranch_Plan_Service)
+            , ISaleChannel_PlanService SaleChannel_PlanService, ISaleBranch_PlanService SaleBranch_PlanService)
         {
-            this.DataContext = DataContext;
             this.Plan_RevenueService = Plan_RevenueService;
             this.Company_PlanService = Company_PlanService;
             this.Customer_PlanService = Customer_PlanService;
             this.County_PlanService = County_PlanService;
             this.SaleRoom_PlanService = SaleRoom_PlanService;
             this.SaleChannel_PlanService = SaleChannel_PlanService;
-            this.SaleBranch_PlanService = SaleBranch_Plan_Service;
+            this.SaleBranch_PlanService = SaleBranch_PlanService;
         }
 
         [HttpPost, Route(Plan_RevenueRoute.Init)]

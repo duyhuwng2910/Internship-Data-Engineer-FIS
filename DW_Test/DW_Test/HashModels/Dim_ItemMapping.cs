@@ -6,7 +6,7 @@ namespace DW_Test.HashModels
     {
         public long Item_MappingId { get; set; }
         public long? ItemId { get; set; }
-        public string? ItemCode { get; set; }
+        public string ItemCode { get; set; }
         public long? ItemTypeId { get; set; }
         public long? ItemMainGroupId { get; set; }
         public long? ItemGroupLevel1Id { get; set; }
