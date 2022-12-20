@@ -4,7 +4,9 @@
     {
         public const string Default = Rpc + Module + "/sale-employee-customer";
 
-        public const string Init = Default + "/init";
+        public const string SaleEmployeeInit = Default + "/sale-employee-init";
+
+        public const string CustomerInit = Default + "/customer-init"; 
 
         public const string Transform = Default + "/transform";
     }

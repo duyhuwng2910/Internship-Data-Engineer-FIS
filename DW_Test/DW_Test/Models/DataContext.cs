@@ -97,6 +97,8 @@ namespace DW_Test.Models
         public virtual DbSet<ServerDAO> Server { get; set; }
         public virtual DbSet<SetDAO> Set { get; set; }
         public virtual DbSet<StateDAO> State { get; set; }
+        public virtual DbSet<StudentDAO> Student { get; set; }
+        public virtual DbSet<Test_RepDAO> Test_Rep { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -107,7 +109,7 @@ namespace DW_Test.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("data source=192.168.20.200;initial catalog=DW_TEST;persist security info=True;user id=TTS_Data;password=1234567;multipleactiveresultsets=True;");
+                optionsBuilder.UseSqlServer("data source=NGUYENDUYHUNG;initial catalog=DW_TEST;Integrated Security=True");
             }
         }
 
@@ -1291,6 +1293,20 @@ namespace DW_Test.Models
                     .WithMany(p => p.States)
                     .HasForeignKey(d => d.JobId)
                     .HasConstraintName("FK_HangFire_State_Job");
+            });
+
+            modelBuilder.Entity<StudentDAO>(entity =>
+            {
+                entity.Property(e => e.Name).HasMaxLength(500);
+
+                entity.Property(e => e.StudentID).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Test_RepDAO>(entity =>
+            {
+                entity.Property(e => e.Key).HasMaxLength(500);
+
+                entity.Property(e => e.Value).HasMaxLength(500);
             });
 
             OnModelCreatingPartial(modelBuilder);

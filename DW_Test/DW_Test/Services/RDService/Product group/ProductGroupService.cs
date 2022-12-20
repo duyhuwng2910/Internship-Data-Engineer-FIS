@@ -23,25 +23,9 @@ namespace DW_Test.Services.RDService.Product_group
 
         public async Task<bool> Init(List<Raw_Product_ProductGroupDAO> Remote)
         {
-            #region Qúa trình kiểm tra tính đúng của dữ liệu trên template Excel
-            List<Raw_Product_ProductGroupDAO> CorrectedRemote = new List<Raw_Product_ProductGroupDAO>();
-
-            List<Dim_ItemDAO> Dim_ItemDAOs = await DataContext.Dim_Item.ToListAsync();
-
-            foreach (var item in Dim_ItemDAOs)
-            {
-                Raw_Product_ProductGroupDAO product = Remote.Where(x => x.MaSP == item.ItemCode).FirstOrDefault();
-
-                if (product != null)
-                {
-                    CorrectedRemote.Add(product);
-                }
-            }
-            #endregion
-
             List<Raw_Product_ProductGroupDAO> Local = await DataContext.Raw_Product_ProductGroup.ToListAsync();
 
-            List<Raw_Product_ProductGroup> HashRemote = CorrectedRemote.Select(x => new Raw_Product_ProductGroup(x)).ToList();
+            List<Raw_Product_ProductGroup> HashRemote = Remote.Select(x => new Raw_Product_ProductGroup(x)).ToList();
 
             List<Raw_Product_ProductGroup> HashLocal = Local.Select(x => new Raw_Product_ProductGroup(x)).ToList();
 
@@ -59,7 +43,7 @@ namespace DW_Test.Services.RDService.Product_group
 
             if (Local.Count == 0)
             {
-                foreach (var remote in CorrectedRemote)
+                foreach (var remote in Remote)
                 {
                     Local.Add(new Raw_Product_ProductGroupDAO()
                     {

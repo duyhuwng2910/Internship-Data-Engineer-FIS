@@ -4,19 +4,24 @@ using DW_Test.Services.RDService.Product_group;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Build.Utilities;
+using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DW_Test.Rpc.RD_report.product_group
 {
     public class ProductGroupController : ControllerBase
     {
+        private DataContext DataContext;
+
         private IProductGroupService ProductGroupService;
 
-        public ProductGroupController(IProductGroupService ProductGroupService)
+        public ProductGroupController(DataContext DataContext, IProductGroupService ProductGroupService)
         {
+            this.DataContext = DataContext;
             this.ProductGroupService = ProductGroupService;
         }
 
@@ -25,13 +30,20 @@ namespace DW_Test.Rpc.RD_report.product_group
         {
             List<Raw_Product_ProductGroupDAO> Remote = new List<Raw_Product_ProductGroupDAO>();
 
+            List<Dim_ItemDAO> Dim_ItemDAOs = await DataContext.Dim_Item.ToListAsync();
+
             using (var stream = new MemoryStream())
             {
                 await file.CopyToAsync(stream);
 
                 using (var package = new ExcelPackage(stream))
                 {
-                    var worksheet = package.Workbook.Worksheets[0];
+                    var worksheet = package.Workbook.Worksheets.Where(x => x.Name == "Product").FirstOrDefault();
+
+                    if (worksheet == null)
+                    {
+                        return BadRequest($"Thiếu sheet Product");
+                    }
 
                     List<string> ColumnNameList = new List<string>();
 
@@ -53,15 +65,23 @@ namespace DW_Test.Rpc.RD_report.product_group
 
                     for (int row = StartRow + 1; row < worksheet.Dimension.End.Row; row++)
                     {
+                        var item = Dim_ItemDAOs
+                            .Where(x => x.ItemCode == worksheet.Cells[row, MaSP].Value?.ToString()).FirstOrDefault();
+                        
+                        if (item == null)
+                        {
+                            return BadRequest($"Mã sản phẩm không tồn tại {worksheet.Cells[row, MaSP].Value?.ToString()}");
+                        }
+
                         Remote.Add(new Raw_Product_ProductGroupDAO()
                         {
-                            MaSP = worksheet.Cells[row, MaSP].Value?.ToString() ?? "",
-                            TenSP = worksheet.Cells[row, TenSP].Value?.ToString() ?? "",
-                            SPC1 = worksheet.Cells[row, SPC1].Value?.ToString() ?? "",
-                            SPC2 = worksheet.Cells[row, SPC2].Value?.ToString() ?? "",
-                            ChatLuong = worksheet.Cells[row, ChatLuong].Value?.ToString() ?? "",
-                            CongSuat = worksheet.Cells[row, CongSuat].Value?.ToString() ?? "",
-                            NhietDoMau = worksheet.Cells[row, NhietDoMau].Value?.ToString() ?? ""
+                            MaSP = worksheet.Cells[row, MaSP].Value?.ToString(),
+                            TenSP = worksheet.Cells[row, TenSP].Value?.ToString(),
+                            SPC1 = worksheet.Cells[row, SPC1].Value?.ToString(),
+                            SPC2 = worksheet.Cells[row, SPC2].Value?.ToString(),
+                            ChatLuong = worksheet.Cells[row, ChatLuong].Value?.ToString(),
+                            CongSuat = worksheet.Cells[row, CongSuat].Value?.ToString(),
+                            NhietDoMau = worksheet.Cells[row, NhietDoMau].Value?.ToString()
                         });
                     }
 
