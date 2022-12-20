@@ -1,10 +1,7 @@
-﻿using DW_Test.HashModels;
-using DW_Test.Models;
+﻿using DW_Test.Models;
 using DW_Test.Services.RDService.Specialized_channel_sale_plan_revenue;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Build.Utilities;
-using Microsoft.EntityFrameworkCore.Internal;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -38,7 +35,7 @@ namespace DW_Test.Rpc.RD_report.specialized_channel_sale_plan_revenue
         public async Task<ActionResult> SalePlan_RevenueUpExcel(IFormFile file)
         {
             List<Raw_SpecializedChannel_SalePlan_RevenueDAO>
-                    SpecializedChannel_SalePlan_RevenueRemoteDAOs 
+                    SpecializedChannel_SalePlan_RevenueRemoteDAOs
                     = new List<Raw_SpecializedChannel_SalePlan_RevenueDAO>();
 
             // sử dụng biến stream cục bộ trong hàm
@@ -52,7 +49,7 @@ namespace DW_Test.Rpc.RD_report.specialized_channel_sale_plan_revenue
 
                     // Vòng lặp foreach cho từng worksheet của file Excel
                     // mỗi worksheet tương ứng với một năm
-                    foreach(var worksheet in workbook.Worksheets)
+                    foreach (var worksheet in workbook.Worksheets)
                     {
                         // Lấy ra số năm của mỗi worksheet
                         long Year = long.TryParse(worksheet.Name, out long year) ? year : 0;
@@ -61,7 +58,7 @@ namespace DW_Test.Rpc.RD_report.specialized_channel_sale_plan_revenue
                         // trả về Exception lỗi load file Excel
                         if (Year == 0)
                         {
-                            throw new Exception("Error to load Excel file");
+                            return BadRequest("Lỗi không có sheet các năm");
                         }
 
                         int StartColumn = 1;

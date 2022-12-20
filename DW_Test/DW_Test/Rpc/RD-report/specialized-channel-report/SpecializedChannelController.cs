@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DW_Test.Rpc.RD_report.specialized_channel_report
@@ -29,7 +30,14 @@ namespace DW_Test.Rpc.RD_report.specialized_channel_report
 
                 using (var package = new ExcelPackage(stream))
                 {
-                    var worksheet = package.Workbook.Worksheets[0];
+                    string SheetName = "SpecializedChannel";
+
+                    var worksheet = package.Workbook.Worksheets.Where(x => x.Name == SheetName).FirstOrDefault();
+
+                    if (worksheet == null)
+                    {
+                        return BadRequest($"Thiếu sheet {SheetName}");
+                    }
 
                     int StartColumn = 1;
                     int StartRow = 1;
@@ -49,9 +57,9 @@ namespace DW_Test.Rpc.RD_report.specialized_channel_report
                     {
                         Remote.Add(new Raw_SpecializedChannelDAO()
                         {
-                            TenMien = worksheet.Cells[row, TenMien].Value?.ToString() ?? "",
-                            TenKenh = worksheet.Cells[row, TenKenh].Value?.ToString() ?? "",
-                            SPC1 = worksheet.Cells[row, SPC1].Value?.ToString() ?? ""
+                            TenMien = worksheet.Cells[row, TenMien].Value?.ToString(),
+                            TenKenh = worksheet.Cells[row, TenKenh].Value?.ToString(),
+                            SPC1 = worksheet.Cells[row, SPC1].Value?.ToString()
                         });
                     }
 
