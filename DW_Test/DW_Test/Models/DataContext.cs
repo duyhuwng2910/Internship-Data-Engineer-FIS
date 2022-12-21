@@ -44,6 +44,7 @@ namespace DW_Test.Models
         public virtual DbSet<Dim_SaleRoomDAO> Dim_SaleRoom { get; set; }
         public virtual DbSet<Dim_SpecializedChannelMappingDAO> Dim_SpecializedChannelMapping { get; set; }
         public virtual DbSet<Dim_UnitMappingDAO> Dim_UnitMapping { get; set; }
+        public virtual DbSet<Dim_WarehouseDAO> Dim_Warehouse { get; set; }
         public virtual DbSet<Dim_YearDAO> Dim_Year { get; set; }
         public virtual DbSet<Fact_Company_Month_PlanDAO> Fact_Company_Month_Plan { get; set; }
         public virtual DbSet<Fact_Company_Quarter_PlanDAO> Fact_Company_Quarter_Plan { get; set; }
@@ -459,8 +460,6 @@ namespace DW_Test.Models
 
                 entity.ToTable("Dim_Region", "RD");
 
-                entity.Property(e => e.RegionCode).HasMaxLength(1000);
-
                 entity.Property(e => e.RegionName).HasMaxLength(1000);
             });
 
@@ -521,6 +520,23 @@ namespace DW_Test.Models
                 entity.Property(e => e.dem)
                     .HasMaxLength(200)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<Dim_WarehouseDAO>(entity =>
+            {
+                entity.HasKey(e => e.WarehouseId);
+
+                entity.ToTable("Dim_Warehouse", "SAP");
+
+                entity.Property(e => e.Location).HasMaxLength(4000);
+
+                entity.Property(e => e.WarehouseLevel1Name).HasMaxLength(4000);
+
+                entity.Property(e => e.WarehouseLevel2Name).HasMaxLength(4000);
+
+                entity.Property(e => e.WhsBranchName).HasMaxLength(4000);
+
+                entity.Property(e => e.WhsCode).HasMaxLength(4000);
             });
 
             modelBuilder.Entity<Dim_YearDAO>(entity =>
@@ -1162,7 +1178,9 @@ namespace DW_Test.Models
             {
                 entity.ToTable("Raw_SaleEmployee_Customer", "RD");
 
-                entity.Property(e => e.MaKH).HasMaxLength(1000);
+                entity.Property(e => e.MaKH)
+                    .IsRequired()
+                    .HasMaxLength(1000);
 
                 entity.Property(e => e.MaNV).HasMaxLength(1000);
 

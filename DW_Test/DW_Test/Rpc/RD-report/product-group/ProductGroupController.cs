@@ -91,5 +91,13 @@ namespace DW_Test.Rpc.RD_report.product_group
                 }
             }
         }
+
+        [HttpGet, Route(ProductGroupRoute.Transform)]
+        public async Task<ActionResult> Transform()
+        {
+            await ProductGroupService.Transform();
+
+            return Ok();
+        }
     }
 }

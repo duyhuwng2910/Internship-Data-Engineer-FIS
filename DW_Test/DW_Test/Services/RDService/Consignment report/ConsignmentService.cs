@@ -13,6 +13,8 @@ namespace DW_Test.Services.RDService.Consignment_report
 {
     public interface IConsignmentService : IServiceScoped
     {
+        public Task<bool> Dim_WarehouseInit();
+
         public Task<bool> Init();
     }
     public class ConsignmentService : IConsignmentService
@@ -25,6 +27,138 @@ namespace DW_Test.Services.RDService.Consignment_report
         {
             this.DWEContext = DWEContext;
             this.DataContext = DataContext;
+        }
+
+        public async Task<bool> Dim_WarehouseInit()
+        {
+            List<DWEModels.Dim_WarehouseDAO> Remote = await DWEContext.Dim_Warehouse.ToListAsync();
+
+            List<Models.Dim_WarehouseDAO> Local = await DataContext.Dim_Warehouse.ToListAsync();
+
+            List<Dim_Warehouse> HashRemote = Remote.Select(x => new Dim_Warehouse(x)).ToList();
+
+            List<Dim_Warehouse> HashLocal = Local.Select(x => new Dim_Warehouse(x)).ToList();
+
+            HashRemote = HashRemote.OrderBy(x => x.Key).ToList();
+
+            HashLocal = HashLocal.OrderBy(x => x.Key).ToList();
+
+            List<Models.Dim_WarehouseDAO> InsertList = new List<Models.Dim_WarehouseDAO>();
+
+            List<Models.Dim_WarehouseDAO> UpdateList = new List<Models.Dim_WarehouseDAO>();
+
+            List<Models.Dim_WarehouseDAO> DeleteList = new List<Models.Dim_WarehouseDAO>();
+
+            int index = 0;
+
+            if (Local.Count == 0)
+            {
+                foreach (var remote in Remote)
+                {
+                    Local.Add(new Models.Dim_WarehouseDAO()
+                    {
+                        WhsCode = remote.WhsCode,
+                        Location = remote.Location,
+                        WhsBranchName = remote.WhsBranchName,
+                        WarehouseLevel1Name = remote.WarehouseLevel1Name,
+                        WarehouseLevel2Name = remote.WarehouseLevel2Name
+                    });
+                }
+
+                await DataContext.BulkMergeAsync(Local);
+            }
+            else
+            {
+                for (int j = 0; j < HashRemote.Count && index < HashLocal.Count;)
+                {
+                    if (CompareMethod.Compare(HashRemote[j].Key, HashLocal[index].Key) < 0)
+                    {
+                        InsertList.Add(new Models.Dim_WarehouseDAO()
+                        {
+                            WhsCode = HashRemote[j].WhsCode,
+                            Location = HashRemote[j].Location,
+                            WhsBranchName = HashRemote[j].WhsBranchName,
+                            WarehouseLevel1Name = HashRemote[j].WarehouseLevel1Name,
+                            WarehouseLevel2Name = HashRemote[j].WarehouseLevel2Name
+                        });
+
+                        j++;
+                    }
+                    else if (CompareMethod.Compare(HashRemote[j].Key, HashLocal[index].Key) == 0)
+                    {
+                        if (HashRemote[j].Value != HashLocal[index].Value)
+                        {
+                            UpdateList.Add(new Models.Dim_WarehouseDAO()
+                            {
+                                WarehouseId = HashLocal[index].WarehouseId,
+                                WhsCode = HashLocal[index].WhsCode,
+                                Location = HashRemote[j].Location,
+                                WhsBranchName = HashRemote[j].WhsBranchName,
+                                WarehouseLevel1Name = HashRemote[j].WarehouseLevel1Name,
+                                WarehouseLevel2Name = HashRemote[j].WarehouseLevel2Name
+                            });
+                        }
+
+                        j++;
+
+                        index++;
+                    }
+                    else if (CompareMethod.Compare(HashRemote[j].Key, HashLocal[index].Key) > 0)
+                    {
+                        DeleteList.Add(new Models.Dim_WarehouseDAO()
+                        {
+                            WarehouseId = HashLocal[index].WarehouseId,
+                            WhsCode = HashLocal[index].WhsCode,
+                            Location = HashLocal[index].Location,
+                            WhsBranchName = HashLocal[index].WhsBranchName,
+                            WarehouseLevel1Name = HashLocal[index].WarehouseLevel1Name,
+                            WarehouseLevel2Name = HashLocal[index].WarehouseLevel2Name
+                        });
+
+                        index++;
+                    }
+                }
+
+                if (index == HashLocal.Count && HashRemote.Last().Key != HashLocal.Last().Key)
+                {
+                    while (index < HashRemote.Count)
+                    {
+                        InsertList.Add(new Models.Dim_WarehouseDAO()
+                        {
+                            WhsCode = HashRemote[index].WhsCode,
+                            Location = HashRemote[index].Location,
+                            WhsBranchName = HashRemote[index].WhsBranchName,
+                            WarehouseLevel1Name = HashRemote[index].WarehouseLevel1Name,
+                            WarehouseLevel2Name = HashRemote[index].WarehouseLevel2Name
+                        });
+
+                        index++;
+                    }
+                }
+                else if (index < HashLocal.Count)
+                {
+                    while (index < HashLocal.Count)
+                    {
+                        DeleteList.Add(new Models.Dim_WarehouseDAO()
+                        {
+                            WarehouseId = HashLocal[index].WarehouseId,
+                            WhsCode = HashLocal[index].WhsCode,
+                            Location = HashLocal[index].Location,
+                            WhsBranchName = HashLocal[index].WhsBranchName,
+                            WarehouseLevel1Name = HashLocal[index].WarehouseLevel1Name,
+                            WarehouseLevel2Name = HashLocal[index].WarehouseLevel2Name
+                        });
+
+                        index++;
+                    }
+                }
+
+                await DataContext.BulkDeleteAsync(DeleteList);
+                await DataContext.BulkMergeAsync(InsertList);
+                await DataContext.BulkMergeAsync(UpdateList);
+            }
+
+            return true;
         }
 
         public async Task<bool> Init()

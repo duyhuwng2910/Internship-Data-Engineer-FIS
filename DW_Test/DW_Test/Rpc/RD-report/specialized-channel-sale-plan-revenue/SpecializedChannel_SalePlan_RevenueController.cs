@@ -22,13 +22,12 @@ namespace DW_Test.Rpc.RD_report.specialized_channel_sale_plan_revenue
         /*
          * Hàm bool kiểm tra xem bảng doanh thu có đang bị bỏ trống không
          */
-        public bool CheckNullObjectRevenue(Raw_SpecializedChannel_SalePlan_RevenueDAO remote)
+        public bool CheckNullObjectRevenue(string TenMien, string TenKenh, string MaKH, string TenKH)
         {
-            return String.IsNullOrWhiteSpace(remote.TenMien)
-                && String.IsNullOrWhiteSpace(remote.TenKenh)
-                && String.IsNullOrWhiteSpace(remote.MaKH)
-                && String.IsNullOrWhiteSpace(remote.TenKH)
-                && (remote.Nam == 0);
+            return String.IsNullOrWhiteSpace(TenMien)
+                && String.IsNullOrWhiteSpace(TenKenh)
+                && String.IsNullOrWhiteSpace(MaKH)
+                && String.IsNullOrWhiteSpace(TenKH);
         }
 
         [HttpPost, Route(SpecializedChannel_SalePlan_RevenueRoute.Init)]
@@ -96,6 +95,22 @@ namespace DW_Test.Rpc.RD_report.specialized_channel_sale_plan_revenue
                         // Vòng lặp để insert dữ liệu trên mỗi dòng
                         for (int row = StartRow + 1; row <= worksheet.Dimension.End.Row; row++)
                         {
+                            string RegionName = worksheet.Cells[row, TenMien].Value?.ToString();
+                            string ChannelName = worksheet.Cells[row, TenKenh].Value?.ToString();
+                            string CustomerCode = worksheet.Cells[row, MaKH].Value?.ToString();
+                            string CustomerName = worksheet.Cells[row, TenKH].Value?.ToString();
+
+                            if (CheckNullObjectRevenue(RegionName, ChannelName, CustomerCode, CustomerName)) {
+                                if (row == worksheet.Dimension.End.Row)
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    return BadRequest($"Lỗi tại dòng {row} không có dữ liệu");
+                                }
+                            }
+
                             Raw_SpecializedChannel_SalePlan_RevenueDAO SalePlan_RevenueDAO = new Raw_SpecializedChannel_SalePlan_RevenueDAO()
                             {
                                 Nam = Year,
@@ -121,11 +136,6 @@ namespace DW_Test.Rpc.RD_report.specialized_channel_sale_plan_revenue
                                 KHThang11 = decimal.TryParse(worksheet.Cells[row, T11].Value?.ToString(), out decimal t11) ? t11 : 0,
                                 KHThang12 = decimal.TryParse(worksheet.Cells[row, T12].Value?.ToString(), out decimal t12) ? t12 : 0,
                             };
-
-                            if (!CheckNullObjectRevenue(SalePlan_RevenueDAO))
-                            {
-                                SpecializedChannel_SalePlan_RevenueRemoteDAOs.Add(SalePlan_RevenueDAO);
-                            }
                         }
                     }
 

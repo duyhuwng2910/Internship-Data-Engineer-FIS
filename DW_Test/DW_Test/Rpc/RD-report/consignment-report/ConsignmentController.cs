@@ -16,6 +16,8 @@ namespace DW_Test.Rpc.RD_report.consignment_report
         [HttpGet, Route(ConsignmentRoute.Init)]
         public async Task<ActionResult> Init()
         {
+            await ConsignmentService.Dim_WarehouseInit();
+
             await ConsignmentService.Init();
 
             return Ok();
