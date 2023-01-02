@@ -45,7 +45,8 @@ namespace DW_Test.Services.MPlan_RevenueService
 
                 decimal revenue = 0;
 
-                var Sale_BranchID = Dim_Sale_BranchDAOs.Where(x => x.SaleBranchName == Raw_Plan_RevenueDAO.VungChiNhanh).Select(x => x.SaleBranchId).FirstOrDefault();
+                var Sale_BranchID = Dim_Sale_BranchDAOs.Where(x => x.SaleBranchName == Raw_Plan_RevenueDAO.VungChiNhanh)
+                                                        .Select(x => x.SaleBranchId).FirstOrDefault();
 
                 for (int i = 1; i <= 12; i++)
                 {
@@ -181,7 +182,8 @@ namespace DW_Test.Services.MPlan_RevenueService
 
                 decimal revenue = Raw_Plan_RevenueDAO.KHNam;
 
-                var Sale_BranchID = Dim_Sale_BranchDAOs.Where(x => x.SaleBranchName == Raw_Plan_RevenueDAO.VungChiNhanh).Select(x => x.SaleBranchId).FirstOrDefault();
+                var Sale_BranchID = Dim_Sale_BranchDAOs.Where(x => x.SaleBranchName == Raw_Plan_RevenueDAO.VungChiNhanh)
+                                                        .Select(x => x.SaleBranchId).FirstOrDefault();
 
                 if (Sale_BranchID != 0)
                 {

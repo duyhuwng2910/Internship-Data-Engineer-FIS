@@ -5,5 +5,7 @@
         public const string Default = Rpc + Module + "/specialized-channel-sale-plan-revenue";
 
         public const string Init = Default + "/init";
+
+        public const string Transform = Default + "/transform";
     }
 }

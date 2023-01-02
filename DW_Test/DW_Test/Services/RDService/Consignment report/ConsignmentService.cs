@@ -1,11 +1,9 @@
 ﻿using DW_Test.DWEModels;
 using DW_Test.HashModels;
 using DW_Test.Models;
-using Microsoft.Build.Utilities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Threading.Tasks;
 using TrueSight.Common;
 
@@ -16,6 +14,8 @@ namespace DW_Test.Services.RDService.Consignment_report
         public Task<bool> Dim_WarehouseInit();
 
         public Task<bool> Init();
+
+        public Task Transform();
     }
     public class ConsignmentService : IConsignmentService
     {
@@ -427,6 +427,49 @@ namespace DW_Test.Services.RDService.Consignment_report
                 await DataContext.BulkMergeAsync(InsertList);
                 await DataContext.BulkMergeAsync(UpdateList);
             }
+
+            return true;
+        }
+
+        public async Task Transform()
+        {
+            await Build_Fact_Item_Whs_Consignment();
+        }
+
+        private async Task<bool> Build_Fact_Item_Whs_Consignment()
+        {
+            List<Models.Raw_B003DAO> Raw_B003DAOs = await DataContext.Raw_B003.ToListAsync();
+
+            List<Models.Dim_RD_ItemDAO> Dim_RD_ItemDAOs = await DataContext.Dim_RD_Item.ToListAsync();
+
+            List<Models.Dim_RD_CustomerDAO> Dim_RD_CustomerDAOs = await DataContext.Dim_RD_Customer.ToListAsync();
+
+            List<Models.Dim_WarehouseDAO> Dim_WarehouseDAOs = await DataContext.Dim_Warehouse.ToListAsync();
+
+            List<Models.Fact_Item_Whs_ConsignmentDAO> Fact_Item_Whs_ConsignmentDAOs = new List<Models.Fact_Item_Whs_ConsignmentDAO>();
+            
+            foreach(var raw in Raw_B003DAOs)
+            {
+                var customer = Dim_RD_CustomerDAOs.Where(x => x.CustomerCode == raw.Ma_KH).FirstOrDefault();
+
+                var item = Dim_RD_ItemDAOs.Where(x => x.ItemCode == raw.ItemCode).FirstOrDefault();
+
+                var warehouse = Dim_WarehouseDAOs.Where(x => x.WhsCode == raw.Kho).FirstOrDefault();
+
+                if (customer != null)
+                {
+                    Fact_Item_Whs_ConsignmentDAOs.Add(new Models.Fact_Item_Whs_ConsignmentDAO()
+                    {
+                        ItemId = item.ItemId,
+                        WarehouseId = warehouse.WarehouseId,
+                        Consignment = raw.Soluong_gui,
+                    });
+                }
+            }
+
+            await DataContext.Fact_Item_Whs_Consignment.DeleteFromQueryAsync();
+
+            await DataContext.BulkMergeAsync(Fact_Item_Whs_ConsignmentDAOs);
 
             return true;
         }

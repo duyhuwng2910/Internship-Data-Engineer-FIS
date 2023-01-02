@@ -22,5 +22,13 @@ namespace DW_Test.Rpc.RD_report.consignment_report
 
             return Ok();
         }
+
+        [HttpGet, Route(ConsignmentRoute.Transform)]
+        public async Task<ActionResult> Transform()
+        {
+            await ConsignmentService.Transform();
+
+            return Ok();
+        }
     }
 }

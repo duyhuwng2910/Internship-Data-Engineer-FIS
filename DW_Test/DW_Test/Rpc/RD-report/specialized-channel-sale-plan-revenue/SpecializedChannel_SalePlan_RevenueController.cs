@@ -14,9 +14,22 @@ namespace DW_Test.Rpc.RD_report.specialized_channel_sale_plan_revenue
     {
         private ISpecializedChannel_SalePlan_RevenueService SpecializedChannel_SalePlan_RevenueService;
 
-        public SpecializedChannel_SalePlan_RevenueController(ISpecializedChannel_SalePlan_RevenueService SpecializedChannel_SalePlan_RevenueService)
+        private IRD_Region_PlanService RD_Region_PlanService;
+
+        private IRD_SaleChannel_PlanService RD_SaleChannel_PlanService;
+
+        private IRD_Customer_PlanService RD_Customer_PlanService;
+
+        public SpecializedChannel_SalePlan_RevenueController
+            (ISpecializedChannel_SalePlan_RevenueService SpecializedChannel_SalePlan_RevenueService,
+                IRD_Region_PlanService RD_Region_PlanService, 
+                IRD_SaleChannel_PlanService RD_SaleChannel_PlanService, 
+                IRD_Customer_PlanService RD_Customer_PlanService)
         {
             this.SpecializedChannel_SalePlan_RevenueService = SpecializedChannel_SalePlan_RevenueService;
+            this.RD_Region_PlanService = RD_Region_PlanService;
+            this.RD_SaleChannel_PlanService = RD_SaleChannel_PlanService;
+            this.RD_Customer_PlanService = RD_Customer_PlanService;
         }
 
         /*
@@ -144,6 +157,19 @@ namespace DW_Test.Rpc.RD_report.specialized_channel_sale_plan_revenue
                     return Ok();
                 }
             }
+        }
+
+        // API transform sang các bảng Fact của luồng ETL kế hoạch doanh thu
+        [HttpGet, Route(SpecializedChannel_SalePlan_RevenueRoute.Transform)]
+        public async Task<ActionResult> Transform()
+        {
+            await RD_Region_PlanService.Transform();
+
+            await RD_SaleChannel_PlanService.Transform();
+
+            await RD_Customer_PlanService.Transform();
+
+            return Ok();
         }
     }
 }
