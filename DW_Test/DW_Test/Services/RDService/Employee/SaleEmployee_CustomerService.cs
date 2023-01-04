@@ -1,4 +1,5 @@
-﻿using DW_Test.HashModels;
+﻿using DocumentFormat.OpenXml.Drawing.ChartDrawing;
+using DW_Test.HashModels;
 using DW_Test.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -26,6 +27,7 @@ namespace DW_Test.Services.RDService.Employee
             this.DataContext = DataContext;
         }
 
+        // Insert dữ liệu vào bảng Raw_SaleEmployee_Customer
         public async Task<bool> CustomerInit(List<Raw_SaleEmployee_CustomerDAO> Remote)
         {
             List<Raw_SaleEmployee_CustomerDAO> Local = await DataContext.Raw_SaleEmployee_Customer.ToListAsync();
@@ -48,18 +50,7 @@ namespace DW_Test.Services.RDService.Employee
 
             if (Local.Count == 0)
             {
-                foreach (var remote in Remote)
-                {
-                    Local.Add(new Raw_SaleEmployee_CustomerDAO()
-                    {
-                        MaKH = remote.MaKH,
-                        TenKH = remote.TenKH,
-                        MaNV = remote.MaNV,
-                        TenNV = remote.TenNV
-                    });
-                }
-
-                await DataContext.BulkMergeAsync(Local);
+                await DataContext.BulkMergeAsync(Remote);
             }
             else
             {
@@ -149,6 +140,7 @@ namespace DW_Test.Services.RDService.Employee
             return true;
         }
 
+        // Init dữ liệu vào bảng Raw_SaleEmployee
         public async Task<bool> SaleEmployeeInit(List<Raw_SaleEmployeeDAO> Remote)
         {
             List<Raw_SaleEmployeeDAO> Local = await DataContext.Raw_SaleEmployee.ToListAsync();
@@ -167,16 +159,7 @@ namespace DW_Test.Services.RDService.Employee
 
             if (Local.Count == 0)
             {
-                foreach (var remote in Remote)
-                {
-                    Local.Add(new Raw_SaleEmployeeDAO()
-                    {
-                        MaNV = remote.MaNV,
-                        TenNV = remote.TenNV
-                    });
-                }
-
-                await DataContext.BulkMergeAsync(Local);
+                await DataContext.BulkMergeAsync(Remote);
             }
             else
             {
@@ -253,9 +236,13 @@ namespace DW_Test.Services.RDService.Employee
                 await DataContext.BulkMergeAsync(UpdateList);
             }
 
+
+            await Transform();
+
             return true;
         }
 
+        // Transform dữ liệu từ các bảng Raw vào các bảng Dim dưới đây
         public async Task Transform()
         {
             await Build_Dim_RD_Customer();
@@ -265,7 +252,8 @@ namespace DW_Test.Services.RDService.Employee
             await Build_Dim_RD_CustomerEmployeeMapping();
         }
 
-        public async Task<bool> Build_Dim_RD_Customer()
+        // Transform dữ liệu sang bảng Dim_RD_Customer
+        private async Task<bool> Build_Dim_RD_Customer()
         {
             List<Raw_SaleEmployee_CustomerDAO> Raw_SaleEmployee_CustomerDAOs = await DataContext
                 .Raw_SaleEmployee_Customer.Where(x => !string.IsNullOrEmpty(x.MaKH)).ToListAsync();
@@ -374,14 +362,15 @@ namespace DW_Test.Services.RDService.Employee
             return true;
         }
 
-        public async Task<bool> Build_Dim_SaleEmployee()
+        // Transform dữ liệu sang bảng Dim_SaleEmployee
+        private async Task<bool> Build_Dim_SaleEmployee()
         {
-            List<Raw_SaleEmployee_CustomerDAO> Raw_SaleEmployee_CustomerDAOs = await DataContext
-                .Raw_SaleEmployee_Customer.Where(x => !string.IsNullOrEmpty(x.MaNV)).ToListAsync();
+            List<Raw_SaleEmployeeDAO> Raw_SaleEmployeeDAOs = await DataContext
+                .Raw_SaleEmployee.Where(x => !string.IsNullOrEmpty(x.MaNV)).ToListAsync();
 
             List<Dim_SaleEmployeeDAO> Local = await DataContext.Dim_SaleEmployee.ToListAsync();
 
-            Raw_SaleEmployee_CustomerDAOs = Raw_SaleEmployee_CustomerDAOs.OrderBy(x => x.MaNV).ToList();
+            Raw_SaleEmployeeDAOs = Raw_SaleEmployeeDAOs.OrderBy(x => x.MaNV).ToList();
 
             Local = Local.OrderBy(x => x.EmployeeCode).ToList();
 
@@ -395,7 +384,7 @@ namespace DW_Test.Services.RDService.Employee
 
             if (Local.Count == 0)
             {
-                foreach (var employee in Raw_SaleEmployee_CustomerDAOs)
+                foreach (var employee in Raw_SaleEmployeeDAOs)
                 {
                     Local.Add(new Dim_SaleEmployeeDAO()
                     {
@@ -408,33 +397,33 @@ namespace DW_Test.Services.RDService.Employee
             }
             else
             {
-                for (int j = 0; j < Raw_SaleEmployee_CustomerDAOs.Count && index < Local.Count;)
+                for (int j = 0; j < Raw_SaleEmployeeDAOs.Count && index < Local.Count;)
                 {
-                    if (CompareMethod.Compare(Raw_SaleEmployee_CustomerDAOs[j].MaNV, Local[index].EmployeeCode) < 0)
+                    if (CompareMethod.Compare(Raw_SaleEmployeeDAOs[j].MaNV, Local[index].EmployeeCode) < 0)
                     {
                         InsertList.Add(new Dim_SaleEmployeeDAO()
                         {
-                            EmployeeCode = Raw_SaleEmployee_CustomerDAOs[j].MaNV,
-                            EmployeeName = Raw_SaleEmployee_CustomerDAOs[j].TenNV
+                            EmployeeCode = Raw_SaleEmployeeDAOs[j].MaNV,
+                            EmployeeName = Raw_SaleEmployeeDAOs[j].TenNV
                         });
 
                         j++;
                     }
-                    else if (CompareMethod.Compare(Raw_SaleEmployee_CustomerDAOs[j].MaNV, Local[index].EmployeeCode) == 0)
+                    else if (CompareMethod.Compare(Raw_SaleEmployeeDAOs[j].MaNV, Local[index].EmployeeCode) == 0)
                     {
-                        if (Raw_SaleEmployee_CustomerDAOs[j].TenNV != Local[index].EmployeeName)
+                        if (Raw_SaleEmployeeDAOs[j].TenNV != Local[index].EmployeeName)
                         {
                             UpdateList.Add(new Dim_SaleEmployeeDAO()
                             {
                                 EmployeeCode = Local[index].EmployeeCode,
-                                EmployeeName = Raw_SaleEmployee_CustomerDAOs[j].TenNV
+                                EmployeeName = Raw_SaleEmployeeDAOs[j].TenNV
                             });
                         }
                         j++;
 
                         index++;
                     }
-                    else if (CompareMethod.Compare(Raw_SaleEmployee_CustomerDAOs[j].MaNV, Local[index].EmployeeCode) > 0)
+                    else if (CompareMethod.Compare(Raw_SaleEmployeeDAOs[j].MaNV, Local[index].EmployeeCode) > 0)
                     {
                         DeleteList.Add(new Dim_SaleEmployeeDAO()
                         {
@@ -447,14 +436,14 @@ namespace DW_Test.Services.RDService.Employee
                     }
                 }
 
-                if (index == Local.Count && Raw_SaleEmployee_CustomerDAOs.Last().MaNV != Local.Last().EmployeeCode)
+                if (index == Local.Count && Raw_SaleEmployeeDAOs.Last().MaNV != Local.Last().EmployeeCode)
                 {
-                    while (index < Raw_SaleEmployee_CustomerDAOs.Count)
+                    while (index < Raw_SaleEmployeeDAOs.Count)
                     {
                         InsertList.Add(new Dim_SaleEmployeeDAO()
                         {
-                            EmployeeCode = Raw_SaleEmployee_CustomerDAOs[index].MaNV,
-                            EmployeeName = Raw_SaleEmployee_CustomerDAOs[index].TenNV
+                            EmployeeCode = Raw_SaleEmployeeDAOs[index].MaNV,
+                            EmployeeName = Raw_SaleEmployeeDAOs[index].TenNV
                         });
 
                         index++;
@@ -483,7 +472,8 @@ namespace DW_Test.Services.RDService.Employee
             return true;
         }
 
-        public async Task<bool> Build_Dim_RD_CustomerEmployeeMapping()
+        // Transform dữ liệu sang bảng Dim_RD_CustomerEmployeeMapping
+        private async Task<bool> Build_Dim_RD_CustomerEmployeeMapping()
         {
             List<Dim_RD_CustomerDAO> Dim_RD_CustomerDAOs = await DataContext.Dim_RD_Customer.ToListAsync();
 

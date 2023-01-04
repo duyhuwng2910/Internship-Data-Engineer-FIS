@@ -25,6 +25,7 @@ namespace DW_Test.Services.RDService.Specialized_channel
             this.DataContext = DataContext;
         }
 
+        // Init dữ liệu vào bảng Raw_SpecializedChannel
         public async Task<bool> Init(List<Raw_SpecializedChannelDAO> Remote)
         {
             List<Raw_SpecializedChannelDAO> Local = await DataContext.Raw_SpecializedChannel.ToListAsync();
@@ -47,17 +48,7 @@ namespace DW_Test.Services.RDService.Specialized_channel
 
             if (Local.Count == 0)
             {
-                foreach(var remote in Remote)
-                {
-                    Local.Add(new Raw_SpecializedChannelDAO()
-                    {
-                        TenMien = remote.TenMien,
-                        TenKenh = remote.TenKenh,
-                        SPC1 = remote.SPC1
-                    });
-                }
-
-                await DataContext.BulkMergeAsync(Local);
+                await DataContext.BulkMergeAsync(Remote);
             }
             else
             {
@@ -139,9 +130,12 @@ namespace DW_Test.Services.RDService.Specialized_channel
                 await DataContext.BulkMergeAsync(UpdateList);
             }
 
+            await Transform();
+
             return true;
         }
 
+        // Transform dữ liệu từ các bảng Raw vào các bảng Dim sau
         public async Task Transform()
         {
             await Build_Dim_RD_SaleChannel();
@@ -153,6 +147,7 @@ namespace DW_Test.Services.RDService.Specialized_channel
             await Build_Dim_ProductSaleChannelMapping();
         }
 
+        // Transform dữ liệu sang bảng Dim_RD_SaleChannel
         public async Task<bool> Build_Dim_RD_SaleChannel()
         {
             List<Raw_SpecializedChannelDAO> SpecializedChannelDAOs = await DataContext.Raw_SpecializedChannel.ToListAsync();
@@ -170,7 +165,7 @@ namespace DW_Test.Services.RDService.Specialized_channel
                 }
             }
 
-            List<Dim_RD_SaleChannelDAO> Local = new List<Dim_RD_SaleChannelDAO>();
+            List<Dim_RD_SaleChannelDAO> Local = await DataContext.Dim_RD_SaleChannel.ToListAsync();
 
             Remote = Remote.OrderBy(x => x.SaleChannelName).ToList();
 
@@ -184,15 +179,7 @@ namespace DW_Test.Services.RDService.Specialized_channel
 
             if (Local.Count == 0)
             {
-                foreach (var remote in Remote)
-                {
-                    Local.Add(new Dim_RD_SaleChannelDAO()
-                    {
-                        SaleChannelName = remote.SaleChannelName
-                    });
-                }
-
-                await DataContext.BulkMergeAsync(Local);
+                await DataContext.BulkMergeAsync(Remote);
             }
             else
             {
@@ -258,6 +245,7 @@ namespace DW_Test.Services.RDService.Specialized_channel
             return true;
         }
 
+        // Transform dữ liệu sang bảng Dim_Region
         public async Task<bool> Build_Dim_Region()
         {
             List<Raw_SpecializedChannelDAO> SpecializedChannelDAOs = await DataContext.Raw_SpecializedChannel.ToListAsync();
@@ -275,7 +263,7 @@ namespace DW_Test.Services.RDService.Specialized_channel
                 }
             }
 
-            List<Dim_RegionDAO> Local = new List<Dim_RegionDAO>();
+            List<Dim_RegionDAO> Local = await DataContext.Dim_Region.ToListAsync();
 
             Remote = Remote.OrderBy(x => x.RegionName).ToList();
 
@@ -289,15 +277,7 @@ namespace DW_Test.Services.RDService.Specialized_channel
 
             if (Local.Count == 0)
             {
-                foreach (var remote in Remote)
-                {
-                    Local.Add(new Dim_RegionDAO()
-                    {
-                        RegionName = remote.RegionName
-                    });
-                }
-
-                await DataContext.BulkMergeAsync(Local);
+                await DataContext.BulkMergeAsync(Remote);
             }
             else
             {
@@ -363,6 +343,7 @@ namespace DW_Test.Services.RDService.Specialized_channel
             return true;
         }
 
+        // Transform dữ liệu sang bảng Dim_SpecializedChannelMapping 
         public async Task<bool> Build_Dim_SpecializedChannelMapping()
         {
             List<Raw_SpecializedChannelDAO> SpecializedChannelDAOs = await DataContext.Raw_SpecializedChannel.ToListAsync();
@@ -402,16 +383,7 @@ namespace DW_Test.Services.RDService.Specialized_channel
 
             if (Local.Count == 0)
             {
-                foreach (var remote in Remote)
-                {
-                    Local.Add(new Dim_SpecializedChannelMappingDAO()
-                    {
-                        RegionId = remote.RegionId,
-                        SaleChannelId = remote.SaleChannelId
-                    });
-                }
-
-                await DataContext.BulkMergeAsync(Local);
+                await DataContext.BulkMergeAsync(Remote);
             }
             else
             {
@@ -492,6 +464,7 @@ namespace DW_Test.Services.RDService.Specialized_channel
             return true;
         }
 
+        // Transform dữ liệu sang bảng Dim_ProductSaleChannelMapping
         public async Task<bool> Build_Dim_ProductSaleChannelMapping()
         {
             List<Raw_SpecializedChannelDAO> SpecializedChannelDAOs = await DataContext.Raw_SpecializedChannel.ToListAsync();
@@ -531,16 +504,7 @@ namespace DW_Test.Services.RDService.Specialized_channel
 
             if (Local.Count == 0)
             {
-                foreach (var remote in Remote)
-                {
-                    Local.Add(new Dim_ProductSaleChannelMappingDAO()
-                    {
-                        ItemGroupLevel1Id = remote.ItemGroupLevel1Id,
-                        SaleChannelId = remote.SaleChannelId
-                    });
-                }
-
-                await DataContext.BulkMergeAsync(Local);
+                await DataContext.BulkMergeAsync(Remote);
             }
             else
             {

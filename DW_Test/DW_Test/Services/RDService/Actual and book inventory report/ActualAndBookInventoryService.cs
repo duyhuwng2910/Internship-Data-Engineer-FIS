@@ -33,31 +33,7 @@ namespace DW_Test.Services.RDService.ActualAndBookInventoryService
 
             if (Raw_A009LocalDAOs.Count == 0)
             {
-                foreach (var remote in Raw_A009RemoteDAOs)
-                {
-                    Raw_A009LocalDAOs.Add(new Models.Raw_A009DAO()
-                    {
-                        Nhom_SP = remote.Nhom_SP,
-                        Loai_SP = remote.Loai_SP,
-                        TenThuKho = remote.TenThuKho,
-                        ItemCode = remote.ItemCode,
-                        ItemName = remote.ItemName,
-                        Nhap = remote.Nhap,
-                        NhapLKThang = remote.NhapLKThang,
-                        XuatChungTu = remote.XuatChungTu,
-                        XuatChungTuLKThang = remote.XuatChungTuLKThang,
-                        ThucXuat = remote.ThucXuat,
-                        ThucXuatLKThang = remote.ThucXuatLKThang,
-                        XuatBan = remote.XuatBan,
-                        XuatBanLKThang = remote.XuatBanLKThang,
-                        TonChungTu = remote.TonChungTu,
-                        TonThucTe = remote.TonThucTe,
-                        HangGui = remote.HangGui,
-                        WhsCode = remote.WhsCode,
-                    });
-                }
-
-                await DataContext.BulkMergeAsync(Raw_A009LocalDAOs);
+                await DataContext.BulkMergeAsync(Raw_A009RemoteDAOs);
             }
             else
             {

@@ -77,7 +77,6 @@ namespace DW_Test.Services.RDService.Consignment_report
                         P0018_GiaLeNiemYet = remote.P0018_GiaLeNiemYet
                     });
                 }
-
                 await DataContext.BulkMergeAsync(Raw_A012LocalDAOs);
             }
             else

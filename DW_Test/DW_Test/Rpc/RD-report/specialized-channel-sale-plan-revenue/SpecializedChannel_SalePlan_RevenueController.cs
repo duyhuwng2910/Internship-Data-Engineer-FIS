@@ -1,4 +1,5 @@
-﻿using DW_Test.Models;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using DW_Test.Models;
 using DW_Test.Services.RDService.Specialized_channel_sale_plan_revenue;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -35,20 +36,18 @@ namespace DW_Test.Rpc.RD_report.specialized_channel_sale_plan_revenue
         /*
          * Hàm bool kiểm tra xem bảng doanh thu có đang bị bỏ trống không
          */
-        public bool CheckNullObjectRevenue(string TenMien, string TenKenh, string MaKH, string TenKH)
+        public bool CheckNullObjectRevenue(Raw_SpecializedChannel_SalePlan_RevenueDAO row)
         {
-            return String.IsNullOrWhiteSpace(TenMien)
-                && String.IsNullOrWhiteSpace(TenKenh)
-                && String.IsNullOrWhiteSpace(MaKH)
-                && String.IsNullOrWhiteSpace(TenKH);
+            return String.IsNullOrWhiteSpace(row.TenMien)
+                && String.IsNullOrWhiteSpace(row.TenKenh)
+                && String.IsNullOrWhiteSpace(row.MaKH)
+                && String.IsNullOrWhiteSpace(row.TenKH);
         }
 
-        [HttpPost, Route(SpecializedChannel_SalePlan_RevenueRoute.Init)]
+        [HttpPost, Route(SpecializedChannel_SalePlan_RevenueRoute.Import)]
         public async Task<ActionResult> SalePlan_RevenueUpExcel(IFormFile file)
         {
-            List<Raw_SpecializedChannel_SalePlan_RevenueDAO>
-                    SpecializedChannel_SalePlan_RevenueRemoteDAOs
-                    = new List<Raw_SpecializedChannel_SalePlan_RevenueDAO>();
+            List<Raw_SpecializedChannel_SalePlan_RevenueDAO> Remote = new List<Raw_SpecializedChannel_SalePlan_RevenueDAO>();
 
             // sử dụng biến stream cục bộ trong hàm
             using (var stream = new MemoryStream())
@@ -84,23 +83,23 @@ namespace DW_Test.Rpc.RD_report.specialized_channel_sale_plan_revenue
                         }
 
                         int TenMien = StartColumn + ColumnNameList.IndexOf("Tên Miền");
-                        int TenKenh = StartColumn + ColumnNameList.IndexOf("Kênh bán");
+                        int TenKenh = StartColumn + ColumnNameList.IndexOf("Kênh Bán");
                         int MaKH = StartColumn + ColumnNameList.IndexOf("Mã KH");
-                        int TenKH = StartColumn + ColumnNameList.IndexOf("Tên KH");
+                        int TenKH = StartColumn + ColumnNameList.IndexOf("TênKH");
                         int KHNam = StartColumn + ColumnNameList.IndexOf("KH Năm");
                         int KHQ1 = StartColumn + ColumnNameList.IndexOf("KH Quý 1");
                         int KHQ2 = StartColumn + ColumnNameList.IndexOf("KH Quý 2");
                         int KHQ3 = StartColumn + ColumnNameList.IndexOf("KH Quý 3");
                         int KHQ4 = StartColumn + ColumnNameList.IndexOf("KH Quý 4");
-                        int T01 = StartColumn + ColumnNameList.IndexOf("KH Tháng 1");
-                        int T02 = StartColumn + ColumnNameList.IndexOf("KH Tháng 2");
-                        int T03 = StartColumn + ColumnNameList.IndexOf("KH Tháng 3");
-                        int T04 = StartColumn + ColumnNameList.IndexOf("KH Tháng 4");
-                        int T05 = StartColumn + ColumnNameList.IndexOf("KH Tháng 5");
-                        int T06 = StartColumn + ColumnNameList.IndexOf("KH Tháng 6");
-                        int T07 = StartColumn + ColumnNameList.IndexOf("KH Tháng 7");
-                        int T08 = StartColumn + ColumnNameList.IndexOf("KH Tháng 8");
-                        int T09 = StartColumn + ColumnNameList.IndexOf("KH Tháng 9");
+                        int T01 = StartColumn + ColumnNameList.IndexOf("KH Tháng 01");
+                        int T02 = StartColumn + ColumnNameList.IndexOf("KH Tháng 02");
+                        int T03 = StartColumn + ColumnNameList.IndexOf("KH Tháng 03");
+                        int T04 = StartColumn + ColumnNameList.IndexOf("KH Tháng 04");
+                        int T05 = StartColumn + ColumnNameList.IndexOf("KH Tháng 05");
+                        int T06 = StartColumn + ColumnNameList.IndexOf("KH Tháng 06");
+                        int T07 = StartColumn + ColumnNameList.IndexOf("KH Tháng 07");
+                        int T08 = StartColumn + ColumnNameList.IndexOf("KH Tháng 08");
+                        int T09 = StartColumn + ColumnNameList.IndexOf("KH Tháng 09");
                         int T10 = StartColumn + ColumnNameList.IndexOf("KH Tháng 10");
                         int T11 = StartColumn + ColumnNameList.IndexOf("KH Tháng 11");
                         int T12 = StartColumn + ColumnNameList.IndexOf("KH Tháng 12");
@@ -108,23 +107,7 @@ namespace DW_Test.Rpc.RD_report.specialized_channel_sale_plan_revenue
                         // Vòng lặp để insert dữ liệu trên mỗi dòng
                         for (int row = StartRow + 1; row <= worksheet.Dimension.End.Row; row++)
                         {
-                            string RegionName = worksheet.Cells[row, TenMien].Value?.ToString();
-                            string ChannelName = worksheet.Cells[row, TenKenh].Value?.ToString();
-                            string CustomerCode = worksheet.Cells[row, MaKH].Value?.ToString();
-                            string CustomerName = worksheet.Cells[row, TenKH].Value?.ToString();
-
-                            if (CheckNullObjectRevenue(RegionName, ChannelName, CustomerCode, CustomerName)) {
-                                if (row == worksheet.Dimension.End.Row)
-                                {
-                                    break;
-                                }
-                                else
-                                {
-                                    return BadRequest($"Lỗi tại dòng {row} không có dữ liệu");
-                                }
-                            }
-
-                            Raw_SpecializedChannel_SalePlan_RevenueDAO SalePlan_RevenueDAO = new Raw_SpecializedChannel_SalePlan_RevenueDAO()
+                            Raw_SpecializedChannel_SalePlan_RevenueDAO remote = new Raw_SpecializedChannel_SalePlan_RevenueDAO()
                             {
                                 Nam = Year,
                                 TenMien = worksheet.Cells[row, TenMien].Value?.ToString(),
@@ -149,10 +132,19 @@ namespace DW_Test.Rpc.RD_report.specialized_channel_sale_plan_revenue
                                 KHThang11 = decimal.TryParse(worksheet.Cells[row, T11].Value?.ToString(), out decimal t11) ? t11 : 0,
                                 KHThang12 = decimal.TryParse(worksheet.Cells[row, T12].Value?.ToString(), out decimal t12) ? t12 : 0,
                             };
+
+                            if (CheckNullObjectRevenue(remote)) {
+                                if (row == worksheet.Dimension.End.Row)
+                                {
+                                    break;
+                                }
+                            }
+
+                            Remote.Add(remote);
                         }
                     }
 
-                    await SpecializedChannel_SalePlan_RevenueService.Init(SpecializedChannel_SalePlan_RevenueRemoteDAOs);
+                    await SpecializedChannel_SalePlan_RevenueService.Init(Remote);
 
                     return Ok();
                 }

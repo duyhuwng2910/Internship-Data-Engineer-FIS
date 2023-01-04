@@ -20,6 +20,7 @@ namespace DW_Test.Services.RDService.Specialized_channel_sale_plan_revenue
             this.DataContext = DataContext;
         }
 
+        // Transform dữ liệu từ bảng Raw_SpecializedChannel_SalePlan_Revenue sang các bảng Fact sau
         public async Task Transform()
         {
             await Build_Fact_RD_Customer_MonthPlan();
@@ -29,6 +30,7 @@ namespace DW_Test.Services.RDService.Specialized_channel_sale_plan_revenue
             await Build_Fact_RD_Customer_YearPlan();
         }
 
+        // Transform dữ liệu sang bảng Fact_RD_Customer_MonthPlan
         private async Task<bool> Build_Fact_RD_Customer_MonthPlan()
         {
             List<Raw_SpecializedChannel_SalePlan_RevenueDAO> Raw_SalePlan_RevenueDAOs
@@ -112,7 +114,8 @@ namespace DW_Test.Services.RDService.Specialized_channel_sale_plan_revenue
 
             return true;
         }
-
+        
+        // Transform dữ liệu sang bảng Fact_RD_Customer_QuarterPlan
         private async Task<bool> Build_Fact_RD_Customer_QuarterPlan()
         {
             List<Raw_SpecializedChannel_SalePlan_RevenueDAO> Raw_SalePlan_RevenueDAOs =
@@ -171,6 +174,7 @@ namespace DW_Test.Services.RDService.Specialized_channel_sale_plan_revenue
             return true;
         }
 
+        // Transform dữ liệu sang bảng Fact_RD_Customer_YearPlan
         private async Task<bool> Build_Fact_RD_Customer_YearPlan()
         {
             List<Raw_SpecializedChannel_SalePlan_RevenueDAO> Raw_SalePlan_RevenueDAOs =

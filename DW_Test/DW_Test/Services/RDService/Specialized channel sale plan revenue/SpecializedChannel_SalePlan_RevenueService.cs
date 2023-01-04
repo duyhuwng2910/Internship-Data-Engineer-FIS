@@ -21,6 +21,7 @@ namespace DW_Test.Services.RDService.Specialized_channel_sale_plan_revenue
             this.DataContext = DataContext;
         }
 
+        // Init dữ liệu vào bảng Raw
         public async Task<bool> Init(List<Raw_SpecializedChannel_SalePlan_RevenueDAO> Remote)
         {
             List<Raw_SpecializedChannel_SalePlan_RevenueDAO> Local =
@@ -46,36 +47,7 @@ namespace DW_Test.Services.RDService.Specialized_channel_sale_plan_revenue
 
             if (Local.Count == 0)
             {
-                foreach (var remote in Remote)
-                {
-                    Local.Add(new Raw_SpecializedChannel_SalePlan_RevenueDAO()
-                    {
-                        TenMien = remote.TenMien,
-                        TenKenh = remote.TenKenh,
-                        MaKH = remote.MaKH,
-                        TenKH = remote.TenKH,
-                        KHNam = remote.KHNam,
-                        KHQuy1 = remote.KHQuy1,
-                        KHQuy2 = remote.KHQuy2,
-                        KHQuy3 = remote.KHQuy3,
-                        KHQuy4 = remote.KHQuy4,
-                        KHThang1 = remote.KHThang1,
-                        KHThang2 = remote.KHThang2,
-                        KHThang3 = remote.KHThang3,
-                        KHThang4 = remote.KHThang4,
-                        KHThang5 = remote.KHThang5,
-                        KHThang6 = remote.KHThang6,
-                        KHThang7 = remote.KHThang7,
-                        KHThang8 = remote.KHThang8,
-                        KHThang9 = remote.KHThang9,
-                        KHThang10 = remote.KHThang10,
-                        KHThang11 = remote.KHThang11,
-                        KHThang12 = remote.KHThang12,
-                        Nam = remote.Nam,
-                    });
-                }
-
-                await DataContext.BulkMergeAsync(Local);
+                await DataContext.BulkMergeAsync(Remote);
             }
             else
             {
@@ -113,7 +85,7 @@ namespace DW_Test.Services.RDService.Specialized_channel_sale_plan_revenue
                     }
                     else if (CompareMethod.Compare(HashRemote[j].Key, HashLocal[index].Key) == 0)
                     {
-                        if (HashRemote[j].Value != HashLocal[index].Value) 
+                        if (HashRemote[j].Value != HashLocal[index].Value)
                         {
                             UpdateList.Add(new Raw_SpecializedChannel_SalePlan_RevenueDAO()
                             {
@@ -182,7 +154,7 @@ namespace DW_Test.Services.RDService.Specialized_channel_sale_plan_revenue
 
                 if (index == HashLocal.Count && HashRemote.Last().Key != HashLocal.Last().Key)
                 {
-                    while (index < HashRemote.Count) 
+                    while (index < HashRemote.Count)
                     {
                         InsertList.Add(new Raw_SpecializedChannel_SalePlan_RevenueDAO()
                         {

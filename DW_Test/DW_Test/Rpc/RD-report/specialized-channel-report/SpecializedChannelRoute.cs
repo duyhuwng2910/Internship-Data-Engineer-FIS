@@ -4,7 +4,7 @@
     {
         public const string Default = Rpc + Module + "/specialized-channel";
 
-        public const string Init = Default + "/init";
+        public const string Import = Default + "/import";
 
         public const string Transform = Default + "/transform";
     }

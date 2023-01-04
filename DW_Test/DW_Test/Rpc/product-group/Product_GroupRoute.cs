@@ -2,7 +2,7 @@
 {
     public class Product_GroupRoute : Root
     {
-        private const string Default = Rpc + Module + "product-group-report";
+        private const string Default = Rpc + Module + "/product-group-report";
 
         public const string Init = Default + "/init";
 

@@ -4,7 +4,7 @@
     {
         public const string Default = Rpc + Module + "/sale-employee-customer";
 
-        public const string SaleEmployeeInit = Default + "/sale-employee-init";
+        public const string Import = Default + "/sale-employee-init";
 
         public const string CustomerInit = Default + "/customer-init"; 
 

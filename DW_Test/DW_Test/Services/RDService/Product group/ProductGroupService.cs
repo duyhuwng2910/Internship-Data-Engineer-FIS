@@ -1,7 +1,6 @@
 ﻿using DW_Test.HashModels;
 using DW_Test.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,6 +23,7 @@ namespace DW_Test.Services.RDService.Product_group
             this.DataContext = DataContext;
         }
 
+        // Init dữ liệu vào bảng Raw_Product_ProductGroup
         public async Task<bool> Init(List<Raw_Product_ProductGroupDAO> Remote)
         {
             List<Raw_Product_ProductGroupDAO> Local = await DataContext.Raw_Product_ProductGroup.ToListAsync();
@@ -46,21 +46,7 @@ namespace DW_Test.Services.RDService.Product_group
 
             if (Local.Count == 0)
             {
-                foreach (var remote in Remote)
-                {
-                    Local.Add(new Raw_Product_ProductGroupDAO()
-                    {
-                        MaSP = remote.MaSP,
-                        TenSP = remote.TenSP,
-                        SPC1 = remote.SPC1,
-                        SPC2 = remote.SPC2,
-                        CongSuat = remote.CongSuat,
-                        NhietDoMau = remote.NhietDoMau,
-                        ChatLuong = remote.ChatLuong,
-                    });
-                }
-
-                await DataContext.BulkMergeAsync(Local);
+                await DataContext.BulkMergeAsync(Remote);
             }
             else
             {
@@ -162,9 +148,12 @@ namespace DW_Test.Services.RDService.Product_group
                 await DataContext.BulkMergeAsync(UpdateList);
             }
 
+            await Transform();
+
             return true;
         }
 
+        // Transform dữ liệu từ các bảng Raw vào các bảng Dim dưới đây
         public async Task Transform()
         {
             await Build_Dim_RD_Item();
@@ -176,9 +165,10 @@ namespace DW_Test.Services.RDService.Product_group
             await Build_Dim_ProductMapping();
         }
 
+        // Transform dữ liệu vào bảng Dim_RD_Item
         public async Task<bool> Build_Dim_RD_Item()
         {
-            List<Raw_Product_ProductGroupDAO> ProductGroupDAOs = 
+            List<Raw_Product_ProductGroupDAO> ProductGroupDAOs =
                 await DataContext.Raw_Product_ProductGroup.ToListAsync();
 
             List<Dim_ItemDAO> Dim_ItemDAOs = await DataContext.Dim_Item.ToListAsync();
@@ -203,7 +193,7 @@ namespace DW_Test.Services.RDService.Product_group
                         Quality = product.ChatLuong,
                         Performance = product.CongSuat,
                         LightColor = product.NhietDoMau,
-                        UnitPrice = decimal.Parse(raw.P0003_GiaC1MN)
+                        UnitPrice = decimal.TryParse(raw.P0003_GiaC1MN.ToString(), out decimal price) ? price : 0
                     });
                 }
             }
@@ -228,21 +218,7 @@ namespace DW_Test.Services.RDService.Product_group
 
             if (Local.Count == 0)
             {
-                foreach (var remote in Remote)
-                {
-                    Local.Add(new Dim_RD_ItemDAO()
-                    {
-                        ItemId = remote.ItemId,
-                        ItemCode = remote.ItemCode,
-                        ItemName = remote.ItemName,
-                        Quality = remote.Quality,
-                        Performance = remote.Performance,
-                        LightColor = remote.LightColor,
-                        UnitPrice = remote.UnitPrice
-                    });
-                }
-
-                await DataContext.BulkMergeAsync(Local);
+                await DataContext.BulkMergeAsync(Remote);
             }
             else
             {
@@ -345,6 +321,7 @@ namespace DW_Test.Services.RDService.Product_group
             return true;
         }
 
+        // Transform dữ liệu vào bảng Dim_RD_ItemGroupLevel1
         public async Task<bool> Build_Dim_RD_ItemGroupLevel1()
         {
             List<Raw_Product_ProductGroupDAO> ProductGroupDAOs = await DataContext.Raw_Product_ProductGroup.ToListAsync();
@@ -376,15 +353,7 @@ namespace DW_Test.Services.RDService.Product_group
 
             if (Local.Count == 0)
             {
-                foreach (var remote in Remote)
-                {
-                    Local.Add(new Dim_RD_ItemGroupLevel1DAO()
-                    {
-                        ItemGroupLevel1Name = remote.ItemGroupLevel1Name
-                    });
-                }
-
-                await DataContext.BulkMergeAsync(Local);
+                await DataContext.BulkMergeAsync(Remote);
             }
             else
             {
@@ -450,6 +419,7 @@ namespace DW_Test.Services.RDService.Product_group
             return true;
         }
 
+        // Transform dữ liệu vào bảng Dim_RD_ItemGroupLevel2
         public async Task<bool> Build_Dim_RD_ItemGroupLevel2()
         {
             List<Raw_Product_ProductGroupDAO> ProductGroupDAOs = await DataContext.Raw_Product_ProductGroup.ToListAsync();
@@ -481,15 +451,7 @@ namespace DW_Test.Services.RDService.Product_group
 
             if (Local.Count == 0)
             {
-                foreach (var remote in Remote)
-                {
-                    Local.Add(new Dim_RD_ItemGroupLevel2DAO()
-                    {
-                        ItemGroupLevel2Name = remote.ItemGroupLevel2Name
-                    });
-                }
-
-                await DataContext.BulkMergeAsync(Local);
+                await DataContext.BulkMergeAsync(Remote);
             }
             else
             {
@@ -555,6 +517,7 @@ namespace DW_Test.Services.RDService.Product_group
             return true;
         }
 
+        // Transform dữ liệu vào bảng Dim_ProductMapping
         public async Task<bool> Build_Dim_ProductMapping()
         {
             List<Raw_Product_ProductGroupDAO> ProductGroupDAOs = await DataContext.Raw_Product_ProductGroup.ToListAsync();
@@ -567,7 +530,7 @@ namespace DW_Test.Services.RDService.Product_group
 
             List<Dim_ProductMappingDAO> Remote = new List<Dim_ProductMappingDAO>();
 
-            foreach(var product in ProductGroupDAOs)
+            foreach (var product in ProductGroupDAOs)
             {
                 var item = ItemDAOs.Where(x => x.ItemCode == product.MaSP).FirstOrDefault();
 
@@ -606,17 +569,7 @@ namespace DW_Test.Services.RDService.Product_group
 
             if (Local.Count == 0)
             {
-                foreach (var remote in Remote)
-                {
-                    Local.Add(new Dim_ProductMappingDAO()
-                    {
-                        ItemId = remote.ItemId,
-                        ItemGroupLevel1Id = remote.ItemGroupLevel1Id,
-                        ItemGroupLevel2Id = remote.ItemGroupLevel2Id
-                    });
-                }
-
-                await DataContext.BulkMergeAsync(Local);
+                await DataContext.BulkMergeAsync(Remote);
             }
             else
             {

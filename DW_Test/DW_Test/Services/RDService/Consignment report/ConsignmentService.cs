@@ -64,7 +64,6 @@ namespace DW_Test.Services.RDService.Consignment_report
                         WarehouseLevel2Name = remote.WarehouseLevel2Name
                     });
                 }
-
                 await DataContext.BulkMergeAsync(Local);
             }
             else
@@ -185,42 +184,7 @@ namespace DW_Test.Services.RDService.Consignment_report
 
             if (Raw_B003LocalDAOs.Count == 0)
             {
-                foreach (var remote in Raw_B003RemoteDAOs)
-                {
-                    Raw_B003LocalDAOs.Add(new Models.Raw_B003DAO()
-                    {
-                        DocEntry = remote.DocEntry,
-                        BPLName = remote.BPLName,
-                        LineNum = remote.LineNum,
-                        ItemCode = remote.ItemCode,
-                        Ten_HH = remote.Ten_HH,
-                        U_KM = remote.U_KM,
-                        Donvitinh = remote.Donvitinh,
-                        Soluong_gui = remote.Soluong_gui,
-                        Luongxuat = remote.Luongxuat,
-                        Conton = remote.Conton,
-                        DonGiaHoaDon = remote.DonGiaHoaDon,
-                        ThanhTien = remote.ThanhTien,
-                        Thuesuat = remote.Thuesuat,
-                        NgayHoaDon = remote.NgayHoaDon,
-                        KhoaHD = remote.KhoaHD,
-                        SoHD = remote.SoHD,
-                        Seri = remote.Seri,
-                        Kho = remote.Kho,
-                        U_Code = remote.U_Code,
-                        U_Description_vn = remote.U_Description_vn,
-                        Ma_KH = remote.Ma_KH,
-                        TenKH = remote.TenKH,
-                        TenKHLe = remote.TenKHLe,
-                        PhongBH = remote.PhongBH,
-                        Thukho = remote.Thukho,
-                        XN = remote.XN,
-                        Loai_NX = remote.Loai_NX,
-                        BP = remote.BP,
-                    });
-                }
-
-                await DataContext.BulkMergeAsync(Raw_B003LocalDAOs);
+                await DataContext.BulkMergeAsync(Raw_B003RemoteDAOs);
             }
             else
             {
@@ -456,13 +420,14 @@ namespace DW_Test.Services.RDService.Consignment_report
 
                 var warehouse = Dim_WarehouseDAOs.Where(x => x.WhsCode == raw.Kho).FirstOrDefault();
 
-                if (customer != null)
+                if (customer != null && item != null && warehouse != null)
                 {
                     Fact_Item_Whs_ConsignmentDAOs.Add(new Models.Fact_Item_Whs_ConsignmentDAO()
                     {
                         ItemId = item.ItemId,
                         WarehouseId = warehouse.WarehouseId,
                         Consignment = raw.Soluong_gui,
+                        CustomerId = customer.CustomerId
                     });
                 }
             }
