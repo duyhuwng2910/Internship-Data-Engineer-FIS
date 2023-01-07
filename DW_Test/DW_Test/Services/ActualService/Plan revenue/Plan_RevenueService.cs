@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TrueSight.Common;
 
-namespace DW_Test.Services.MPlan_RevenueService
+namespace DW_Test.Services.ActualService.Plan_RevenueService
 {
     public interface IPlan_RevenueService : IServiceScoped
     {

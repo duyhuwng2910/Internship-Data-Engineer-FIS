@@ -15,7 +15,7 @@ using Dim_ItemNewItemGroupDAO = DW_Test.Models.Dim_ItemNewItemGroupDAO;
 using Dim_ItemVATGroupDAO = DW_Test.Models.Dim_ItemVATGroupDAO;
 using Raw_B1_5_ActualExportReport_RepDAO = DW_Test.Models.Raw_B1_5_ActualExportReport_RepDAO;
 
-namespace DW_Test.Services.MActualService
+namespace DW_Test.Services.ActualService.ActualService
 {
     public interface IActualService : IServiceScoped
     {

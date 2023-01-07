@@ -1,5 +1,5 @@
 ﻿using DW_Test.Models;
-using DW_Test.Services.MProduct_GroupService;
+using DW_Test.Services.ActualSerivce.Product_GroupService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
@@ -79,13 +79,13 @@ namespace DW_Test.Rpc.product_group
                         Raw_Product_GroupDAO.NhomC3 = worksheet.Cells[row, NhomC3].Value?.ToString();
                         Raw_Product_GroupDAO.Nhom_LEDSMRT1 = worksheet.Cells[row, Nhom_LEDSMRT1].Value?.ToString();
                         Raw_Product_GroupDAO.Nhom_SMARTDONLE = worksheet.Cells[row, Nhom_SMARTDONLE].Value?.ToString();
-                        
-                        Raw_Product_GroupDAO.M_StartDate = DateTime.TryParseExact(worksheet.Cells[row, M_StartDate].Text.ToString(), "dd-MM-yyyy", 
+
+                        Raw_Product_GroupDAO.M_StartDate = DateTime.TryParseExact(worksheet.Cells[row, M_StartDate].Text.ToString(), "dd-MM-yyyy",
                             CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date1) ? (DateTime?)date1 : null;
-                        
+
                         Raw_Product_GroupDAO.M_EndDate = DateTime.TryParseExact(worksheet.Cells[row, M_EndDate].Text.ToString(), "dd-MM-yyyy",
                             CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date2) ? (DateTime?)date2 : null;
-                        
+
                         Raw_Product_GroupDAO.GTGT_StartDate = DateTime.TryParseExact(worksheet.Cells[row, GTGT_StartDate].Text.ToString(), "dd-MM-yyyy",
                             CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date3) ? (DateTime?)date3 : null;
 

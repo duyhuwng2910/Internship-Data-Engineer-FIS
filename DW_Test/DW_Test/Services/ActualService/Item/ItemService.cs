@@ -8,7 +8,7 @@ using TrueSight.Common;
 using Dim_ItemDAO = DW_Test.Models.Dim_ItemDAO;
 using Raw_Item_RepDAO = DW_Test.Models.Raw_Item_RepDAO;
 
-namespace DW_Test.Services.MItemService
+namespace DW_Test.Services.ActualService.ItemService
 {
     public interface IItemService : IServiceScoped
     {

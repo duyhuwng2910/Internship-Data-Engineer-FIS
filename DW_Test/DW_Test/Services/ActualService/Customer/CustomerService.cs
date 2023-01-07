@@ -14,7 +14,7 @@ using Dim_SaleChannelDAO = DW_Test.Models.Dim_SaleChannelDAO;
 using Dim_SaleRoomDAO = DW_Test.Models.Dim_SaleRoomDAO;
 using Raw_Customer_RepDAO = DW_Test.Models.Raw_Customer_RepDAO;
 
-namespace DW_Test.Services.MCustomerService
+namespace DW_Test.Services.ActualSerivce.CustomerService
 {
     public interface ICustomerService : IServiceScoped
     {

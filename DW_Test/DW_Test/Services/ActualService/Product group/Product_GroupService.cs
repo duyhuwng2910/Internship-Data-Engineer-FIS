@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TrueSight.Common;
 
-namespace DW_Test.Services.MProduct_GroupService
+namespace DW_Test.Services.ActualSerivce.Product_GroupService
 {
     public interface IProduct_GroupService : IServiceScoped
     {
